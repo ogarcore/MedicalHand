@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "818500504209",
+    "project_id": "medicalhand-f2fd3",
+    "storage_bucket": "medicalhand-f2fd3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:818500504209:android:598abc7d1a4075fbcc8d30",
+        "android_client_info": {
+          "package_name": "com.example.p_hn25"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBW1cOuEUXKHXd6qF9Od69v2mZBdxvFZjo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
