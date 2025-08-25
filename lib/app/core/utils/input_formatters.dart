@@ -5,7 +5,6 @@ class CedulaInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
-    // Obtenemos el texto sin guiones para procesarlo
     String rawText = newValue.text.replaceAll('-', '');
     String filteredText = '';
 
@@ -14,13 +13,11 @@ class CedulaInputFormatter extends TextInputFormatter {
         if (RegExp(r'^[0-9]$').hasMatch(rawText[i])) {
           filteredText += rawText[i];
         }
-      }
-      else if (i == 13) {
+      } else if (i == 13) {
         if (RegExp(r'^[a-zA-Z]$').hasMatch(rawText[i])) {
           filteredText += rawText[i];
         }
-      }
-      else {
+      } else {
         break;
       }
     }
@@ -43,7 +40,7 @@ class CedulaInputFormatter extends TextInputFormatter {
   }
 }
 
-// Formateador para Fechas (DD/MM/AAAA) -
+// Formateador para Fechas (DD/MM/AAAA)
 class DateInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
@@ -72,4 +69,27 @@ class DateInputFormatter extends TextInputFormatter {
       selection: TextSelection.collapsed(offset: newText.length),
     );
   }
+}
+
+// Formateador para Número de Celular (0000-0000)
+class PhoneInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    final digitsOnly = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+    var newText = '';
+
+    if (digitsOnly.length > 4) {
+      newText = '${digitsOnly.substring(0, 4)}-${digitsOnly.substring(4, digitsOnly.length > 8 ? 8 : digitsOnly.length)}';
+    } else {
+      newText = digitsOnly;
+    }
+
+    return TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newText.length),
+    );
+  }
+
+  
 }

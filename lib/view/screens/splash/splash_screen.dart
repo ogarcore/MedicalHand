@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:lottie/lottie.dart';
 import '../../../app/core/constants/app_colors.dart';
 import '../../../view_model/splash_view_model.dart';
+import '../home/home_screen.dart';
 import '../welcome/welcome_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -15,49 +17,71 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Llamamos a nuestra nueva función de inicialización
     _initializeApp();
   }
 
-  // Creamos una función async separada para manejar la lógica
   void _initializeApp() async {
-    final splashViewModel = Provider.of<SplashViewModel>(context, listen: false);
-    final navigator = Navigator.of(context);
-    await splashViewModel.handleStartupLogic();
+    final splashViewModel = Provider.of<SplashViewModel>(
+      context,
+      listen: false,
+    );
+
+    final String route = await splashViewModel.checkUserStatus();
+
     if (mounted) {
-      navigator.pushReplacement(
-        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
-      );
+      if (route == 'HOME') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.medical_services_outlined,
-              size: 100,
-              color: AppColors.primaryColor,
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'MedicalHand',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textColor,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [AppColors.primaryColor, AppColors.primaryColor],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/images/icono.png',
+                width: 150,
+                height: 130,
+                fit: BoxFit.contain,
               ),
-            ),
-            const SizedBox(height: 48),
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
-            ),
-          ],
+              Lottie.asset(
+                'assets/animation/loading.json',
+                width: 200,
+                height: 200,
+                repeat: true,
+                animate: true,
+                delegates: LottieDelegates(
+                  values: [
+                    ValueDelegate.color(
+                      const ['**'], 
+                      value:
+                          AppColors.accentColor, 
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

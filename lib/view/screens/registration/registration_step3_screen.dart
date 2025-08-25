@@ -4,40 +4,22 @@ import '../../widgets/custom_text_field.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/registration_progress_indicator.dart';
 import 'registration_step4_screen.dart';
+import '../../../app/core/utils/input_formatters.dart'; 
+import '../../../view_model/auth_view_model.dart';
+import 'package:provider/provider.dart'; 
 
-class RegistrationStep3Screen extends StatefulWidget {
+class RegistrationStep3Screen extends StatelessWidget {
   const RegistrationStep3Screen({super.key});
 
   @override
-  State<RegistrationStep3Screen> createState() =>
-      _RegistrationStep3ScreenState();
-}
-
-class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController addressController = TextEditingController();
-  final TextEditingController emergencyNameController =
-      TextEditingController();
-  final TextEditingController emergencyPhoneController =
-      TextEditingController();
-
-  @override
-  void dispose() {
-    phoneController.dispose();
-    addressController.dispose();
-    emergencyNameController.dispose();
-    emergencyPhoneController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
     final Size size = MediaQuery.of(context).size;
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        resizeToAvoidBottomInset: true, // 👈 ahora sí se ajusta al teclado
+        resizeToAvoidBottomInset: true, 
         body: Stack(
           children: [
             // Fondo con gradiente
@@ -136,18 +118,19 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                     const SizedBox(height: 24),
 
                     CustomTextField(
-                      controller: phoneController,
+                      controller: authViewModel.phoneController,
                       labelText: 'Número de Teléfono',
                       hintText: 'Ingrese su número de teléfono',
                       icon: Icons.phone_outlined,
+                      inputFormatters: [PhoneInputFormatter()],
                       keyboardType: TextInputType.phone,
                     ),
                     const SizedBox(height: 20),
 
                     CustomTextField(
-                      controller: addressController,
+                      controller: authViewModel.addressController,
                       labelText: 'Dirección de Domicilio',
-                      hintText: 'Managua, Nicaragua',
+                      hintText: 'Ingrese su dirección',
                       icon: Icons.home_outlined,
                     ),
                     const SizedBox(height: 30),
@@ -178,7 +161,7 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                     const SizedBox(height: 16),
 
                     CustomTextField(
-                      controller: emergencyNameController,
+                      controller: authViewModel.emergencyNameController,
                       labelText: 'Nombre del Contacto',
                       hintText: 'Ingrese el nombre del contacto',
                       icon: Icons.person_outline,
@@ -186,10 +169,11 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                     const SizedBox(height: 20),
 
                     CustomTextField(
-                      controller: emergencyPhoneController,
+                      controller: authViewModel.emergencyPhoneController,
                       labelText: 'Número de Teléfono ',
                       hintText: 'Ingresa el número del contacto',
                       icon: Icons.phone_outlined,
+                      inputFormatters: [PhoneInputFormatter()],
                       keyboardType: TextInputType.phone,
                     ),
                     const SizedBox(height: 50),

@@ -49,17 +49,10 @@ class ChronicDiseasesList extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Container(
-          height: 180,
+          height: 130,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(140),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            color: Colors.white.withAlpha(160),
           ),
           child: Scrollbar(
             child: ListView.builder(

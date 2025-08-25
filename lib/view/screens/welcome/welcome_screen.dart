@@ -20,7 +20,7 @@ class WelcomeScreen extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.primaryColor.withAlpha(50),
+                  AppColors.primaryColor.withAlpha(60),
                   AppColors.backgroundColor,
                 ],
                 begin: Alignment.topCenter,
@@ -31,13 +31,13 @@ class WelcomeScreen extends StatelessWidget {
 
           // Círculos decorativos con sombras suaves
           Positioned(
-            top: -size.height * 0.18,
+            top: -size.height * 0.24,
             right: -size.width * 0.2,
             child: Container(
               width: size.width * 0.8,
               height: size.width * 0.8,
               decoration: BoxDecoration(
-                color: AppColors.primaryColor.withAlpha(15),
+                color: AppColors.primaryColor.withAlpha(8),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
@@ -56,11 +56,11 @@ class WelcomeScreen extends StatelessWidget {
               width: size.width * 0.65,
               height: size.width * 0.65,
               decoration: BoxDecoration(
-                color: AppColors.accentColor.withAlpha(25),
+                color: AppColors.secondaryColor.withAlpha(5),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.accentColor.withAlpha(100),
+                    color: AppColors.secondaryColor.withAlpha(100),
                     blurRadius: 50,
                     spreadRadius: 30,
                   ),
@@ -79,85 +79,75 @@ class WelcomeScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Logo / Ilustración
+                      // Logo con diseño mejorado
                       Container(
-                        margin: const EdgeInsets.only(bottom: 1),
-                        child: Stack(
-                          alignment: Alignment.center,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [
+                              AppColors.primaryColor.withAlpha(5),
+                              AppColors.primaryColor.withAlpha(5),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primaryColor.withAlpha(60),
+                              blurRadius: 20,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Image.asset(
+                          'assets/images/icono.png',
+                          width: 150,
+                          height: 130,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(height: 26),
+                      RichText(
+                        text: TextSpan(
                           children: [
-                            Container(
-                              width: 220,
-                              height: 220,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: RadialGradient(
-                                  colors: [
-                                    AppColors.primaryColor.withAlpha(50),
-                                    Colors.transparent,
-                                  ],
-                                ),
+                            TextSpan(
+                              text: 'Medical',
+                              style: TextStyle(
+                                fontSize: 42,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.textColor,
+                                letterSpacing: 1.5,
                               ),
                             ),
-                            Container(
-                              width: 160,
-                              height: 160,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  colors: [
-                                    AppColors.primaryColor.withAlpha(180),
-                                    AppColors.accentColor.withAlpha(180),
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.primaryColor.withAlpha(80),
-                                    blurRadius: 25,
-                                    spreadRadius: 2,
-                                    offset: const Offset(0, 12),
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.medical_services_outlined,
-                                size: 65,
-                                color: Colors.white,
+                            TextSpan(
+                              text: 'Hand',
+                              style: TextStyle(
+                                fontSize: 42,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.primaryColor,
+                                letterSpacing: 1.5,
                               ),
                             ),
                           ],
                         ),
                       ),
-
-                      // Texto
-                      Text(
-                        'MedicalHand',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 38,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textColor,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
                       const SizedBox(height: 12),
                       Text(
-                        'Tu salud, en tus manos.\nRápido y fácil.',
+                        'El poder de gestionar tu bienestar, \nen la palma de tu mano.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 17,
                           fontWeight: FontWeight.w400,
                           color: Colors.grey[700],
                           height: 1.5,
                         ),
                       ),
-                      const SizedBox(height: 140),
+                      const SizedBox(height: 120),
                       // Botones
                       SecondaryButton(
                         text: 'Registrarse',
                         onPressed: () {
-                          // ESTA ES LA LÍNEA QUE CAMBIA
                           Navigator.push(
                             context,
                             MaterialPageRoute(

@@ -47,7 +47,7 @@ class AppStyledDropdown extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: DropdownButtonHideUnderline(
               child: DropdownButtonFormField<String>(
-                value: value,
+                initialValue: value,
                 onChanged: onChanged,
                 items: items.map<DropdownMenuItem<String>>((String v) {
                   return DropdownMenuItem<String>(
@@ -116,7 +116,6 @@ class AppStyledDropdown extends StatelessWidget {
                       alignment: Alignment.centerLeft,
                       child: Row(
                         children: [
-                          const SizedBox(width: 12),
                           Text(
                             v,
                             style: const TextStyle(
