@@ -18,9 +18,56 @@ class FirebaseAuthService {
       }
       await _auth.signOut();
     } catch (e) {
-      print("Error al cerrar sesión: ${e.toString()}");
+     //pasa nada
     }
   }
+
+  Future<List<String>> getSignInMethodsForEmail(String email) async {
+    try {
+      // Intentamos crear el usuario con una contraseña temporal
+      await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: "temporary_password_123456",
+      );
+
+      // Si llega aquí significa que NO existía ese correo.
+      // Eliminamos inmediatamente al usuario recién creado
+      await _auth.currentUser?.delete();
+
+      return []; // No había métodos de inicio de sesión
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        // Si el correo ya existe, devolvemos ['password'] como antes
+        return ['password'];
+      }
+      // Otros errores (ej: formato inválido)
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<String> getAuthProviderFromFirestore(String email) async {
+    try {
+      final query = await _firestore
+          .collection('usuarios_movil')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        // Si encontramos al usuario, devolvemos el valor del campo 'authProvider'.
+        // Si el campo no existiera, devolvemos 'password' por defecto.
+        return query.docs.first.data()['authProvider'] ?? 'password';
+      }
+      // Si no encontramos un documento, devolvemos 'desconocido'
+      return 'desconocido';
+    } catch (e) {
+      // En caso de error, devolvemos 'password' para no bloquear al usuario.
+      return 'password';
+    }
+  }
+
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     serverClientId:
@@ -53,7 +100,7 @@ class FirebaseAuthService {
           .doc(userModel.uid)
           .set(userModel.toMap());
     } catch (e) {
-      print("Error al guardar datos: ${e.toString()}");
+     //pasa nada
     }
   }
 
@@ -80,7 +127,7 @@ class FirebaseAuthService {
       );
       return userCredential.user;
     } catch (e) {
-      print("Error con Google Sign In: ${e.toString()}");
+      //pasa nada
       return null;
     }
   }
@@ -91,6 +138,83 @@ class FirebaseAuthService {
       await _auth.signOut();
     } catch (e) {
       print("Error al desconectar de Google: ${e.toString()}");
+    }
+  }
+
+  Future<bool> doesEmailExistInFirestore(String email) async {
+    try {
+      final query = await _firestore
+          .collection(
+            'usuarios_movil',
+          ) // ¡Importante! Usar el nombre correcto de tu colección
+          .where('email', isEqualTo: email)
+          .limit(1) // Optimización: solo necesitamos saber si existe al menos 1
+          .get();
+      return query
+          .docs
+          .isNotEmpty; // Si la lista de documentos no está vacía, el correo existe
+    } catch (e) {
+      print("Error al verificar email en Firestore: ${e.toString()}");
+      return false; // En caso de error, asumimos que no existe para evitar bloqueos
+    }
+  }
+
+  // --- CORRECCIÓN DE BUG MENOR ---
+  // El método que tenías antes apuntaba a una colección 'users' que no existe.
+  // Lo he corregido para que use la lógica robusta que ya implementamos.
+  Future<bool> checkIfEmailInUse(String emailAddress) async {
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: emailAddress,
+        password:
+            "a_deliberately_wrong_password_${DateTime.now().millisecondsSinceEpoch}",
+      );
+      return false;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        return false;
+      } else if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+        return true;
+      }
+      return false;
+    }
+  }
+
+  Future<User?> signInWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    try {
+      UserCredential credential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return credential.user;
+    } on FirebaseAuthException {
+      // Dejamos que el ViewModel maneje el tipo de excepción
+      rethrow;
+    }
+  }
+
+  Future<void> updateUserAuthProvider(String uid, String provider) async {
+  try {
+    await _firestore
+        .collection('usuarios_movil')
+        .doc(uid)
+        .update({'authProvider': provider}); // Actualiza solo este campo
+  } catch (e) {
+    print("Error al actualizar el authProvider: ${e.toString()}");
+  }
+}
+
+
+  // NUEVO: Enviar correo para restablecer contraseña
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException {
+      // Dejamos que el ViewModel maneje el tipo de excepción
+      rethrow;
     }
   }
 

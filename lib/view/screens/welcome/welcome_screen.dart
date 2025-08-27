@@ -37,11 +37,11 @@ class WelcomeScreen extends StatelessWidget {
               width: size.width * 0.8,
               height: size.width * 0.8,
               decoration: BoxDecoration(
-                color: AppColors.primaryColor.withAlpha(8),
+                color: AppColors.secondaryColor.withAlpha(8),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primaryColor.withAlpha(60),
+                    color: AppColors.secondaryColor.withAlpha(60),
                     blurRadius: 40,
                     spreadRadius: 20,
                   ),

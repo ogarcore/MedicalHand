@@ -18,6 +18,8 @@ dependencies:
   firebase_auth: ^6.0.1
   google_sign_in: ^6.3.0
   lottie: ^3.3.1
+  flutter_native_splash: ^2.4.6
+  hugeicons: ^0.0.11
 
 dev_dependencies:
   flutter_test:
@@ -25,10 +27,12 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.14.4
 
+
 flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/icon/app_icon.png"
+
 
 flutter:
   uses-material-design: true
@@ -36,3 +40,11 @@ flutter:
     - assets/images/
     - assets/icon/
     - assets/animation/
+
+flutter_native_splash:
+  color: '#A5D6A7'
+  image: assets/images/icono.png
+  android: true
+  ios: true
+  web: false
+

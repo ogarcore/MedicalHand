@@ -9,5 +9,5 @@ class AppColors {
   static const Color successColor = Color(0xFF2E7D32); // Verde Jade (éxito, validaciones)
   static const Color textColor = Color(0xFF333333); // Gris Grafito (texto principal)
   static const Color textLightColor = Color(0xFF757575); // Gris Medio (texto secundario)
+  static const Color graceColor = Color(0xFFFFB74D); // Naranja cálido (gracia/bendición)
 }
-

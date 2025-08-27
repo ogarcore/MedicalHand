@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:p_hn25/app/core/utils/validators.dart';
 import '../data/network/firebase_auth_service.dart';
 import '../data/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -57,6 +58,50 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<String?> signInWithGoogleLogin() async {
+  setLoading(true);
+  setErrorMessage(null);
+
+  try {
+    // 1. Intentamos autenticar con Google.
+    final User? user = await _authService.signInWithGoogle();
+    
+    if (user == null) {
+      setLoading(false); // El usuario canceló.
+      return null;
+    }
+
+    // 2. Buscamos el proveedor en nuestra base de datos por su email.
+    final provider = await _authService.getAuthProviderFromFirestore(user.email!);
+
+    // 3. Aplicamos la lógica de inicio de sesión.
+    switch (provider) {
+      case 'google.com':
+        // ¡Éxito! El usuario existe y se registró con Google.
+        setLoading(false);
+        return 'HOME'; // Navegamos a la pantalla principal.
+
+      case 'password':
+        // El usuario existe, pero se registró con contraseña.
+        setErrorMessage('Ese correo ya está registrado con contraseña. Por favor, inicia sesión con tu contraseña.');
+        await _authService.signOut();
+        setLoading(false);
+        return null;
+
+      default: // 'desconocido' o cualquier otro valor
+        // El correo no fue encontrado en nuestra base de datos.
+        setErrorMessage('Este correo no se encuentra registrado. Por favor, crea una cuenta.');
+        await _authService.signOut();
+        setLoading(false);
+        return null;
+    }
+  } on FirebaseAuthException {
+    setErrorMessage('Ocurrió un error al intentar iniciar sesión con Google.');
+    setLoading(false);
+    return null;
+  }
+}
+
   Future<String?> signInWithGoogleFlow() async {
     setLoading(true);
     setErrorMessage(null);
@@ -76,7 +121,7 @@ class AuthViewModel extends ChangeNotifier {
       await _authService.signOutFromGoogle();
       setLoading(false);
       return 'EXIST';
-    }  else {
+    } else {
       emailController.text = user.email ?? '';
       final nameParts = user.displayName?.split(' ') ?? [''];
       nameController.text = nameParts.first;
@@ -105,17 +150,30 @@ class AuthViewModel extends ChangeNotifier {
 
     User? user = _authService.getCurrentUser();
 
-    // Si no hay usuario, es el flujo de correo y contraseña
     if (user == null) {
       if (passwordController.text != confirmPasswordController.text) {
         setErrorMessage("Las contraseñas no coinciden.");
         setLoading(false);
         return null;
       }
-      user = await _authService.signUpWithEmailAndPassword(
-        emailController.text,
-        passwordController.text,
-      );
+      // NOTA: He eliminado una línea duplicada aquí que causaba un error
+      // y he movido la lógica al bloque try-catch para un manejo de errores correcto.
+      try {
+        user = await _authService.signUpWithEmailAndPassword(
+          emailController.text,
+          passwordController.text,
+        );
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'email-already-in-use') {
+          setErrorMessage(
+            'Este correo ya está registrado. Intenta iniciar sesión con Google.',
+          );
+        } else {
+          setErrorMessage('No se pudo crear la cuenta. Inténtalo de nuevo.');
+        }
+        setLoading(false);
+        return null;
+      }
     }
 
     if (user != null) {
@@ -128,6 +186,7 @@ class AuthViewModel extends ChangeNotifier {
         ),
       );
 
+      // Creamos el modelo SIN el authProvider inicialmente
       final userModel = UserModel(
         uid: user.uid,
         email: emailController.text,
@@ -156,13 +215,15 @@ class AuthViewModel extends ChangeNotifier {
       );
 
       await _authService.saveUserData(userModel);
-      setLoading(false);
 
-      // Decidimos a dónde navegar basándonos en el proveedor de autenticación
       if (user.providerData.any((p) => p.providerId == 'password')) {
-        return 'VERIFY'; // Flujo de correo, va a la pantalla de verificación
+        await _authService.updateUserAuthProvider(user.uid, 'password');
+        setLoading(false);
+        return 'VERIFY';
       } else {
-        return 'SPLASH'; 
+        await _authService.updateUserAuthProvider(user.uid, 'google.com');
+        setLoading(false);
+        return 'SPLASH';
       }
     } else {
       setErrorMessage("No se pudo crear la cuenta. Inténtalo de nuevo.");
@@ -170,6 +231,108 @@ class AuthViewModel extends ChangeNotifier {
       return null;
     }
   }
+
+  Future<bool> checkEmailExists() async {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      final emailExists = await _authService.doesEmailExistInFirestore(
+        emailController.text.trim(),
+      );
+
+      if (emailExists) {
+        setErrorMessage('Este correo electrónico ya se encuentra registrado.');
+        setLoading(false);
+        return true; // Sí, existe
+      }
+
+      setLoading(false);
+      return false; // No, no existe (se puede continuar)
+    } catch (e) {
+      setErrorMessage('Error al verificar el correo. Intenta de nuevo.');
+      setLoading(false);
+      return true; // Asumimos que existe para prevenir un error mayor
+    }
+  }
+
+  Future<bool> signInUser(String email, String password) async {
+  setLoading(true);
+  setErrorMessage(null);
+
+  try {
+    // Primero, revisamos en nuestra base de datos si el correo existe.
+    final bool emailExists = await _authService.doesEmailExistInFirestore(email);
+
+    if (!emailExists) {
+      setErrorMessage('El correo electrónico no se encuentra registrado.');
+      setLoading(false);
+      return false;
+    }
+
+    // Si el correo existe, consultamos CÓMO se registró ese usuario.
+    final provider = await _authService.getAuthProviderFromFirestore(email);
+
+    // Si el proveedor es 'google.com', no intentamos el login con contraseña.
+    if (provider == 'google.com') {
+      setErrorMessage('Ese correo está registrado con Google. Por favor, inicia sesión con Google.');
+      setLoading(false);
+      return false;
+    }
+
+    // Si el proveedor es 'password', procedemos con el login normal.
+    final user = await _authService.signInWithEmailAndPassword(email, password);
+
+    if (user != null && !user.emailVerified) {
+      setErrorMessage("Por favor, verifica tu correo electrónico.");
+      setLoading(false);
+      return false;
+    }
+
+    setLoading(false);
+    return user != null;
+
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+      setErrorMessage('La contraseña es incorrecta.');
+    } else {
+      setErrorMessage('Ocurrió un error inesperado.');
+    }
+    
+    setLoading(false);
+    return false;
+  }
+}
+
+  // NUEVO: Lógica para recuperar contraseña
+  Future<String?> sendPasswordResetLink(String email) async {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      // Validamos el formato del correo antes de enviarlo
+      if (AppValidators.validateEmail(email) != null) {
+        setLoading(false);
+        return 'Por favor, ingresa un correo válido.';
+      }
+      await _authService.sendPasswordResetEmail(email);
+      setLoading(false);
+      return null; // Nulo significa éxito
+    } on FirebaseAuthException catch (e) {
+      String message;
+      switch (e.code) {
+        case 'user-not-found':
+          message = 'No se encontró un usuario con ese correo.';
+          break;
+        case 'invalid-email':
+          message = 'El formato del correo no es válido.';
+          break;
+        default:
+          message = 'Ocurrió un error. Inténtalo de nuevo.';
+      }
+      setLoading(false);
+      return message; // Devolvemos el mensaje de error
+    }
+  }
+
   void clearControllers() {
     emailController.clear();
     passwordController.clear();

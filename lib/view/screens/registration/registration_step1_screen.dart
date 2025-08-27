@@ -8,7 +8,6 @@ import '../../widgets/primary_button.dart';
 import '../../widgets/registration_progress_indicator.dart';
 import 'registration_step2_screen.dart';
 
-// Convertido a StatefulWidget para manejar el estado del formulario correctamente.
 class RegistrationStep1Screen extends StatefulWidget {
   const RegistrationStep1Screen({super.key});
 
@@ -18,14 +17,13 @@ class RegistrationStep1Screen extends StatefulWidget {
 }
 
 class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
-  // La clave del formulario se inicializa aquí para que persista entre reconstrucciones.
   final _formKey = GlobalKey<FormState>();
 
-  void _clearFieldsAndNavigateBack() {
-    // Obtenemos el viewModel para acceder a los controladores
-    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+  bool _isCheckingEmail = false; // loader solo para "Siguiente"
+  bool _isGoogleLoading = false; // loader exclusivo de Google
 
-    // 1. Limpia los controladores de texto.
+  void _clearFieldsAndNavigateBack() {
+    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
     authViewModel.emailController.clear();
     authViewModel.passwordController.clear();
     authViewModel.confirmPasswordController.clear();
@@ -52,7 +50,7 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
           resizeToAvoidBottomInset: true,
           body: Stack(
             children: [
-              // --- Tu código de decoración de fondo (sin cambios) ---
+              // Fondo decorativo
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -104,234 +102,296 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                 ),
               ),
 
-              // --- Fin del código de decoración ---
               SafeArea(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(24.0),
                   child: Form(
                     key: _formKey,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                        Row(
                           children: [
-                            Row(
-                              children: [
-                                IconButton(
-                                  onPressed: _clearFieldsAndNavigateBack,
-                                  icon: const Icon(
-                                    Icons.arrow_back,
-                                    color: AppColors.textColor,
-                                    size: 26.5,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  "Crear cuenta",
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textColor,
-                                  ),
-                                ),
-                              ],
+                            IconButton(
+                              onPressed: _clearFieldsAndNavigateBack,
+                              icon: const Icon(
+                                Icons.arrow_back,
+                                color: AppColors.textColor,
+                                size: 26.5,
+                              ),
                             ),
-                            const SizedBox(height: 24),
-                            const RegistrationProgressIndicator(currentStep: 1),
-                            const SizedBox(height: 32),
+                            const SizedBox(width: 8),
                             const Text(
-                              'Primero, tus datos de acceso',
+                              "Crear cuenta",
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textColor,
                               ),
                             ),
-                            const SizedBox(height: 24),
-                            CustomTextField(
-                              controller: authViewModel.emailController,
-                              labelText: 'Correo Electrónico',
-                              hintText: 'Ingresa tu correo',
-                              icon: Icons.alternate_email,
-                              keyboardType: TextInputType.emailAddress,
-                              validator: AppValidators.validateEmail,
-                            ),
-                            const SizedBox(height: 20),
-                            CustomTextField(
-                              controller: authViewModel.passwordController,
-                              labelText: 'Crea una contraseña',
-                              hintText: 'Mínimo 8 caracteres',
-                              isPassword: true,
-                              icon: Icons.lock_outline,
-                              validator: AppValidators.validatePassword,
-                            ),
-                            const SizedBox(height: 20),
-                            CustomTextField(
-                              controller:
-                                  authViewModel.confirmPasswordController,
-                              labelText: 'Confirmar contraseña',
-                              hintText: 'Repite tu contraseña',
-                              isPassword: true,
-                              icon: Icons.lock_outline,
-                              validator: (value) =>
-                                  AppValidators.validateConfirmPassword(
-                                    authViewModel.passwordController.text,
-                                    value,
-                                  ),
-                            ),
-                            const SizedBox(height: 32),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Divider(
-                                    color: Colors.grey[400],
-                                    thickness: 1,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12.0,
-                                  ),
-                                  child: Text(
-                                    'O regístrate con',
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Divider(
-                                    color: Colors.grey[400],
-                                    thickness: 1,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Consumer<AuthViewModel>(
-                              builder: (context, viewModel, child) {
-                                return Align(
-                                  alignment: Alignment.center,
-                                  child: SizedBox(
-                                    width: 280,
-                                    child: OutlinedButton.icon(
-                                      onPressed: viewModel.isLoading
-                                          ? null
-                                          : () async {
-                                              final scaffoldMessenger =
-                                                  ScaffoldMessenger.of(context);
-                                              final navigator = Navigator.of(
-                                                context,
-                                              );
-                                              final result = await viewModel
-                                                  .signInWithGoogleFlow();
-                                              if (!mounted) return;
-                                              if (result == null) {
-                                                scaffoldMessenger.showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      viewModel.errorMessage ??
-                                                          'Ocurrió un error.',
-                                                    ),
-                                                    backgroundColor: AppColors.warningColor,
-                                                  ),
-                                                );
-                                                return;
-                                              }
-                                              if (result == 'EXIST') {
-                                                scaffoldMessenger.showSnackBar(
-                                                  SnackBar(
-                                                    backgroundColor: AppColors
-                                                        .accentColor
-                                                        .withAlpha(200),
-                                                    content: const Text(
-                                                      'Esta cuenta de Google ya está registrada. Por favor, inicia sesión.',
-                                                    ),
-                                                  ),
-                                                );
-                                              }
-                                              if (result == 'REGISTER_STEP_2') {
-                                                navigator.pushReplacement(
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const RegistrationStep2Screen(),
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                      icon: viewModel.isLoading
-                                          ? Container(
-                                              width: 24,
-                                              height: 24,
-                                              padding: const EdgeInsets.all(
-                                                2.0,
-                                              ),
-                                              child:
-                                                  const CircularProgressIndicator(
-                                                    color:
-                                                        AppColors.primaryColor,
-                                                    strokeWidth: 3,
-                                                  ),
-                                            )
-                                          : Container(
-                                              width: 24,
-                                              height: 24,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
-                                              ),
-                                              child: Image.asset(
-                                                'assets/images/google_icon.png',
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                      label: const Text(
-                                        'Registrarse con Google',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColors.textColor,
-                                        ),
-                                      ),
-                                      style: OutlinedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 14.5,
-                                          horizontal: 12,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                        ),
-                                        side: BorderSide.none,
-                                        backgroundColor: Colors.grey.shade200,
-                                        foregroundColor: AppColors.textColor,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 50),
-                            PrimaryButton(
-                              text: 'Siguiente',
-                              onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const RegistrationStep2Screen(),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                            const SizedBox(height: 20),
                           ],
                         ),
+                        const SizedBox(height: 24),
+                        const RegistrationProgressIndicator(currentStep: 1),
+                        const SizedBox(height: 32),
+                        const Text(
+                          'Primero, tus datos de acceso',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textColor,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        CustomTextField(
+                          controller: authViewModel.emailController,
+                          labelText: 'Correo Electrónico',
+                          hintText: 'Ingresa tu correo',
+                          icon: Icons.alternate_email,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: AppValidators.validateEmail,
+                        ),
+                        const SizedBox(height: 20),
+                        CustomTextField(
+                          controller: authViewModel.passwordController,
+                          labelText: 'Crea una contraseña',
+                          hintText: 'Mínimo 8 caracteres',
+                          isPassword: true,
+                          icon: Icons.lock_outline,
+                          keyboardType: TextInputType.visiblePassword,
+                          validator: AppValidators.validatePassword,
+                        ),
+                        const SizedBox(height: 20),
+                        CustomTextField(
+                          controller: authViewModel.confirmPasswordController,
+                          labelText: 'Confirmar contraseña',
+                          hintText: 'Repite tu contraseña',
+                          keyboardType: TextInputType.visiblePassword,
+                          isPassword: true,
+                          icon: Icons.lock_outline,
+                          validator: (value) =>
+                              AppValidators.validateConfirmPassword(
+                            authViewModel.passwordController.text,
+                            value,
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Divider(
+                                color: Colors.grey[400],
+                                thickness: 1,
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12.0),
+                              child: Text(
+                                'O regístrate con',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Divider(
+                                color: Colors.grey[400],
+                                thickness: 1,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Consumer<AuthViewModel>(
+                          builder: (context, viewModel, child) {
+                            return Align(
+                              alignment: Alignment.center,
+                              child: SizedBox(
+                                width: 280,
+                                child: _isGoogleLoading
+                                    ? Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 14.5, horizontal: 12),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                valueColor:
+                                                    AlwaysStoppedAnimation<Color>(
+                                                        AppColors.primaryColor),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            const Text(
+                                              'Cargando...',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColors.textColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : OutlinedButton.icon(
+                                        onPressed: () async {
+                                          // Guardamos referencias ANTES del await
+                                          final scaffoldMessenger =
+                                              ScaffoldMessenger.of(context);
+                                          final navigator =
+                                              Navigator.of(context);
+
+                                          setState(() {
+                                            _isGoogleLoading = true;
+                                          });
+
+                                          final result = await viewModel
+                                              .signInWithGoogleFlow();
+
+                                          if (!mounted) return;
+
+                                          setState(() {
+                                            _isGoogleLoading = false;
+                                          });
+
+                                          if (result == null) {
+                                            scaffoldMessenger.showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  viewModel.errorMessage ??
+                                                      'Ocurrió un error.',
+                                                ),
+                                                backgroundColor:
+                                                    AppColors.warningColor,
+                                              ),
+                                            );
+                                            return;
+                                          }
+                                          if (result == 'EXIST') {
+                                            scaffoldMessenger.showSnackBar(
+                                              SnackBar(
+                                                backgroundColor: AppColors
+                                                    .accentColor
+                                                    .withAlpha(200),
+                                                content: const Text(
+                                                  'Esta cuenta ya está registrada. Por favor, inicia sesión.',
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                          if (result == 'REGISTER_STEP_2') {
+                                            navigator.pushReplacement(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const RegistrationStep2Screen(),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        icon: Container(
+                                          width: 24,
+                                          height: 24,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                          child: Image.asset(
+                                            'assets/images/google_icon.png',
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                        label: const Text(
+                                          'Registrarse con Google',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.textColor,
+                                          ),
+                                        ),
+                                        style: OutlinedButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 14.5,
+                                            horizontal: 12,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                          side: BorderSide.none,
+                                          backgroundColor: Colors.grey.shade200,
+                                          foregroundColor: AppColors.textColor,
+                                        ),
+                                      ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 50),
+                        Consumer<AuthViewModel>(
+                          builder: (context, viewModel, child) {
+                            return PrimaryButton(
+                              text: 'Siguiente',
+                              isLoading: _isCheckingEmail,
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  FocusScope.of(context).unfocus();
+
+                                  setState(() {
+                                    _isCheckingEmail = true;
+                                  });
+
+                                  // Guardamos referencias ANTES del await
+                                  final scaffoldMessenger =
+                                      ScaffoldMessenger.of(context);
+                                  final navigator = Navigator.of(context);
+
+                                  final emailExists =
+                                      await viewModel.checkEmailExists();
+
+                                  if (!mounted) return;
+
+                                  setState(() {
+                                    _isCheckingEmail = false;
+                                  });
+
+                                  if (emailExists) {
+                                    scaffoldMessenger.showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          viewModel.errorMessage ??
+                                              'Error desconocido.',
+                                        ),
+                                        backgroundColor:
+                                            AppColors.warningColor,
+                                      ),
+                                    );
+                                  } else {
+                                    navigator.push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const RegistrationStep2Screen(),
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),

@@ -46,42 +46,51 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.primaryColor, AppColors.primaryColor],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/images/icono.png',
-                width: 150,
-                height: 130,
-                fit: BoxFit.contain,
+      backgroundColor: AppColors.primaryColor, // Fondo verde sólido
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Logo
+            Image.asset(
+              'assets/images/icono.png',
+              width: 160,
+              height: 140,
+              fit: BoxFit.contain,
+            ),
+
+            const SizedBox(height: 40),
+
+            // Loader animado
+            Lottie.asset(
+              'assets/animation/loading.json',
+              width: 120,
+              height: 120,
+              repeat: true,
+              animate: true,
+              delegates: LottieDelegates(
+                values: [
+                  ValueDelegate.color(
+                    const ['**'],
+                    value: AppColors.accentColor,
+                  ),
+                ],
               ),
-              Lottie.asset(
-                'assets/animation/loading.json',
-                width: 200,
-                height: 200,
-                repeat: true,
-                animate: true,
-                delegates: LottieDelegates(
-                  values: [
-                    ValueDelegate.color(
-                      const ['**'], 
-                      value:
-                          AppColors.accentColor, 
-                    ),
-                  ],
-                ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Texto minimalista
+            const Text(
+              "Cargando...",
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 1.2,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
