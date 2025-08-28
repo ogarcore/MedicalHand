@@ -99,7 +99,7 @@ class _FilterHistoryModalState extends State<FilterHistoryModal> {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    value: selectedSpecialty,
+                    initialValue: selectedSpecialty,
                     items: widget.specialties.map((String specialty) {
                       return DropdownMenuItem<String>(
                         value: specialty,
@@ -182,8 +182,8 @@ class _FilterHistoryModalState extends State<FilterHistoryModal> {
                           withResults = newValue;
                         });
                       },
-                      activeColor: AppColors.primaryColor,
-                      activeTrackColor: AppColors.primaryColor.withOpacity(0.3),
+                      activeThumbColor: AppColors.primaryColor,
+                      activeTrackColor: AppColors.primaryColor.withAlpha(35),
                     ),
                   ),
                 ],

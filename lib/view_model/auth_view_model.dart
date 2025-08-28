@@ -59,48 +59,56 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   Future<String?> signInWithGoogleLogin() async {
-  setLoading(true);
-  setErrorMessage(null);
+    setLoading(true);
+    setErrorMessage(null);
 
-  try {
-    // 1. Intentamos autenticar con Google.
-    final User? user = await _authService.signInWithGoogle();
-    
-    if (user == null) {
-      setLoading(false); // El usuario canceló.
+    try {
+      // 1. Intentamos autenticar con Google.
+      final User? user = await _authService.signInWithGoogle();
+
+      if (user == null) {
+        setLoading(false); // El usuario canceló.
+        return null;
+      }
+
+      // 2. Buscamos el proveedor en nuestra base de datos por su email.
+      final provider = await _authService.getAuthProviderFromFirestore(
+        user.email!,
+      );
+
+      // 3. Aplicamos la lógica de inicio de sesión.
+      switch (provider) {
+        case 'google.com':
+          // ¡Éxito! El usuario existe y se registró con Google.
+          setLoading(false);
+          return 'HOME'; // Navegamos a la pantalla principal.
+
+        case 'password':
+          // El usuario existe, pero se registró con contraseña.
+          setErrorMessage(
+            'Ese correo ya está registrado con contraseña. Por favor, inicia sesión con tu contraseña.',
+          );
+          await _authService.signOut();
+          setLoading(false);
+          return null;
+
+        default: // 'desconocido' o cualquier otro valor
+          // El correo no fue encontrado en nuestra base de datos.
+          setErrorMessage(
+            'Este correo no se encuentra registrado. Por favor, crea una cuenta.',
+          );
+          await _authService.signOut();
+          setLoading(false);
+          return null;
+      }
+    } on FirebaseAuthException {
+      setErrorMessage(
+        'Ocurrió un error al intentar iniciar sesión con Google.',
+      );
+      setLoading(false);
       return null;
     }
-
-    // 2. Buscamos el proveedor en nuestra base de datos por su email.
-    final provider = await _authService.getAuthProviderFromFirestore(user.email!);
-
-    // 3. Aplicamos la lógica de inicio de sesión.
-    switch (provider) {
-      case 'google.com':
-        // ¡Éxito! El usuario existe y se registró con Google.
-        setLoading(false);
-        return 'HOME'; // Navegamos a la pantalla principal.
-
-      case 'password':
-        // El usuario existe, pero se registró con contraseña.
-        setErrorMessage('Ese correo ya está registrado con contraseña. Por favor, inicia sesión con tu contraseña.');
-        await _authService.signOut();
-        setLoading(false);
-        return null;
-
-      default: // 'desconocido' o cualquier otro valor
-        // El correo no fue encontrado en nuestra base de datos.
-        setErrorMessage('Este correo no se encuentra registrado. Por favor, crea una cuenta.');
-        await _authService.signOut();
-        setLoading(false);
-        return null;
-    }
-  } on FirebaseAuthException {
-    setErrorMessage('Ocurrió un error al intentar iniciar sesión con Google.');
-    setLoading(false);
-    return null;
   }
-}
 
   Future<String?> signInWithGoogleFlow() async {
     setLoading(true);
@@ -218,6 +226,7 @@ class AuthViewModel extends ChangeNotifier {
 
       if (user.providerData.any((p) => p.providerId == 'password')) {
         await _authService.updateUserAuthProvider(user.uid, 'password');
+        await _authService.signOut();
         setLoading(false);
         return 'VERIFY';
       } else {
@@ -256,52 +265,58 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   Future<bool> signInUser(String email, String password) async {
-  setLoading(true);
-  setErrorMessage(null);
+    setLoading(true);
+    setErrorMessage(null);
 
-  try {
-    // Primero, revisamos en nuestra base de datos si el correo existe.
-    final bool emailExists = await _authService.doesEmailExistInFirestore(email);
+    try {
+      // Primero, revisamos en nuestra base de datos si el correo existe.
+      final bool emailExists = await _authService.doesEmailExistInFirestore(
+        email,
+      );
 
-    if (!emailExists) {
-      setErrorMessage('El correo electrónico no se encuentra registrado.');
+      if (!emailExists) {
+        setErrorMessage('El correo electrónico no se encuentra registrado.');
+        setLoading(false);
+        return false;
+      }
+
+      // Si el correo existe, consultamos CÓMO se registró ese usuario.
+      final provider = await _authService.getAuthProviderFromFirestore(email);
+
+      // Si el proveedor es 'google.com', no intentamos el login con contraseña.
+      if (provider == 'google.com') {
+        setErrorMessage(
+          'Ese correo está registrado con Google. Por favor, inicia sesión con Google.',
+        );
+        setLoading(false);
+        return false;
+      }
+
+      // Si el proveedor es 'password', procedemos con el login normal.
+      final user = await _authService.signInWithEmailAndPassword(
+        email,
+        password,
+      );
+
+      if (user != null && !user.emailVerified) {
+        setErrorMessage("Por favor, verifica tu correo electrónico.");
+        setLoading(false);
+        return false;
+      }
+
+      setLoading(false);
+      return user != null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+        setErrorMessage('La contraseña es incorrecta.');
+      } else {
+        setErrorMessage('Ocurrió un error inesperado.');
+      }
+
       setLoading(false);
       return false;
     }
-
-    // Si el correo existe, consultamos CÓMO se registró ese usuario.
-    final provider = await _authService.getAuthProviderFromFirestore(email);
-
-    // Si el proveedor es 'google.com', no intentamos el login con contraseña.
-    if (provider == 'google.com') {
-      setErrorMessage('Ese correo está registrado con Google. Por favor, inicia sesión con Google.');
-      setLoading(false);
-      return false;
-    }
-
-    // Si el proveedor es 'password', procedemos con el login normal.
-    final user = await _authService.signInWithEmailAndPassword(email, password);
-
-    if (user != null && !user.emailVerified) {
-      setErrorMessage("Por favor, verifica tu correo electrónico.");
-      setLoading(false);
-      return false;
-    }
-
-    setLoading(false);
-    return user != null;
-
-  } on FirebaseAuthException catch (e) {
-    if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
-      setErrorMessage('La contraseña es incorrecta.');
-    } else {
-      setErrorMessage('Ocurrió un error inesperado.');
-    }
-    
-    setLoading(false);
-    return false;
   }
-}
 
   // NUEVO: Lógica para recuperar contraseña
   Future<String?> sendPasswordResetLink(String email) async {

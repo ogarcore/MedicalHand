@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hugeicons/hugeicons.dart';
+import 'package:p_hn25/view/widgets/custom_modal.dart';
 import '../../../app/core/constants/app_colors.dart';
 import '../../../app/core/utils/input_formatters.dart';
 import '../../../app/core/utils/validators.dart'; // Asegúrate de importar tus validadores
@@ -28,20 +30,26 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
   Future<void> _onWillPop() async {
     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
 
-    await showDialog<bool>(
+    await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('¿Estás seguro?'),
+      builder: (context) => CustomModal(
+        icon: HugeIcons.strokeRoundedAlert01,
+        title: '¿Estás seguro?',
         content: const Text(
           'Si sales ahora, perderás todo el progreso del registro.',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 16, height: 1.5),
         ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancelar'),
+        actions: [
+          ModalButton(
+            text: 'Cancelar',
+            onPressed: () => Navigator.of(context).pop(),
           ),
-          TextButton(
+          ModalButton(
+            text: 'Salir',
+            isWarning: true, // Usa tu estilo de botón de advertencia.
             onPressed: () async {
+              // La lógica de salida es exactamente la misma que antes.
               await authViewModel.cancelGoogleRegistration();
               if (context.mounted) {
                 Navigator.of(context).pushAndRemoveUntil(
@@ -52,7 +60,6 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                 );
               }
             },
-            child: const Text('Salir', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

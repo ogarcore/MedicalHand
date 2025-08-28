@@ -1,3 +1,4 @@
+// lib/view/screens/home/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -7,6 +8,7 @@ import 'package:p_hn25/view/screens/history/clinical_history_screen.dart';
 import 'package:p_hn25/view/screens/home/widgets/home_app_bar.dart';
 import 'package:p_hn25/view/screens/home/widgets/main_bottom_nav_bar.dart';
 import 'widgets/dashboard_view.dart';
+import '../../widgets/custom_modal.dart'; 
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,15 +32,46 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<bool> _showExitConfirmationDialog() async {
+    final bool? result = await showDialog<bool>(
+      context: context,
+      builder: (context) => CustomModal(
+        icon: HugeIcons.strokeRoundedLogout01,
+        title: 'Salir de Medical Hand',
+        content: const Text(
+          '¿Estás seguro de que quieres cerrar la aplicación?',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 16, height: 1.5),
+        ),
+        actions: [
+          ModalButton(
+            text: 'Cancelar',
+            onPressed: () => Navigator.of(context).pop(false),
+          ),
+          ModalButton(
+            text: 'Salir',
+            isWarning: true,
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
+      onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
-          SystemNavigator.pop();
+          final bool shouldExit = await _showExitConfirmationDialog();
+          if (shouldExit) {
+            SystemNavigator.pop();
+          }
         }
       },
+
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         appBar: const HomeAppBar(),

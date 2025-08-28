@@ -4,7 +4,7 @@ import '../../../app/core/constants/app_colors.dart';
 
 class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
-  final FocusNode? focusNode; 
+  final FocusNode? focusNode;
   final String labelText;
   final String hintText;
   final IconData icon;
@@ -12,11 +12,15 @@ class CustomTextField extends StatefulWidget {
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
   final List<TextInputFormatter>? inputFormatters;
+  // ----- INICIO DEL CAMBIO -----
+  // 1. Se añade maxLines como un parámetro opcional.
+  final int? maxLines;
+  // ----- FIN DEL CAMBIO -----
 
   const CustomTextField({
     super.key,
     required this.controller,
-    this.focusNode, 
+    this.focusNode,
     required this.labelText,
     required this.hintText,
     required this.icon,
@@ -24,6 +28,7 @@ class CustomTextField extends StatefulWidget {
     this.keyboardType = TextInputType.text,
     this.validator,
     this.inputFormatters,
+    this.maxLines, // <-- Se añade al constructor
   });
 
   @override
@@ -42,13 +47,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   void dispose() {
-    // Limpiamos el listener
     widget.focusNode?.removeListener(_onFocusChange);
     super.dispose();
   }
 
   void _onFocusChange() {
-    // Actualizamos el estado del widget cuando cambia el foco
     if (mounted) {
       setState(() {
         _hasFocus = widget.focusNode?.hasFocus ?? false;
@@ -59,13 +62,17 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      focusNode: widget.focusNode, 
+      focusNode: widget.focusNode,
       autofocus: false,
       controller: widget.controller,
       obscureText: widget.isPassword && _isObscured,
       keyboardType: widget.keyboardType,
       validator: widget.validator,
       inputFormatters: widget.inputFormatters,
+      // ----- INICIO DEL CAMBIO -----
+      // 2. Se pasa el valor de maxLines. Si es nulo, por defecto es 1.
+      maxLines: widget.isPassword ? 1 : widget.maxLines,
+      // ----- FIN DEL CAMBIO -----
       style: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w500,
@@ -103,7 +110,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
+          borderSide: const BorderSide(
             color: Colors.transparent,
             width: 0.6,
           ),
@@ -117,7 +124,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(
+          borderSide: const BorderSide(
             color: AppColors.primaryColor,
             width: 1.8,
           ),
@@ -126,8 +133,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
         fillColor: Colors.white.withAlpha(180),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 16,
+          
           horizontal: 16,
         ),
+        
         floatingLabelBehavior: FloatingLabelBehavior.auto,
       ),
     );

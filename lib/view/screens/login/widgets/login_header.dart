@@ -1,0 +1,59 @@
+import 'package:flutter/material.dart';
+import 'package:p_hn25/app/core/constants/app_colors.dart';
+
+class LoginHeader extends StatelessWidget {
+  const LoginHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(height: 40),
+        Center(
+          child: Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(50),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryColor.withAlpha(50),
+                  blurRadius: 15,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.supervised_user_circle,
+              size: 60,
+              color: AppColors.primaryColor,
+            ),
+          ),
+        ),
+        const SizedBox(height: 30),
+        const Text(
+          '¡Bienvenido/a!',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textColor,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Accede a tu cuenta para continuar',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[700],
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 40),
+      ],
+    );
+  }
+}
