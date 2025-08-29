@@ -26,27 +26,15 @@ class SupportScreen extends StatelessWidget {
           const SizedBox(height: 32),
           _buildSectionTitle('Contacta con Nosotros'),
           const SizedBox(height: 16),
-          _buildContactOption(
-            icon: HugeIcons.strokeRoundedComment01,
-            title: 'Chat en Vivo',
-            subtitle: 'Habla con un agente ahora',
-            color: const Color(0xFF00C853),
-            onTap: () {},
-          ),
+          
           _buildContactOption(
             icon: HugeIcons.strokeRoundedMail01,
             title: 'Enviar un Correo',
-            subtitle: 'Recibe respuesta en 24 horas',
+            subtitle: 'Recibe respuesta en aproximadamente 24 horas',
             color: const Color(0xFF2979FF),
             onTap: () {},
           ),
-          _buildContactOption(
-            icon: HugeIcons.strokeRoundedSmartPhone04,
-            title: 'Llamada Telefónica',
-            subtitle: 'Disponible 24/7 para emergencias',
-            color: const Color(0xFFFF1744),
-            onTap: () {},
-          ),
+          
           const SizedBox(height: 32),
           _buildSectionTitle('Preguntas Frecuentes'),
           const SizedBox(height: 16),

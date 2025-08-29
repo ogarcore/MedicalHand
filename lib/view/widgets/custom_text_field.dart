@@ -12,10 +12,9 @@ class CustomTextField extends StatefulWidget {
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
   final List<TextInputFormatter>? inputFormatters;
-  // ----- INICIO DEL CAMBIO -----
-  // 1. Se añade maxLines como un parámetro opcional.
   final int? maxLines;
-  // ----- FIN DEL CAMBIO -----
+  final Color? iconColor; // 👈 Nuevo: color de ícono
+  final Color? focusedBorderColor; // 👈 Nuevo: color de borde en focus
 
   const CustomTextField({
     super.key,
@@ -28,7 +27,9 @@ class CustomTextField extends StatefulWidget {
     this.keyboardType = TextInputType.text,
     this.validator,
     this.inputFormatters,
-    this.maxLines, // <-- Se añade al constructor
+    this.maxLines,
+    this.iconColor,
+    this.focusedBorderColor,
   });
 
   @override
@@ -69,10 +70,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       keyboardType: widget.keyboardType,
       validator: widget.validator,
       inputFormatters: widget.inputFormatters,
-      // ----- INICIO DEL CAMBIO -----
-      // 2. Se pasa el valor de maxLines. Si es nulo, por defecto es 1.
       maxLines: widget.isPassword ? 1 : widget.maxLines,
-      // ----- FIN DEL CAMBIO -----
       style: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w500,
@@ -86,20 +84,19 @@ class _CustomTextFieldState extends State<CustomTextField> {
           fontSize: 17,
         ),
         hintText: widget.hintText,
-        hintStyle: TextStyle(
-          color: Colors.grey[500],
-          fontSize: 16,
-        ),
+        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 16),
         prefixIcon: Icon(
           widget.icon,
-          color: AppColors.primaryColor,
+          color: widget.iconColor ?? AppColors.primaryColor, // 👈 configurable
           size: 22,
         ),
         suffixIcon: widget.isPassword
             ? IconButton(
                 icon: Icon(
                   _isObscured ? Icons.visibility_off : Icons.visibility,
-                  color: AppColors.primaryColor,
+                  color:
+                      widget.iconColor ??
+                      AppColors.primaryColor, // 👈 configurable
                 ),
                 onPressed: () {
                   setState(() {
@@ -110,22 +107,18 @@ class _CustomTextFieldState extends State<CustomTextField> {
             : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: Colors.transparent,
-            width: 0.6,
-          ),
+          borderSide: const BorderSide(color: Colors.transparent, width: 0.6),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(
-            color: Colors.grey.shade400,
-            width: 0.4,
-          ),
+          borderSide: BorderSide(color: Colors.grey.shade400, width: 0.4),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(
-            color: AppColors.primaryColor,
+          borderSide: BorderSide(
+            color:
+                widget.focusedBorderColor ??
+                AppColors.primaryColor, // 👈 configurable
             width: 1.8,
           ),
         ),
@@ -133,10 +126,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
         fillColor: Colors.white.withAlpha(180),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 16,
-          
           horizontal: 16,
         ),
-        
         floatingLabelBehavior: FloatingLabelBehavior.auto,
       ),
     );

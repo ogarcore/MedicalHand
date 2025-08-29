@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
-import 'package:p_hn25/view/screens/appointments/request_appointment_screen.dart';
+import 'package:p_hn25/view/screens/appointments/appointment_options_screen.dart';
 
 class NoAppointmentCard extends StatelessWidget {
   const NoAppointmentCard({super.key});
@@ -91,7 +91,7 @@ class NoAppointmentCard extends StatelessWidget {
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const RequestAppointmentScreen(),
+                  builder: (_) => const AppointmentOptionsScreen(),
                 ),
               ),
               style: ElevatedButton.styleFrom(

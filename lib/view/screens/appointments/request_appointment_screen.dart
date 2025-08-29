@@ -24,16 +24,24 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
   final _pageController = PageController();
   final FocusNode _reasonFocusNode = FocusNode();
 
-  String? _selectedSpecialty;
+  String? _selectedDepartament;
   String? _selectedHospital;
   final TextEditingController _reasonController = TextEditingController();
   int _currentStep = 0;
 
-  final List<String> _specialties = [
-    'Cardiología', 'Dermatología', 'Medicina General', 'Odontología', 'Pediatría'
+  final List<String> _departaments = [
+    'Boaco',
+    'Chinandega',
+    'Estelí',
+    'Jinotepe',
+    'Jinotega',
+    'Managua',
   ];
   final List<String> _hospitals = [
-    'Hospital Manolo Morales', 'Hospital Vélez Paiz', 'Centro de Salud Sócrates Flores', 'Centro Cardiológico Nacional'
+    'Hospital Manolo Morales',
+    'Hospital Vélez Paiz',
+    'Centro de Salud Sócrates Flores',
+    'Centro Cardiológico Nacional',
   ];
 
   void _nextStepOrSummary() {
@@ -42,15 +50,17 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
 
     switch (_currentStep) {
       case 0:
-        isValid = _selectedSpecialty != null;
-        errorMessage = 'Por favor, selecciona una especialidad';
+        isValid = _selectedDepartament != null;
+        errorMessage = 'Por favor, selecciona tu departamento';
         break;
       case 1:
         isValid = _selectedHospital != null;
         errorMessage = 'Por favor, selecciona un hospital';
         break;
       case 2:
-        isValid = _reasonController.text.isNotEmpty && _reasonController.text.length >= 10;
+        isValid =
+            _reasonController.text.isNotEmpty &&
+            _reasonController.text.length >= 10;
         errorMessage = _reasonController.text.isEmpty
             ? 'Por favor, describe el motivo de tu consulta'
             : 'Por favor, proporciona más detalles (mínimo 10 caracteres)';
@@ -68,7 +78,7 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
           context,
           MaterialPageRoute(
             builder: (context) => AppointmentSummaryScreen(
-              specialty: _selectedSpecialty!,
+              departament: _selectedDepartament!,
               hospital: _selectedHospital!,
               reason: _reasonController.text,
             ),
@@ -81,7 +91,9 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
           content: Text(errorMessage),
           backgroundColor: AppColors.warningColor,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       );
     }
@@ -134,22 +146,44 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
-          title: const Text('Solicitar Cita Médica'),
-          backgroundColor: Colors.white,
+          title: const Text(
+            'Solicitar Cita Médica',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(22),
+              ),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.primaryColor.withAlpha(243),
+                  AppColors.primaryColor.withAlpha(217),
+                ],
+              ),
+            ),
+          ),
           elevation: 1,
-          shadowColor: const Color.fromARGB(100, 0, 0, 0), // 👈 CORREGIDO
+          shadowColor: const Color.fromARGB(100, 0, 0, 0),
           surfaceTintColor: Colors.transparent,
           centerTitle: false,
-          iconTheme: const IconThemeData(color: AppColors.textColor),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-          ),
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
+
         body: Form(
           key: _formKey,
           child: Column(
             children: [
-              AppointmentProgressIndicator(currentStep: _currentStep),
+              AppointmentProgressIndicator(
+                currentStep: _currentStep,
+                activeColor: AppColors.primaryColor,
+              ),
               Expanded(
                 child: PageView(
                   controller: _pageController,
@@ -159,40 +193,58 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
                   },
                   children: [
                     AppointmentStepLayout(
-                      icon: HugeIcons.strokeRoundedMicroscope,
-                      title: '¿Qué especialidad necesitas?',
-                      subtitle: 'Selecciona la especialidad médica que necesitas consultar',
+                      icon: HugeIcons.strokeRoundedLocation04,
+                      title: '¿En qué departamento te encuentras?',
+                      subtitle:
+                          'Selecciona tu ubicación para mostrarte los hospital de tu zona',
+                      iconColor: AppColors.primaryColor,
                       content: AppStyledDropdown(
-                        value: _selectedSpecialty,
-                        items: _specialties,
-                        hintText: 'Selecciona una especialidad',
-                        prefixIcon: HugeIcons.strokeRoundedMicroscope,
-                        onChanged: (value) => setState(() => _selectedSpecialty = value),
+                        value: _selectedDepartament,
+                        items: _departaments,
+                        hintText: 'Selecciona tú departamento',
+                        prefixIcon: HugeIcons.strokeRoundedLocation04,
+                        iconColor: AppColors.accentColor,
+                        iconBackgroundColor: AppColors.accentColor.withAlpha(
+                          30,
+                        ),
+                        onChanged: (value) =>
+                            setState(() => _selectedDepartament = value),
                       ),
                     ),
                     AppointmentStepLayout(
                       icon: HugeIcons.strokeRoundedHospital01,
                       title: 'Elige tu centro médico',
-                      subtitle: 'Selecciona el hospital o centro de salud de tu preferencia',
+                      subtitle:
+                          'Elige el centro médico donde deseas agendar tu cita',
                       content: AppStyledDropdown(
                         value: _selectedHospital,
                         items: _hospitals,
                         hintText: 'Selecciona un hospital',
                         prefixIcon: HugeIcons.strokeRoundedHospital01,
-                        onChanged: (value) => setState(() => _selectedHospital = value),
+                        iconColor: AppColors.accentColor,
+                        iconBackgroundColor: AppColors.accentColor.withAlpha(
+                          30,
+                        ),
+                        onChanged: (value) =>
+                            setState(() => _selectedHospital = value),
                       ),
                     ),
                     AppointmentStepLayout(
                       icon: HugeIcons.strokeRoundedNote,
                       title: 'Cuéntanos sobre tu consulta',
-                      subtitle: 'Describe brevemente el motivo de tu visita médica',
+                      subtitle:
+                          'Describe brevemente el motivo de tu visita médica',
                       content: CustomTextField(
                         controller: _reasonController,
                         focusNode: _reasonFocusNode,
                         labelText: 'Motivo de la consulta',
-                        hintText: 'Ej: Dolor de cabeza, chequeo general, molestias...',
+                        hintText:
+                            'Ej: Dolor de cabeza, chequeo general, molestias...',
                         icon: HugeIcons.strokeRoundedNote,
+
                         maxLines: 5,
+                        iconColor: AppColors.accentColor,
+                        focusedBorderColor: AppColors.accentColor,
                       ),
                     ),
                   ],

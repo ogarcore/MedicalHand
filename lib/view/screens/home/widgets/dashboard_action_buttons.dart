@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
-import 'package:p_hn25/view/screens/appointments/request_appointment_screen.dart';
+import 'package:p_hn25/view/screens/appointments/appointment_options_screen.dart';
 
 class DashboardActionButtons extends StatelessWidget {
   const DashboardActionButtons({super.key});
@@ -24,7 +24,7 @@ class DashboardActionButtons extends StatelessWidget {
             },
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 18),
-              backgroundColor: AppColors.primaryColor,
+              backgroundColor: AppColors.primaryColor.withAlpha(200),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -49,11 +49,11 @@ class DashboardActionButtons extends StatelessWidget {
             ),
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const RequestAppointmentScreen()),
+              MaterialPageRoute(builder: (_) => const AppointmentOptionsScreen()),
             ),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
-              backgroundColor: AppColors.accentColor,
+              backgroundColor: AppColors.accentColor.withAlpha(200),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),

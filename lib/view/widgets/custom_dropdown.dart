@@ -1,4 +1,3 @@
-// lib/view/widgets/custom_dropdown.dart
 import 'package:flutter/material.dart';
 import '../../../app/core/constants/app_colors.dart';
 
@@ -8,10 +7,9 @@ class AppStyledDropdown extends StatelessWidget {
   final ValueChanged<String?> onChanged;
   final String hintText;
   final IconData prefixIcon;
-  // ----- INICIO DEL CAMBIO -----
-  // 1. Se añade el validador como un parámetro opcional (nullable).
   final FormFieldValidator<String>? validator;
-  // ----- FIN DEL CAMBIO -----
+  final Color? iconColor;
+  final Color? iconBackgroundColor;
 
   const AppStyledDropdown({
     super.key,
@@ -20,11 +18,17 @@ class AppStyledDropdown extends StatelessWidget {
     required this.onChanged,
     required this.hintText,
     required this.prefixIcon,
-    this.validator, // <-- Se añade al constructor
+    this.validator,
+    this.iconColor, 
+    this.iconBackgroundColor, 
   });
 
   @override
   Widget build(BuildContext context) {
+    // 👇 Valores por defecto
+    final effectiveIconColor = iconColor ?? AppColors.primaryColor;
+    final effectiveIconBg = iconBackgroundColor ?? AppColors.primaryColor.withAlpha(25);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -53,12 +57,8 @@ class AppStyledDropdown extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: DropdownButtonHideUnderline(
               child: DropdownButtonFormField<String>(
-                // ----- INICIO DEL CAMBIO -----
-                // 2. Se pasa el validador al widget interno.
-                // Si es nulo, simplemente no se aplica ninguna validación.
                 validator: validator,
-                // ----- FIN DEL CAMBIO -----
-                value: value, // Cambiado de initialValue a value para mejor manejo de estado
+                initialValue: value,
                 onChanged: onChanged,
                 items: items.map<DropdownMenuItem<String>>((String v) {
                   return DropdownMenuItem<String>(
@@ -95,7 +95,7 @@ class AppStyledDropdown extends StatelessWidget {
                   ),
                   prefixIcon: Icon(
                     prefixIcon,
-                    color: AppColors.primaryColor,
+                    color: effectiveIconColor, 
                     size: 22,
                   ),
                 ),
@@ -104,11 +104,11 @@ class AppStyledDropdown extends StatelessWidget {
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.primaryColor.withAlpha(25),
+                    color: effectiveIconBg, 
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_drop_down,
-                    color: AppColors.primaryColor,
+                    color: effectiveIconColor, 
                     size: 24,
                   ),
                 ),

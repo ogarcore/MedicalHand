@@ -5,9 +5,10 @@ import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/view/screens/family/family_members_screen.dart';
 import 'package:p_hn25/view/screens/profile/profile_screen.dart';
 import 'package:p_hn25/view/screens/support/support_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:p_hn25/view/screens/splash/splash_screen.dart';
 import 'package:p_hn25/view/widgets/custom_modal.dart';
+import 'package:provider/provider.dart'; // <-- 1. IMPORTA PROVIDER
+import 'package:p_hn25/view_model/auth_view_model.dart';
 
 // Importa los nuevos widgets
 import 'profile_button.dart';
@@ -28,6 +29,7 @@ class _HomeAppBarState extends State<HomeAppBar> {
   final GlobalKey _profileButtonKey = GlobalKey();
 
   void _showLogoutDialog() {
+    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -52,8 +54,7 @@ class _HomeAppBarState extends State<HomeAppBar> {
               onPressed: () async {
                 final navigator = Navigator.of(context);
                 Navigator.of(dialogContext).pop();
-                await FirebaseAuth.instance.signOut();
-                if (!mounted) return;
+                await authViewModel.signOut();
                 navigator.pushAndRemoveUntil(
                   MaterialPageRoute(builder: (_) => const SplashScreen()),
                   (Route<dynamic> route) => false,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import '../../../app/core/constants/app_colors.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/secondary_button.dart';
@@ -7,6 +8,81 @@ import '../registration/registration_step1_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
+
+  Future<bool> _hasInternet() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    return !connectivityResult.contains(ConnectivityResult.none);
+  }
+
+  void _showNoConnectionMessage(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppColors.warningColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.wifi_off_rounded, color: Colors.white, size: 22),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  "Sin conexión a internet",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.close, color: Colors.white, size: 18),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                },
+                padding: EdgeInsets.zero,
+                constraints: BoxConstraints(),
+              ),
+            ],
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+        margin: const EdgeInsets.all(16),
+        padding: EdgeInsets.zero,
+      ),
+    );
+  }
+
+  void _handleLogin(BuildContext context) async {
+    final connected = await _hasInternet();
+    if (!connected) {
+      _showNoConnectionMessage(context);
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+    );
+  }
+
+  void _handleRegister(BuildContext context) async {
+    final connected = await _hasInternet();
+    if (!connected) {
+      _showNoConnectionMessage(context);
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const RegistrationStep1Screen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +105,7 @@ class WelcomeScreen extends StatelessWidget {
             ),
           ),
 
-          // Círculos decorativos con sombras suaves
+          // Círculos decorativos
           Positioned(
             top: -size.height * 0.24,
             right: -size.width * 0.2,
@@ -69,7 +145,7 @@ class WelcomeScreen extends StatelessWidget {
             ),
           ),
 
-          // Contenido principal centrado
+          // Contenido principal
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -79,7 +155,7 @@ class WelcomeScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Logo con diseño mejorado
+                      // Logo
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
@@ -108,6 +184,8 @@ class WelcomeScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 26),
+
+                      // Título
                       RichText(
                         text: TextSpan(
                           children: [
@@ -133,6 +211,7 @@ class WelcomeScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 12),
+
                       Text(
                         'El poder de gestionar tu bienestar, \nen la palma de tu mano.',
                         textAlign: TextAlign.center,
@@ -144,31 +223,18 @@ class WelcomeScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 120),
+
                       // Botones
                       SecondaryButton(
                         text: 'Registrarse',
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const RegistrationStep1Screen(),
-                            ),
-                          );
-                        },
+                        width: 280,
+                        onPressed: () => _handleRegister(context),
                       ),
                       const SizedBox(height: 18),
 
                       PrimaryButton(
                         text: 'Iniciar Sesión',
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const LoginScreen(),
-                            ),
-                          );
-                        },
+                        onPressed: () => _handleLogin(context),
                       ),
                     ],
                   ),

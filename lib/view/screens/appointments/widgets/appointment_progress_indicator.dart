@@ -15,7 +15,7 @@ class AppointmentProgressIndicator extends StatelessWidget {
   const AppointmentProgressIndicator({
     super.key,
     required this.currentStep,
-    this.stepTitles = const ['Especialidad', 'Hospital', 'Motivo'],
+    this.stepTitles = const ['Ubicación', 'Hospital', 'Motivo'],
     this.activeColor,
     this.inactiveColor,
     this.showStepNumbers = true,
@@ -108,7 +108,7 @@ class AppointmentProgressIndicator extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
-                mainAxisSize: MainAxisSize.min, // Para que se ajuste al contenido
+                mainAxisSize: MainAxisSize.min, 
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(

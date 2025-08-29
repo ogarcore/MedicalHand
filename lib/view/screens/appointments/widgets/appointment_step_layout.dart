@@ -1,4 +1,3 @@
-// lib/view/screens/appointments/widgets/appointment_step_layout.dart
 import 'package:flutter/material.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 
@@ -7,6 +6,7 @@ class AppointmentStepLayout extends StatelessWidget {
   final String title;
   final String subtitle;
   final Widget content;
+  final Color? iconColor;
 
   const AppointmentStepLayout({
     super.key,
@@ -14,41 +14,44 @@ class AppointmentStepLayout extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.content,
+    this.iconColor, 
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveIconColor = iconColor ?? AppColors.primaryColor;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal:18 , vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 12),
-          
+
           // Icono con diseño premium
           Center(
             child: Column(
               children: [
                 Container(
-                  width: 96,
-                  height: 96,
+                  width: 80,
+                  height: 80,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        AppColors.accentColor.withOpacity(0.15),
-                        AppColors.accentColor.withOpacity(0.03),
+                        effectiveIconColor.withAlpha(15),
+                        effectiveIconColor.withAlpha(10),
                       ],
                     ),
                     border: Border.all(
-                      color: AppColors.accentColor.withOpacity(0.2),
+                      color: effectiveIconColor.withAlpha(70),
                       width: 1.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.accentColor.withOpacity(0.1),
+                        color: effectiveIconColor.withAlpha(15),
                         blurRadius: 15,
                         offset: const Offset(0, 4),
                       ),
@@ -56,15 +59,15 @@ class AppointmentStepLayout extends StatelessWidget {
                   ),
                   child: Icon(
                     icon,
-                    size: 42,
-                    color: AppColors.accentColor,
+                    size: 30,
+                    color: effectiveIconColor,
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
               ],
             ),
           ),
-          
+
           // Título elegante
           Container(
             width: double.infinity,
@@ -72,7 +75,7 @@ class AppointmentStepLayout extends StatelessWidget {
             child: Text(
               title,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.w800,
                 color: AppColors.textColor,
@@ -81,7 +84,7 @@ class AppointmentStepLayout extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Subtítulo refinado
           Container(
             width: double.infinity,
@@ -89,7 +92,7 @@ class AppointmentStepLayout extends StatelessWidget {
             child: Text(
               subtitle,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 height: 1.5,
                 color: AppColors.textLightColor,
@@ -97,9 +100,9 @@ class AppointmentStepLayout extends StatelessWidget {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 32),
-          
+
           // Separador elegante
           Container(
             height: 1,
@@ -108,13 +111,13 @@ class AppointmentStepLayout extends StatelessWidget {
               gradient: LinearGradient(
                 colors: [
                   Colors.transparent,
-                  Colors.grey.withOpacity(0.2),
+                  Colors.grey.withAlpha(60),
                   Colors.transparent,
                 ],
               ),
             ),
           ),
-          
+
           const SizedBox(height: 28),
           content,
         ],

@@ -1,18 +1,39 @@
-// lib/view/screens/appointments/widgets/appointment_navigation_bar.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
+import 'package:p_hn25/view/widgets/primary_button.dart';
+import 'package:p_hn25/view/widgets/secondary_button.dart';
 
 class AppointmentNavigationBar extends StatelessWidget {
   final int currentStep;
   final VoidCallback onNextPressed;
   final VoidCallback onPreviousPressed;
+  final Color? primaryColor;
+  final Color? primaryForegroundColor;
+  final Color? primaryIconColor;
+  final Color? primaryShadowColor;
+
+  // 👇 Parámetros personalizables para SecondaryButton
+  final Color? secondaryColor;
+  final BorderSide? secondarySide;
+  final Color? secondaryForegroundColor;
+  final Color? secondaryIconColor;
+  final Color? secondaryShadowColor;
 
   const AppointmentNavigationBar({
     super.key,
     required this.currentStep,
     required this.onNextPressed,
     required this.onPreviousPressed,
+    this.primaryColor,
+    this.primaryForegroundColor,
+    this.primaryIconColor,
+    this.primaryShadowColor,
+    this.secondaryColor,
+    this.secondarySide,
+    this.secondaryForegroundColor,
+    this.secondaryIconColor,
+    this.secondaryShadowColor,
   });
 
   @override
@@ -23,7 +44,7 @@ class AppointmentNavigationBar extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withAlpha(20),
             blurRadius: 16,
             offset: const Offset(0, -6),
           ),
@@ -40,80 +61,46 @@ class AppointmentNavigationBar extends StatelessWidget {
             if (currentStep > 0)
               Expanded(
                 flex: 1,
-                child: SizedBox(
+                child: SecondaryButton(
+                  text: "Atrás",
+                  onPressed: onPreviousPressed,
                   height: 45,
-                  child: OutlinedButton(
-                    onPressed: onPreviousPressed,
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  side: secondarySide ??
+                      const BorderSide(
+                        color: AppColors.primaryColor,
+                        width: 1,
                       ),
-                      side: const BorderSide(
-                        color: AppColors.accentColor,
-                        width: 0.8,
-                      ),
-                      backgroundColor: Colors.white,
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          HugeIcons.strokeRoundedArrowLeft01,
-                          size: 18,
-                          color: AppColors.accentColor,
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          'Atrás',
-                          style: TextStyle(
-                            color: AppColors.accentColor,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
+                  foregroundColor:
+                      secondaryForegroundColor ?? AppColors.primaryColor,
+                  shadowColor: secondaryShadowColor,
+                  icon: Icon(
+                    HugeIcons.strokeRoundedArrowLeft01,
+                    size: 18,
+                    color: secondaryIconColor ??
+                        secondaryColor ??
+                        AppColors.primaryColor,
                   ),
                 ),
               ),
+
             if (currentStep > 0) const SizedBox(width: 16),
             Expanded(
               flex: currentStep == 0 ? 1 : 2,
-              child: SizedBox(
+              child: PrimaryButton(
+                text: currentStep < 2 ? "Continuar" : "Revisar datos",
+                onPressed: onNextPressed,
                 height: 45,
-                child: ElevatedButton(
-                  onPressed: onNextPressed,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.accentColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 4,
-                    shadowColor: AppColors.accentColor.withOpacity(0.5),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        currentStep < 2 ? 'Continuar' : 'Ver resumen',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
-                      ),
-                      if (currentStep < 2) ...[
-                        const SizedBox(width: 8),
-                        const Icon(
-                          HugeIcons.strokeRoundedArrowRight01,
-                          size: 20,
-                          color: Colors.white,
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                backgroundColor: primaryColor ?? AppColors.primaryColor.withAlpha(230),
+                icon: currentStep < 2
+                    ? Icon(
+                        HugeIcons.strokeRoundedArrowRight01,
+                        size: 20,
+                        color: primaryIconColor ?? Colors.white,
+                      )
+                    : null,
+                iconAtEnd: true,
               ),
             ),
           ],
