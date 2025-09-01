@@ -1,4 +1,3 @@
-// lib/view/screens/home/widgets/dashboard_view.dart
 import 'package:flutter/material.dart';
 import 'dashboard_header.dart';
 import 'next_appointment_card.dart';

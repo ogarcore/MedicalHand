@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
+import 'package:p_hn25/data/models/hospital_model.dart';
 import 'package:p_hn25/view/widgets/custom_dropdown.dart';
 import 'appointment_summary_screen.dart';
 import 'widgets/appointment_progress_indicator.dart';
@@ -28,7 +29,7 @@ class _ExternalAppoinmentScreenState extends State<ExternalAppoinmentScreen> {
   String? _selectedSpecialty;
 
   String? _selectedDepartment;
-  String? _selectedHospital;
+HospitalModel? _selectedHospital; 
 
   int _currentStep = 0;
 
@@ -48,11 +49,7 @@ class _ExternalAppoinmentScreenState extends State<ExternalAppoinmentScreen> {
     'Jinotega',
     'Managua',
   ];
-  final List<String> _hospitals = [
-    'Hospital Manolo Morales',
-    'Hospital Vélez Paiz',
-    'Centro Cardiológico Nacional',
-  ];
+    List<HospitalModel> _hospitalsList = []; 
 
   Future<void> _pickImage() async {
     // 1. Si ya está activo, no hagas nada.
@@ -138,7 +135,8 @@ class _ExternalAppoinmentScreenState extends State<ExternalAppoinmentScreen> {
               referralImage: _referralImage,
               specialty: _selectedSpecialty,
               departament: _selectedDepartment!,
-              hospital: _selectedHospital!,
+               hospitalId: _selectedHospital!.id,
+              hospitalName: _selectedHospital!.name,
               reason: "Cita solicitada por referencia",
             ),
           ),
@@ -279,12 +277,19 @@ class _ExternalAppoinmentScreenState extends State<ExternalAppoinmentScreen> {
                     subtitle:
                         'Verifica el hospital de destino que indica tu referencia',
                     content: AppStyledDropdown(
-                      value: _selectedHospital,
-                      items: _hospitals,
+                      value: _selectedHospital?.name,
+                            // Mapeamos nuestra lista de objetos a una lista de Strings para mostrar
+                            items: _hospitalsList.map((hospital) => hospital.name).toList(),
                       hintText: 'Selecciona un hospital',
                       prefixIcon: HugeIcons.strokeRoundedHospital01,
-                      onChanged: (value) =>
-                          setState(() => _selectedHospital = value),
+                      onChanged: (selectedName) {
+                              setState(() {
+                                // ...buscamos en nuestra lista completa el objeto HospitalModel que coincide
+                                _selectedHospital = _hospitalsList.firstWhere(
+                                  (hospital) => hospital.name == selectedName
+                                );
+                              });
+                            },
                     ),
                   ),
                 ],

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:p_hn25/view_model/appointment_view_model.dart';
 import 'package:p_hn25/view_model/auth_view_model.dart';
+import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'view/screens/splash/splash_screen.dart';
@@ -34,6 +36,8 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => SplashViewModel()),
         ChangeNotifierProvider(create: (_) => AuthViewModel()),
+        ChangeNotifierProvider(create: (_) => AppointmentViewModel()),
+        ChangeNotifierProvider(create: (_) => UserViewModel()),
       ],
       child: MaterialApp(
         title: 'MedicalHand',

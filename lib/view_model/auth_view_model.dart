@@ -4,6 +4,8 @@ import 'package:p_hn25/app/core/utils/validators.dart';
 import '../data/network/firebase_auth_service.dart';
 import '../data/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart'; 
+import 'user_view_model.dart';   
 
 class AuthViewModel extends ChangeNotifier {
   final FirebaseAuthService _authService = FirebaseAuthService();
@@ -58,7 +60,7 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<String?> signInWithGoogleLogin() async {
+  Future<String?> signInWithGoogleLogin(BuildContext context) async {
     setLoading(true);
     setErrorMessage(null);
 
@@ -79,7 +81,8 @@ class AuthViewModel extends ChangeNotifier {
       // 3. Aplicamos la lógica de inicio de sesión.
       switch (provider) {
         case 'google.com':
-          // ¡Éxito! El usuario existe y se registró con Google.
+        final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+          await userViewModel.fetchCurrentUser();
           setLoading(false);
           return 'HOME'; // Navegamos a la pantalla principal.
 
@@ -142,7 +145,9 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> signOut() async {
+  Future<void> signOut(BuildContext context) async {
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+    userViewModel.clearUser();
     await _authService.signOut();
     clearControllers();
   }
@@ -264,7 +269,7 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> signInUser(String email, String password) async {
+  Future<bool> signInUser(BuildContext context, String email, String password) async {
     setLoading(true);
     setErrorMessage(null);
 
@@ -302,6 +307,11 @@ class AuthViewModel extends ChangeNotifier {
         setErrorMessage("Por favor, verifica tu correo electrónico.");
         setLoading(false);
         return false;
+      }
+
+      if (user != null) {
+        final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+        await userViewModel.fetchCurrentUser();
       }
 
       setLoading(false);

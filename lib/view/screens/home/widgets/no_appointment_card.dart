@@ -1,4 +1,3 @@
-// lib/view/screens/home/widgets/no_appointment_card.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';

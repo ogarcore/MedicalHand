@@ -7,10 +7,8 @@ import 'package:p_hn25/view/screens/profile/profile_screen.dart';
 import 'package:p_hn25/view/screens/support/support_screen.dart';
 import 'package:p_hn25/view/screens/splash/splash_screen.dart';
 import 'package:p_hn25/view/widgets/custom_modal.dart';
-import 'package:provider/provider.dart'; // <-- 1. IMPORTA PROVIDER
+import 'package:provider/provider.dart';
 import 'package:p_hn25/view_model/auth_view_model.dart';
-
-// Importa los nuevos widgets
 import 'profile_button.dart';
 import 'notification_icon_button.dart';
 
@@ -30,6 +28,7 @@ class _HomeAppBarState extends State<HomeAppBar> {
 
   void _showLogoutDialog() {
     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -52,9 +51,111 @@ class _HomeAppBarState extends State<HomeAppBar> {
               text: 'Aceptar',
               isWarning: true,
               onPressed: () async {
+                // --- 1. LÓGICA MODIFICADA PARA LA PANTALLA DE CARGA ---
+
+                // Guardamos el navigator del contexto principal ANTES de cualquier operación asíncrona.
                 final navigator = Navigator.of(context);
+
+                // Cerramos el diálogo de confirmación actual.
                 Navigator.of(dialogContext).pop();
-                await authViewModel.signOut();
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) {
+                    return Dialog(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              AppColors.primaryColor.withAlpha(100),
+                              AppColors.accentColor.withAlpha(100),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 28,
+                            vertical: 32,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.backgroundColor,
+                            borderRadius: BorderRadius.circular(22),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Icono animado
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      AppColors.primaryColor,
+                                      AppColors.accentColor,
+                                    ],
+                                  ),
+                                ),
+                                child: SizedBox(
+                                  width: 36,
+                                  height: 36,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              // Texto con tipografía mejorada
+                              Text(
+                                "Cerrando sesión",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge?.color,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                "Por favor espere un momento...",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.grey[600],
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+
+                // Esperamos a que el proceso de signOut termine.
+                await authViewModel.signOut(context);
+
+                // Si el widget todavía está en pantalla, continuamos.
+                if (!navigator.mounted) return;
+
+                // Cerramos el diálogo de "Cerrando sesión...".
+                navigator.pop();
+
+                // Finalmente, navegamos a la SplashScreen.
                 navigator.pushAndRemoveUntil(
                   MaterialPageRoute(builder: (_) => const SplashScreen()),
                   (Route<dynamic> route) => false,
@@ -229,10 +330,7 @@ class _HomeAppBarState extends State<HomeAppBar> {
           }
         },
       ),
-      actions: const [
-        NotificationIconButton(),
-        SizedBox(width: 8),
-      ],
+      actions: const [NotificationIconButton(), SizedBox(width: 8)],
     );
   }
 }

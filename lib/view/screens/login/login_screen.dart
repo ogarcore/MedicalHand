@@ -93,6 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final messenger = ScaffoldMessenger.of(context);
 
       final success = await authViewModel.signInUser(
+        context,
         emailController.text.trim(),
         passwordController.text.trim(),
       );
@@ -120,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final messenger = ScaffoldMessenger.of(context);
 
     setState(() => _isGoogleLoading = true);
-    final result = await authViewModel.signInWithGoogleLogin();
+    final result = await authViewModel.signInWithGoogleLogin(context);
     if (!mounted) return;
     setState(() => _isGoogleLoading = false);
 

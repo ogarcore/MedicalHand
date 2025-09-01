@@ -1,3 +1,4 @@
+// lib/view/widgets/custom_dropdown.dart
 import 'package:flutter/material.dart';
 import '../../../app/core/constants/app_colors.dart';
 
@@ -10,6 +11,7 @@ class AppStyledDropdown extends StatelessWidget {
   final FormFieldValidator<String>? validator;
   final Color? iconColor;
   final Color? iconBackgroundColor;
+  final bool showDropdownIcon;
 
   const AppStyledDropdown({
     super.key,
@@ -19,15 +21,16 @@ class AppStyledDropdown extends StatelessWidget {
     required this.hintText,
     required this.prefixIcon,
     this.validator,
-    this.iconColor, 
-    this.iconBackgroundColor, 
+    this.iconColor,
+    this.iconBackgroundColor,
+    this.showDropdownIcon = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    // 👇 Valores por defecto
     final effectiveIconColor = iconColor ?? AppColors.primaryColor;
-    final effectiveIconBg = iconBackgroundColor ?? AppColors.primaryColor.withAlpha(25);
+    final effectiveIconBg =
+        iconBackgroundColor ?? AppColors.primaryColor.withAlpha(25);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,34 +61,50 @@ class AppStyledDropdown extends StatelessWidget {
             child: DropdownButtonHideUnderline(
               child: DropdownButtonFormField<String>(
                 validator: validator,
-                initialValue: value,
+                value: value,
                 onChanged: onChanged,
                 items: items.map<DropdownMenuItem<String>>((String v) {
                   return DropdownMenuItem<String>(
                     value: v,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 12),
-                          Text(
-                            v,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColor,
-                            ),
-                          ),
-                        ],
+                      constraints: const BoxConstraints(minWidth: 100),
+                      child: Text(
+                        v,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textColor,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2, // Permite hasta 2 líneas para textos largos
                       ),
                     ),
                   );
                 }).toList(),
+                
+                selectedItemBuilder: (BuildContext context) {
+                  return items.map<Widget>((String item) {
+                    return Container(
+                      alignment: Alignment.centerLeft,
+                      constraints: const BoxConstraints(minWidth: 100),
+                      child: Text(
+                        item,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textColor,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1, // Para el campo seleccionado, solo una línea con puntos suspensivos
+                      ),
+                    );
+                  }).toList();
+                },
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 1,
-                    vertical: 16,
+                    vertical: 12,
                   ),
                   hintText: hintText,
                   hintStyle: TextStyle(
@@ -95,23 +114,26 @@ class AppStyledDropdown extends StatelessWidget {
                   ),
                   prefixIcon: Icon(
                     prefixIcon,
-                    color: effectiveIconColor, 
+                    color: effectiveIconColor,
                     size: 22,
                   ),
+                  isDense: true,
                 ),
                 dropdownColor: Colors.white,
-                icon: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: effectiveIconBg, 
-                  ),
-                  child: Icon(
-                    Icons.arrow_drop_down,
-                    color: effectiveIconColor, 
-                    size: 24,
-                  ),
-                ),
+                icon: showDropdownIcon
+                    ? Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: effectiveIconBg,
+                        ),
+                        child: Icon(
+                          Icons.arrow_drop_down,
+                          color: effectiveIconColor,
+                          size: 24,
+                        ),
+                      )
+                    : const SizedBox.shrink(),
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -119,27 +141,8 @@ class AppStyledDropdown extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(16),
                 isExpanded: true,
-                menuMaxHeight: 200,
+                menuMaxHeight: 300, 
                 elevation: 8,
-                selectedItemBuilder: (BuildContext context) {
-                  return items.map<Widget>((String v) {
-                    return Container(
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        children: [
-                          Text(
-                            v,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList();
-                },
               ),
             ),
           ),
