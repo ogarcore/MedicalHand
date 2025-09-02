@@ -1,14 +1,7 @@
 // lib/view/screens/home/widgets/home_app_bar.dart
 import 'package:flutter/material.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
-import 'package:p_hn25/view/screens/family/family_members_screen.dart';
-import 'package:p_hn25/view/screens/profile/profile_screen.dart';
-import 'package:p_hn25/view/screens/support/support_screen.dart';
-import 'package:p_hn25/view/screens/splash/splash_screen.dart';
-import 'package:p_hn25/view/widgets/custom_modal.dart';
-import 'package:provider/provider.dart';
-import 'package:p_hn25/view_model/auth_view_model.dart';
+import 'home_app_bar_logic.dart'; 
 import 'profile_button.dart';
 import 'notification_icon_button.dart';
 
@@ -22,298 +15,8 @@ class HomeAppBar extends StatefulWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-class _HomeAppBarState extends State<HomeAppBar> {
-  bool _isMenuOpen = false;
-  final GlobalKey _profileButtonKey = GlobalKey();
-
-  void _showLogoutDialog() {
-    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
-
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return CustomModal(
-          icon: HugeIcons.strokeRoundedLogout03,
-          title: 'Cerrar Sesión',
-          content: const Text(
-            '¿Estás seguro de que deseas cerrar sesión?',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, height: 1.5),
-          ),
-          actions: <Widget>[
-            ModalButton(
-              text: 'Cancelar',
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-            ModalButton(
-              text: 'Aceptar',
-              isWarning: true,
-              onPressed: () async {
-                // --- 1. LÓGICA MODIFICADA PARA LA PANTALLA DE CARGA ---
-
-                // Guardamos el navigator del contexto principal ANTES de cualquier operación asíncrona.
-                final navigator = Navigator.of(context);
-
-                // Cerramos el diálogo de confirmación actual.
-                Navigator.of(dialogContext).pop();
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext context) {
-                    return Dialog(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppColors.primaryColor.withAlpha(100),
-                              AppColors.accentColor.withAlpha(100),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 28,
-                            vertical: 32,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.backgroundColor,
-                            borderRadius: BorderRadius.circular(22),
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Icono animado
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      AppColors.primaryColor,
-                                      AppColors.accentColor,
-                                    ],
-                                  ),
-                                ),
-                                child: SizedBox(
-                                  width: 36,
-                                  height: 36,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              // Texto con tipografía mejorada
-                              Text(
-                                "Cerrando sesión",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  color: Theme.of(
-                                    context,
-                                  ).textTheme.bodyLarge?.color,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                "Por favor espere un momento...",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.grey[600],
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                );
-
-                // Esperamos a que el proceso de signOut termine.
-                await authViewModel.signOut(context);
-
-                // Si el widget todavía está en pantalla, continuamos.
-                if (!navigator.mounted) return;
-
-                // Cerramos el diálogo de "Cerrando sesión...".
-                navigator.pop();
-
-                // Finalmente, navegamos a la SplashScreen.
-                navigator.pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const SplashScreen()),
-                  (Route<dynamic> route) => false,
-                );
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showProfileMenu() {
-    setState(() {
-      _isMenuOpen = true;
-    });
-
-    final RenderBox renderBox =
-        _profileButtonKey.currentContext!.findRenderObject() as RenderBox;
-    final size = renderBox.size;
-    final position = renderBox.localToGlobal(Offset.zero);
-    final navigator = Navigator.of(context);
-
-    const double menuWidth = 190.0;
-
-    showMenu<String>(
-      context: context,
-      position: RelativeRect.fromLTRB(
-        position.dx - 60,
-        position.dy + size.height + 6.0,
-        position.dx + size.width,
-        position.dy,
-      ),
-      items: [
-        PopupMenuItem(
-          enabled: false,
-          child: SizedBox(
-            width: menuWidth,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Oliver García (yo)',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const PopupMenuDivider(height: 8),
-        PopupMenuItem<String>(
-          value: 'profile',
-          child: Row(
-            children: [
-              const Icon(
-                HugeIcons.strokeRoundedUser,
-                color: AppColors.primaryColor,
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Mi Perfil',
-                style: TextStyle(color: AppColors.primaryColor),
-              ),
-            ],
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'family',
-          child: Row(
-            children: [
-              const Icon(
-                HugeIcons.strokeRoundedUserGroup02,
-                color: AppColors.accentColor,
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Mis Familiares',
-                style: TextStyle(color: AppColors.accentColor),
-              ),
-            ],
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'support',
-          child: Row(
-            children: [
-              Icon(
-                HugeIcons.strokeRoundedCustomerService01,
-                color: AppColors.textColor.withAlpha(178),
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Text('Soporte', style: TextStyle(color: AppColors.textColor)),
-            ],
-          ),
-        ),
-        const PopupMenuDivider(height: 16),
-        PopupMenuItem<String>(
-          value: 'logout',
-          child: Row(
-            children: [
-              const Icon(
-                HugeIcons.strokeRoundedLogout03,
-                color: AppColors.warningColor,
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Cerrar Sesión',
-                style: TextStyle(
-                  color: AppColors.warningColor,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.withAlpha(50), width: 1),
-      ),
-      elevation: 8,
-      color: Colors.white.withAlpha(250),
-    ).then((selectedValue) {
-      if (!mounted) return;
-
-      setState(() {
-        _isMenuOpen = false;
-      });
-
-      if (selectedValue == null) return;
-
-      if (selectedValue == 'profile') {
-        navigator.push(
-          MaterialPageRoute(builder: (_) => const ProfileScreen()),
-        );
-      } else if (selectedValue == 'family') {
-        navigator.push(
-          MaterialPageRoute(builder: (_) => const FamilyMembersScreen()),
-        );
-      } else if (selectedValue == 'support') {
-        navigator.push(
-          MaterialPageRoute(builder: (_) => const SupportScreen()),
-        );
-      } else if (selectedValue == 'logout') {
-        _showLogoutDialog();
-      }
-    });
-  }
-
+// CAMBIO: La clase ahora hereda de State y "mezcla" la lógica con 'with'.
+class _HomeAppBarState extends State<HomeAppBar> with HomeAppBarLogic {
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -322,15 +25,20 @@ class _HomeAppBarState extends State<HomeAppBar> {
       backgroundColor: AppColors.backgroundColor,
       surfaceTintColor: Colors.transparent,
       title: ProfileButton(
-        buttonKey: _profileButtonKey,
-        isMenuOpen: _isMenuOpen,
+        buttonKey: profileButtonKey, // Usa la variable del mixin
+        isMenuOpen: isMenuOpen, // Usa la variable del mixin
         onTap: () {
-          if (!_isMenuOpen) {
-            _showProfileMenu();
+          if (!isMenuOpen) {
+            showProfileMenu(); // Usa el método del mixin
           }
         },
       ),
-      actions: const [NotificationIconButton(), SizedBox(width: 8)],
+      actions: [
+        NotificationIconButton(
+          onPressed: showNotificationsPanel, // Usa el método del mixin
+        ),
+        const SizedBox(width: 8)
+      ],
     );
   }
 }

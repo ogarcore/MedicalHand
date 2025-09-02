@@ -1,10 +1,20 @@
 // lib/view/screens/home/widgets/next_appointment_card.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:intl/intl.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
+import 'package:p_hn25/data/models/cita_model.dart';
 
 class NextAppointmentCard extends StatelessWidget {
-  const NextAppointmentCard({super.key});
+  final CitaModel appointment;
+
+  const NextAppointmentCard({super.key, required this.appointment});
+
+  // CAMBIO: La lógica de formato ahora usa el objeto 'appointment'
+  String _formatFullDate() {
+    if (appointment.assignedDate == null) return 'Fecha no asignada';
+    return "${DateFormat('d MMMM', 'es_ES').format(appointment.assignedDate!)} - ${DateFormat('hh:mm a', 'es_ES').format(appointment.assignedDate!)}";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +56,11 @@ class NextAppointmentCard extends StatelessWidget {
             ),
             child: const Row(
               children: [
-                Icon(HugeIcons.strokeRoundedCalendar03, color: Colors.white, size: 22),
+                Icon(
+                  HugeIcons.strokeRoundedCalendar03,
+                  color: Colors.white,
+                  size: 22,
+                ),
                 SizedBox(width: 10),
                 Text(
                   'Tu Próxima Cita',
@@ -65,28 +79,29 @@ class NextAppointmentCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // CAMBIO: Los datos ahora son dinámicos
                 _buildInfoRow(
                   HugeIcons.strokeRoundedMicroscope,
                   'Especialidad',
-                  'Cardiología',
+                  appointment.specialty ?? 'Consulta General',
                 ),
                 const SizedBox(height: 16),
                 _buildInfoRow(
                   HugeIcons.strokeRoundedHospital01,
                   'Hospital',
-                  'Hospital Velez Paiz',
+                  appointment.hospital,
                 ),
                 const SizedBox(height: 16),
                 _buildInfoRow(
                   HugeIcons.strokeRoundedHospitalBed01,
                   'Consultorio',
-                  'Consultorio 17',
+                  appointment.clinicOffice ?? 'Por Asignar',
                 ),
                 const SizedBox(height: 16),
                 _buildInfoRow(
                   HugeIcons.strokeRoundedDateTime,
                   'Fecha y Hora',
-                  '25 de septiembre - 10:00 AM',
+                  _formatFullDate(),
                 ),
               ],
             ),

@@ -4,15 +4,16 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 
 class NotificationIconButton extends StatelessWidget {
-  const NotificationIconButton({super.key});
+  final VoidCallback? onPressed;
+  const NotificationIconButton({super.key, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         Container(
-          width: 44,
-          height: 44,
+          width: 46,
+          height: 46,
           decoration: BoxDecoration(
             color: Colors.white,
             shape: BoxShape.circle,
@@ -26,11 +27,11 @@ class NotificationIconButton extends StatelessWidget {
             ],
           ),
           child: IconButton(
-            onPressed: () {},
+            onPressed: onPressed,
             icon: Icon(
               HugeIcons.strokeRoundedNotification03,
               color: AppColors.textColor.withAlpha(204),
-              size: 24,
+              size: 25,
             ),
           ),
         ),

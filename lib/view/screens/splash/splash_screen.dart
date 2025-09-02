@@ -35,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             Image.asset(
               'assets/images/icono.png',
-              width: 160,
+              width: 120,
               height: 140,
               fit: BoxFit.contain,
             ),
@@ -46,15 +46,6 @@ class _SplashScreenState extends State<SplashScreen> {
               height: 120,
               delegates: LottieDelegates(
                 values: [ValueDelegate.color(const ['**'], value: AppColors.accentColor)],
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              "Cargando...",
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
               ),
             ),
           ],

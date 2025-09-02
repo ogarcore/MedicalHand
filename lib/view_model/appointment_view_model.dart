@@ -6,6 +6,7 @@ import '../data/models/hospital_model.dart';
 
 class AppointmentViewModel extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  
 
   // ... (tus otros métodos como getNicaraguaDepartments, getHospitals, etc., no cambian)
   List<String> getNicaraguaDepartments() {
@@ -117,5 +118,25 @@ Stream<List<CitaModel>> getUpcomingAppointments(String userId) {
               .map((doc) => CitaModel.fromFirestore(doc))
               .toList();
         });
+  }
+
+  Stream<CitaModel?> getNextConfirmedAppointment(String userId) {
+    final now = DateTime.now();
+
+    return _firestore
+        .collection('citas')
+        .where('uid', isEqualTo: userId)
+        .where('status', isEqualTo: 'confirmada')
+        .where('assignedDate', isGreaterThanOrEqualTo: Timestamp.fromDate(now))
+        .orderBy('assignedDate') 
+        .limit(1) 
+        .snapshots()
+        .map((snapshot) {
+      if (snapshot.docs.isEmpty) {
+        return null; // No hay citas próximas confirmadas
+      }
+      // Si hay documentos, toma el primero y lo convierte en un objeto CitaModel
+      return CitaModel.fromFirestore(snapshot.docs.first);
+    });
   }
 }

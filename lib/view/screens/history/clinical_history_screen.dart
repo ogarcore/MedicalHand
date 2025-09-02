@@ -4,9 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'widgets/history_card.dart';
 import 'widgets/empty_history_view.dart';
-// ----- INICIO DEL CAMBIO -----
-import 'widgets/filter_history_modal.dart'; // <-- 1. Importamos el nuevo widget.
-// ----- FIN DEL CAMBIO -----
+import 'widgets/filter_history_modal.dart';
 
 class ClinicalHistoryScreen extends StatefulWidget {
   const ClinicalHistoryScreen({super.key});
@@ -96,8 +94,6 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
     });
   }
 
-  // ----- INICIO DEL CAMBIO -----
-  // 2. El método para mostrar el diálogo ahora es mucho más simple.
   void _showFilterDialog() {
     final specialties = [
       'Todas',
@@ -111,7 +107,6 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (context) {
-        // Simplemente llamamos a nuestro nuevo widget y le pasamos las funciones.
         return FilterHistoryModal(
           specialties: specialties,
           onApplyFilters: _applyFilters,
@@ -120,7 +115,6 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
       },
     );
   }
-  // ----- FIN DEL CAMBIO -----
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +123,9 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
+            // ----- INICIO DEL CAMBIO -----
+            automaticallyImplyLeading: false, // <-- ¡Esta es la línea que soluciona el problema!
+            // ----- FIN DEL CAMBIO -----
             backgroundColor: AppColors.backgroundColor,
             surfaceTintColor: Colors.transparent,
             pinned: true,
