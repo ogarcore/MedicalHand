@@ -4,8 +4,8 @@ import 'package:p_hn25/app/core/utils/validators.dart';
 import '../data/network/firebase_auth_service.dart';
 import '../data/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:provider/provider.dart'; 
-import 'user_view_model.dart';   
+import 'package:provider/provider.dart';
+import 'user_view_model.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final FirebaseAuthService _authService = FirebaseAuthService();
@@ -81,7 +81,10 @@ class AuthViewModel extends ChangeNotifier {
       // 3. Aplicamos la lógica de inicio de sesión.
       switch (provider) {
         case 'google.com':
-        final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+          final userViewModel = Provider.of<UserViewModel>(
+            context,
+            listen: false,
+          );
           await userViewModel.fetchCurrentUser();
           setLoading(false);
           return 'HOME'; // Navegamos a la pantalla principal.
@@ -157,7 +160,7 @@ class AuthViewModel extends ChangeNotifier {
     clearControllers();
   }
 
-  Future<String?> finalizeRegistration() async {
+  Future<String?> finalizeRegistration(BuildContext context) async {
     setLoading(true);
     setErrorMessage(null);
 
@@ -169,8 +172,6 @@ class AuthViewModel extends ChangeNotifier {
         setLoading(false);
         return null;
       }
-      // NOTA: He eliminado una línea duplicada aquí que causaba un error
-      // y he movido la lógica al bloque try-catch para un manejo de errores correcto.
       try {
         user = await _authService.signUpWithEmailAndPassword(
           emailController.text,
@@ -199,7 +200,6 @@ class AuthViewModel extends ChangeNotifier {
         ),
       );
 
-      // Creamos el modelo SIN el authProvider inicialmente
       final userModel = UserModel(
         uid: user.uid,
         email: emailController.text,
@@ -225,9 +225,16 @@ class AuthViewModel extends ChangeNotifier {
           'knownAllergies': allergiesController.text,
           'chronicDiseases': selectedDiseases.toList(),
         },
+        isTutor: true,
+        managedBy: null,
       );
 
       await _authService.saveUserData(userModel);
+
+      // CAMBIO 2: ¡Aquí está la solución!
+      // Le decimos al UserViewModel que cargue los datos del usuario que acabamos de guardar.
+      final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+      await userViewModel.fetchCurrentUser();
 
       if (user.providerData.any((p) => p.providerId == 'password')) {
         await _authService.updateUserAuthProvider(user.uid, 'password');
@@ -269,7 +276,11 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> signInUser(BuildContext context, String email, String password) async {
+  Future<bool> signInUser(
+    BuildContext context,
+    String email,
+    String password,
+  ) async {
     setLoading(true);
     setErrorMessage(null);
 
@@ -310,7 +321,10 @@ class AuthViewModel extends ChangeNotifier {
       }
 
       if (user != null) {
-        final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+        final userViewModel = Provider.of<UserViewModel>(
+          context,
+          listen: false,
+        );
         await userViewModel.fetchCurrentUser();
       }
 

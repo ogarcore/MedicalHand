@@ -1,4 +1,3 @@
-// lib/view/screens/home/widgets/dashboard_action_buttons.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -13,62 +12,62 @@ class DashboardActionButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // CAMBIO: El botón de confirmar asistencia ahora es condicional
         if (canCheckIn)
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              icon: const Icon(HugeIcons.strokeRoundedTickDouble04, size: 22),
+              icon: const Icon(HugeIcons.strokeRoundedTickDouble04, size: 20),
               label: const Text(
                 'Confirmar asistencia y recibir turno',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
               ),
               onPressed: () {
                 // Lógica para el check-in
               },
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 18),
-                backgroundColor: AppColors.primaryColor.withAlpha(200),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                backgroundColor: AppColors.primaryColor,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                shadowColor: AppColors.primaryColor.withAlpha(102),
-                elevation: 5,
+                shadowColor: Colors.black.withAlpha(130),
+                elevation: 3,
               ),
             ),
           ),
-        
-        // CAMBIO: El espacio entre botones también es condicional
-        if (canCheckIn) const SizedBox(height: 16),
-
-        // El botón de agendar nueva cita siempre se muestra
+        if (canCheckIn) const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
-            icon: const Icon(HugeIcons.strokeRoundedLayerAdd, size: 22, color: Colors.white),
+            icon: const Icon(
+              HugeIcons.strokeRoundedLayerAdd,
+              size: 20,
+              color: Colors.white,
+            ),
             label: const Text(
               'Agendar Nueva Cita',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
             ),
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const AppointmentOptionsScreen()),
+              MaterialPageRoute(
+                builder: (_) => const AppointmentOptionsScreen(),
+              ),
             ),
             style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
-              backgroundColor: AppColors.accentColor.withAlpha(200),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              backgroundColor: AppColors.accentColor,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(14),
               ),
-              shadowColor: AppColors.accentColor.withAlpha(102),
-              elevation: 5,
-              animationDuration: const Duration(milliseconds: 300),
+              shadowColor: Colors.black.withOpacity(0.15),
+              elevation: 3,
             ),
           ),
         ),

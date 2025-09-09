@@ -11,18 +11,15 @@ import 'view_model/splash_view_model.dart';
 import 'app/core/constants/app_colors.dart';
 
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark, 
+      statusBarIconBrightness: Brightness.dark,
     ),
   );
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(const MyApp());
 }
@@ -44,7 +41,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           scaffoldBackgroundColor: AppColors.backgroundColor,
-          fontFamily: 'Inter', 
+          fontFamily: 'Inter',
         ),
         home: const SplashScreen(),
       ),

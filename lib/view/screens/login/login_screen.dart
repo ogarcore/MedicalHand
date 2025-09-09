@@ -38,7 +38,8 @@ class _LoginScreenState extends State<LoginScreen> {
         return CustomModal(
           icon: HugeIcons.strokeRoundedSquareLockPassword,
           title: 'Recuperar Contraseña',
-          subtitle: 'Introduce el correo electrónico asociado a tu cuenta para enviarte un enlace de recuperación.',
+          subtitle:
+              'Introduce el correo electrónico asociado a tu cuenta para enviarte un enlace de recuperación.',
           content: CustomTextField(
             controller: resetEmailController,
             labelText: 'Correo Electrónico',
@@ -66,7 +67,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 if (error == null) {
                   messenger.showSnackBar(
                     const SnackBar(
-                      content: Text('Enlace de recuperación enviado a tu correo.'),
+                      content: Text(
+                        'Enlace de recuperación enviado a tu correo.',
+                      ),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -87,6 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleLogin() async {
+    FocusScope.of(context).unfocus();
     if (_formKey.currentState!.validate()) {
       final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
       final navigator = Navigator.of(context);
@@ -116,6 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleGoogleLogin() async {
+    FocusScope.of(context).unfocus();
     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -150,11 +155,12 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
+      behavior: HitTestBehavior.opaque,
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         body: Stack(
           children: [
-            const LoginBackground(), 
+            const LoginBackground(),
             SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -166,7 +172,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       formKey: _formKey,
                       emailController: emailController,
                       passwordController: passwordController,
-                      isLoading: Provider.of<AuthViewModel>(context).isLoading && !_isGoogleLoading,
+                      isLoading:
+                          Provider.of<AuthViewModel>(context).isLoading &&
+                          !_isGoogleLoading,
                       onLoginPressed: _handleLogin,
                       onForgotPasswordPressed: _showForgotPasswordDialog,
                     ),

@@ -1,3 +1,4 @@
+// lib/view/widgets/custom_text_field.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../app/core/constants/app_colors.dart';
@@ -13,8 +14,8 @@ class CustomTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final List<TextInputFormatter>? inputFormatters;
   final int? maxLines;
-  final Color? iconColor; // 👈 Nuevo: color de ícono
-  final Color? focusedBorderColor; // 👈 Nuevo: color de borde en focus
+  final Color? iconColor;
+  final Color? focusedBorderColor;
 
   const CustomTextField({
     super.key,
@@ -60,6 +61,19 @@ class _CustomTextFieldState extends State<CustomTextField> {
     }
   }
 
+  // CAMBIO: Helper para decidir qué tipo de capitalización usar.
+  TextCapitalization _getTextCapitalization() {
+    // Si es un campo de contraseña, email o URL, no aplicamos ninguna capitalización.
+    if (widget.isPassword ||
+        widget.keyboardType == TextInputType.emailAddress ||
+        widget.keyboardType == TextInputType.visiblePassword ||
+        widget.keyboardType == TextInputType.url) {
+      return TextCapitalization.none;
+    }
+    // Para el resto (texto normal, nombres, direcciones), capitalizamos la primera letra de las oraciones.
+    return TextCapitalization.sentences;
+  }
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -68,6 +82,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
       controller: widget.controller,
       obscureText: widget.isPassword && _isObscured,
       keyboardType: widget.keyboardType,
+      // CAMBIO: Se añade la propiedad aquí
+      textCapitalization: _getTextCapitalization(),
       validator: widget.validator,
       inputFormatters: widget.inputFormatters,
       maxLines: widget.isPassword ? 1 : widget.maxLines,
@@ -87,16 +103,14 @@ class _CustomTextFieldState extends State<CustomTextField> {
         hintStyle: TextStyle(color: Colors.grey[500], fontSize: 16),
         prefixIcon: Icon(
           widget.icon,
-          color: widget.iconColor ?? AppColors.primaryColor, // 👈 configurable
+          color: widget.iconColor ?? AppColors.primaryColor,
           size: 22,
         ),
         suffixIcon: widget.isPassword
             ? IconButton(
                 icon: Icon(
                   _isObscured ? Icons.visibility_off : Icons.visibility,
-                  color:
-                      widget.iconColor ??
-                      AppColors.primaryColor, // 👈 configurable
+                  color: widget.iconColor ?? AppColors.primaryColor,
                 ),
                 onPressed: () {
                   setState(() {
@@ -116,9 +130,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(
-            color:
-                widget.focusedBorderColor ??
-                AppColors.primaryColor, // 👈 configurable
+            color: widget.focusedBorderColor ?? AppColors.primaryColor,
             width: 1.8,
           ),
         ),

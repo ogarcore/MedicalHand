@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
+import 'package:p_hn25/view_model/user_view_model.dart';
+import 'package:provider/provider.dart';
 
 class ProfileButton extends StatelessWidget {
   final GlobalKey buttonKey;
@@ -51,14 +53,39 @@ class ProfileButton extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            const Text(
-              'Oliver García',
-              style: TextStyle(
-                color: AppColors.textColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+
+            Consumer<UserViewModel>(
+              builder: (context, userViewModel, child) {
+                if (userViewModel.isLoading) {
+                  return const Text(
+                    '...',
+                    style: TextStyle(
+                      color: AppColors.textColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  );
+                }
+                final firstName = (userViewModel.currentUser?.firstName ?? '')
+                    .split(' ')
+                    .first;
+                final lastName = (userViewModel.currentUser?.lastName ?? '')
+                    .split(' ')
+                    .first;
+
+                final displayName = "$firstName $lastName".trim();
+
+                return Text(
+                  displayName,
+                  style: const TextStyle(
+                    color: AppColors.textColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                );
+              },
             ),
+
             const SizedBox(width: 8),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
@@ -66,7 +93,9 @@ class ProfileButton extends StatelessWidget {
                 return FadeTransition(opacity: animation, child: child);
               },
               child: Icon(
-                isMenuOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                isMenuOpen
+                    ? Icons.keyboard_arrow_up
+                    : Icons.keyboard_arrow_down,
                 key: ValueKey<bool>(isMenuOpen),
                 color: AppColors.textColor.withAlpha(178),
                 size: 20,

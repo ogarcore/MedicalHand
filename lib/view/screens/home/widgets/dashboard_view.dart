@@ -18,7 +18,6 @@ class DashboardView extends StatefulWidget {
 }
 
 class _DashboardViewState extends State<DashboardView> {
-
   Stream<CitaModel?>? _appointmentStream;
 
   @override
@@ -27,7 +26,10 @@ class _DashboardViewState extends State<DashboardView> {
     initializeDateFormatting('es_ES', null);
     final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     if (userId.isNotEmpty) {
-      final viewModel = Provider.of<AppointmentViewModel>(context, listen: false);
+      final viewModel = Provider.of<AppointmentViewModel>(
+        context,
+        listen: false,
+      );
       _appointmentStream = viewModel.getNextConfirmedAppointment(userId);
     }
   }
@@ -45,16 +47,17 @@ class _DashboardViewState extends State<DashboardView> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 19.0, vertical: 14.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const DashboardHeader(),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
           StreamBuilder<CitaModel?>(
             stream: _appointmentStream,
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.none && snapshot.data == null) {
+              if (snapshot.connectionState == ConnectionState.none &&
+                  snapshot.data == null) {
                 return const NoAppointmentCard();
               }
 

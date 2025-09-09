@@ -9,6 +9,7 @@ import 'package:p_hn25/view/screens/splash/splash_screen.dart';
 import 'package:p_hn25/view/screens/support/support_screen.dart';
 import 'package:p_hn25/view/widgets/custom_modal.dart';
 import 'package:p_hn25/view_model/auth_view_model.dart';
+import 'package:p_hn25/view_model/user_view_model.dart'; // 👈 Importar UserViewModel
 import 'package:provider/provider.dart';
 import 'notifications_panel.dart';
 
@@ -69,13 +70,38 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  'Oliver García (yo)', // Esto debería ser dinámico en el futuro
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textColor,
-                  ),
+                // 👇 Aquí el cambio dinámico
+                Consumer<UserViewModel>(
+                  builder: (context, userViewModel, child) {
+                    if (userViewModel.isLoading) {
+                      return Text(
+                        '...(yo)',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textColor,
+                        ),
+                      );
+                    }
+
+                    final firstName =
+                        (userViewModel.currentUser?.firstName ?? '')
+                            .split(' ')
+                            .first;
+                    final lastName = (userViewModel.currentUser?.lastName ?? '')
+                        .split(' ')
+                        .first;
+                    final displayName = "$firstName $lastName".trim();
+
+                    return Text(
+                      '$displayName (yo)',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textColor,
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -86,9 +112,16 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
           value: 'profile',
           child: Row(
             children: [
-              const Icon(HugeIcons.strokeRoundedUser, color: AppColors.primaryColor, size: 20),
+              const Icon(
+                HugeIcons.strokeRoundedUser,
+                color: AppColors.primaryColor,
+                size: 20,
+              ),
               const SizedBox(width: 12),
-              Text('Mi Perfil', style: TextStyle(color: AppColors.primaryColor)),
+              Text(
+                'Mi Perfil',
+                style: TextStyle(color: AppColors.primaryColor),
+              ),
             ],
           ),
         ),
@@ -96,9 +129,16 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
           value: 'family',
           child: Row(
             children: [
-              const Icon(HugeIcons.strokeRoundedUserGroup02, color: AppColors.accentColor, size: 20),
+              const Icon(
+                HugeIcons.strokeRoundedUserGroup02,
+                color: AppColors.accentColor,
+                size: 20,
+              ),
               const SizedBox(width: 12),
-              Text('Mis Familiares', style: TextStyle(color: AppColors.accentColor)),
+              Text(
+                'Mis Familiares',
+                style: TextStyle(color: AppColors.accentColor),
+              ),
             ],
           ),
         ),
@@ -106,7 +146,11 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
           value: 'support',
           child: Row(
             children: [
-              Icon(HugeIcons.strokeRoundedCustomerService01, color: AppColors.textColor.withAlpha(178), size: 20),
+              Icon(
+                HugeIcons.strokeRoundedCustomerService01,
+                color: AppColors.textColor.withAlpha(178),
+                size: 20,
+              ),
               const SizedBox(width: 12),
               Text('Soporte', style: TextStyle(color: AppColors.textColor)),
             ],
@@ -117,9 +161,19 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
           value: 'logout',
           child: Row(
             children: [
-              const Icon(HugeIcons.strokeRoundedLogout03, color: AppColors.warningColor, size: 20),
+              const Icon(
+                HugeIcons.strokeRoundedLogout03,
+                color: AppColors.warningColor,
+                size: 20,
+              ),
               const SizedBox(width: 12),
-              Text('Cerrar Sesión', style: TextStyle(color: AppColors.warningColor, fontWeight: FontWeight.w500)),
+              Text(
+                'Cerrar Sesión',
+                style: TextStyle(
+                  color: AppColors.warningColor,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ],
           ),
         ),
@@ -137,11 +191,17 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
       });
       if (selectedValue == null) return;
       if (selectedValue == 'profile') {
-        navigator.push(MaterialPageRoute(builder: (_) => const ProfileScreen()));
+        navigator.push(
+          MaterialPageRoute(builder: (_) => const ProfileScreen()),
+        );
       } else if (selectedValue == 'family') {
-        navigator.push(MaterialPageRoute(builder: (_) => const FamilyMembersScreen()));
+        navigator.push(
+          MaterialPageRoute(builder: (_) => const FamilyMembersScreen()),
+        );
       } else if (selectedValue == 'support') {
-        navigator.push(MaterialPageRoute(builder: (_) => const SupportScreen()));
+        navigator.push(
+          MaterialPageRoute(builder: (_) => const SupportScreen()),
+        );
       } else if (selectedValue == 'logout') {
         showLogoutDialog();
       }
@@ -180,7 +240,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                     return const Dialog(
                       backgroundColor: Colors.transparent,
                       elevation: 0,
-                      child: Center(child: CircularProgressIndicator()), // Simplificado para brevedad
+                      child: Center(child: CircularProgressIndicator()),
                     );
                   },
                 );

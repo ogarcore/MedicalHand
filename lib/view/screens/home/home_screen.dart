@@ -1,4 +1,3 @@
-// lib/view/screens/home/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -8,7 +7,7 @@ import 'package:p_hn25/view/screens/history/clinical_history_screen.dart';
 import 'package:p_hn25/view/screens/home/widgets/home_app_bar.dart';
 import 'package:p_hn25/view/screens/home/widgets/main_bottom_nav_bar.dart';
 import 'widgets/dashboard_view.dart';
-import '../../widgets/custom_modal.dart'; 
+import '../../widgets/custom_modal.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

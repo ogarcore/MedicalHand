@@ -37,44 +37,55 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
               children: [
                 // ... (tu código de fondo no cambia)
                 Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.primaryColor.withAlpha(30),
+                        AppColors.backgroundColor,
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: -size.height * 0.25,
+                  right: -size.width * 0.2,
+                  child: Container(
+                    width: size.width * 0.8,
+                    height: size.width * 0.8,
                     decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [
-                              AppColors.primaryColor.withAlpha(30),
-                              AppColors.backgroundColor,
-                            ],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter))),
+                      color: AppColors.primaryColor.withAlpha(15),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primaryColor.withAlpha(50),
+                          blurRadius: 40,
+                          spreadRadius: 20,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 Positioned(
-                    top: -size.height * 0.25,
-                    right: -size.width * 0.2,
-                    child: Container(
-                        width: size.width * 0.8,
-                        height: size.width * 0.8,
-                        decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withAlpha(15),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                  color: AppColors.primaryColor.withAlpha(50),
-                                  blurRadius: 40,
-                                  spreadRadius: 20)
-                            ]))),
-                Positioned(
-                    bottom: -size.height * 0.2,
-                    left: -size.width * 0.2,
-                    child: Container(
-                        width: size.width * 0.65,
-                        height: size.width * 0.65,
-                        decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withAlpha(10),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                  color: AppColors.primaryColor.withAlpha(80),
-                                  blurRadius: 50,
-                                  spreadRadius: 30)
-                            ]))),
+                  bottom: -size.height * 0.2,
+                  left: -size.width * 0.2,
+                  child: Container(
+                    width: size.width * 0.65,
+                    height: size.width * 0.65,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor.withAlpha(10),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primaryColor.withAlpha(80),
+                          blurRadius: 50,
+                          spreadRadius: 30,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
 
                 SafeArea(
                   child: Container(
@@ -123,9 +134,10 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                               controller: authViewModel.bloodTypeController,
                               labelText: 'Tipo de Sangre',
                               hintText: 'Ej: O+, AB-, B+',
-                              keyboardType:TextInputType.text ,
+                              keyboardType: TextInputType.text,
                               icon: Icons.bloodtype_outlined,
-                              validator: AppValidators.validateOptionalBloodType,
+                              validator:
+                                  AppValidators.validateOptionalBloodType,
                             ),
                             const SizedBox(height: 20),
                             CustomTextField(
@@ -137,8 +149,7 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                             ),
                             const SizedBox(height: 20),
                             ChronicDiseasesList(
-                              selectedDiseases:
-                                  authViewModel.selectedDiseases,
+                              selectedDiseases: authViewModel.selectedDiseases,
                               onDiseaseSelected: (disease, selected) {
                                 authViewModel.updateSelectedDiseases(
                                   disease,
@@ -148,27 +159,38 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                             ),
                             const SizedBox(height: 20),
                             Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                    color: AppColors.primaryColor.withAlpha(60),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        color: AppColors.primaryColor
-                                            .withAlpha(80),
-                                        width: 1)),
-                                child: Row(children: [
-                                  const Icon(Icons.info_outline_rounded,
-                                      color: AppColors.primaryColor, size: 24),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryColor.withAlpha(60),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: AppColors.primaryColor.withAlpha(80),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.info_outline_rounded,
+                                    color: AppColors.primaryColor,
+                                    size: 24,
+                                  ),
                                   const SizedBox(width: 12),
                                   Expanded(
-                                      child: Text(
-                                          'Si no tienes conocimientos de estos datos, puedes finalizar el registro y actualizarlos después en tu perfil.',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: AppColors.textColor
-                                                  .withAlpha(200),
-                                              height: 1.4)))
-                                ])),
+                                    child: Text(
+                                      'Si no tienes conocimientos de estos datos, puedes finalizar el registro y actualizarlos después en tu perfil.',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: AppColors.textColor.withAlpha(
+                                          200,
+                                        ),
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                             const SizedBox(height: 24),
                             PrimaryButton(
                               text: 'Finalizar Registro',
@@ -177,8 +199,9 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                               onPressed: () async {
                                 // Validamos el formulario antes de finalizar
                                 if (_formKey.currentState!.validate()) {
-                                  final result = await authViewModel.finalizeRegistration();
-                                  
+                                  final result = await authViewModel
+                                      .finalizeRegistration(context);
+
                                   if (!context.mounted) return;
 
                                   if (result == 'VERIFY') {
@@ -187,9 +210,10 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                                       MaterialPageRoute(
                                         builder: (context) =>
                                             VerificationScreen(
-                                          email: authViewModel
-                                              .emailController.text,
-                                        ),
+                                              email: authViewModel
+                                                  .emailController
+                                                  .text,
+                                            ),
                                       ),
                                       (route) => false,
                                     );
@@ -205,12 +229,12 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                                     );
                                     authViewModel.clearControllers();
                                   } else {
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(
+                                    ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                            authViewModel.errorMessage ??
-                                                'Ocurrió un error.'),
+                                          authViewModel.errorMessage ??
+                                              'Ocurrió un error.',
+                                        ),
                                         backgroundColor: Colors.red,
                                       ),
                                     );

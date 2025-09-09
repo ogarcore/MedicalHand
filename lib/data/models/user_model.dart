@@ -1,3 +1,4 @@
+// lib/data/models/user_model.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserModel {
@@ -12,6 +13,8 @@ class UserModel {
   final String address;
   final Map<String, String>? emergencyContact;
   final Map<String, dynamic>? medicalInfo;
+  final bool isTutor;
+  final String? managedBy;
 
   UserModel({
     required this.uid,
@@ -25,14 +28,15 @@ class UserModel {
     required this.address,
     this.emergencyContact,
     this.medicalInfo,
+    required this.isTutor,
+    this.managedBy,
   });
 
-  /// 🔹 Constructor para crear UserModel desde un DocumentSnapshot
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
 
     return UserModel(
-      uid: doc.id, // o data['uid'] si prefieres leer el campo
+      uid: doc.id,
       email: data['email'] ?? '',
       firstName: data['personalInfo']?['firstName'] ?? '',
       lastName: data['personalInfo']?['lastName'] ?? '',
@@ -45,10 +49,11 @@ class UserModel {
           ? Map<String, String>.from(data['contactInfo']?['emergencyContact'])
           : null,
       medicalInfo: data['medicalInfo'],
+      // CAMBIO: Leemos los nuevos campos desde Firestore
+      isTutor: data['isTutor'] ?? false,
+      managedBy: data['managedBy'],
     );
   }
-
-  /// 🔹 Convierte UserModel a un mapa para guardar en Firestore
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
@@ -67,6 +72,8 @@ class UserModel {
         'emergencyContact': emergencyContact,
       },
       'medicalInfo': medicalInfo,
+      'isTutor': isTutor,
+      'managedBy': managedBy,
     };
   }
 }

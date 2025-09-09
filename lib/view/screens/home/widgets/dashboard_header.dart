@@ -19,13 +19,19 @@ class DashboardHeader extends StatelessWidget {
     final now = DateTime.now();
     final greeting = _getGreeting(now.hour);
 
-    // CAMBIO: Usamos un Consumer para escuchar los cambios en UserViewModel
     return Consumer<UserViewModel>(
       builder: (context, userViewModel, child) {
-        // Obtenemos el nombre del usuario. Si está cargando o no existe, usamos '...' como placeholder.
-        final userName = userViewModel.isLoading
-            ? '...'
-            : (userViewModel.currentUser?.firstName ?? 'Usuario');
+        if (userViewModel.isLoading) {
+          return const Text("Cargando...");
+        }
+
+        final firstName = (userViewModel.currentUser?.firstName ?? '')
+            .split(' ')
+            .first;
+        final lastName = (userViewModel.currentUser?.lastName ?? '')
+            .split(' ')
+            .first;
+        final displayName = "$firstName $lastName".trim();
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,7 +50,7 @@ class DashboardHeader extends StatelessWidget {
                   ),
                   TextSpan(
                     // CAMBIO: Se reemplaza el nombre estático por el del usuario
-                    text: '$userName!',
+                    text: '$displayName!',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
