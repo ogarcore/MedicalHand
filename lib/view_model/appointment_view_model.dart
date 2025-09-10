@@ -1,4 +1,5 @@
 // lib/view_model/appointment_view_model.dart
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../data/models/cita_model.dart';
@@ -6,11 +7,16 @@ import '../data/models/hospital_model.dart';
 
 class AppointmentViewModel extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
 
-  // ... (tus otros métodos como getNicaraguaDepartments, getHospitals, etc., no cambian)
+  // Propiedades para gestionar el estado del dashboard
+  CitaModel? _nextAppointment;
+  CitaModel? get nextAppointment => _nextAppointment;
+  bool _isDashboardLoading = true;
+  bool get isDashboardLoading => _isDashboardLoading;
+  StreamSubscription? _appointmentSubscription;
+
+  // ... (Tus métodos de getHospitals y getNicaraguaDepartments no cambian)
   List<String> getNicaraguaDepartments() {
-    // ... (este método no cambia)
     return [
       'Boaco',
       'Carazo',
@@ -33,7 +39,6 @@ class AppointmentViewModel extends ChangeNotifier {
   }
 
   Future<List<HospitalModel>> getHospitals(String department) async {
-    // ... (este método no cambia)
     try {
       final snapshot = await _firestore
           .collection('hospitales_MedicalHand')
@@ -46,7 +51,6 @@ class AppointmentViewModel extends ChangeNotifier {
           name: doc.data()['name'] as String,
         );
       }).toList();
-
       hospitals.sort((a, b) => a.name.compareTo(b.name));
       return hospitals;
     } catch (e) {
@@ -56,7 +60,6 @@ class AppointmentViewModel extends ChangeNotifier {
   }
 
   Future<bool> submitAppointmentRequest(CitaModel cita) async {
-    // ... (este método no cambia)
     try {
       await _firestore.collection('citas').add(cita.toMap());
       return true;
@@ -66,46 +69,32 @@ class AppointmentViewModel extends ChangeNotifier {
     }
   }
 
-  // CAMBIO: Nuevo método para obtener las citas próximas en tiempo real.
-Stream<List<CitaModel>> getUpcomingAppointments(String userId) {
+  // Tu método para obtener citas próximas (sin cambios)
+  Stream<List<CitaModel>> getUpcomingAppointments(String userId) {
     return _firestore
         .collection('citas')
         .where('uid', isEqualTo: userId)
         .where('status', whereIn: ['pendiente', 'confirmada'])
-        // Quitamos el ordenamiento de Firestore para hacerlo manualmente
         .snapshots()
         .map((snapshot) {
-      var citas = snapshot.docs
-          .map((doc) => CitaModel.fromFirestore(doc))
-          .toList();
-
-      // CAMBIO: Lógica de ordenamiento personalizado
-      citas.sort((a, b) {
-        // Regla 1: 'confirmada' siempre va antes que 'pendiente'
-        if (a.status == 'confirmada' && b.status == 'pendiente') {
-          return -1; // a va primero
-        }
-        if (a.status == 'pendiente' && b.status == 'confirmada') {
-          return 1; // b va primero
-        }
-
-        // Regla 2: Si ambas son 'confirmada', ordenar por fecha más cercana
-        if (a.status == 'confirmada' && b.status == 'confirmada') {
-          // Nos aseguramos de que las fechas no sean nulas
-          if (a.assignedDate != null && b.assignedDate != null) {
-            return a.assignedDate!.compareTo(b.assignedDate!); // Orden ascendente
-          }
-        }
-
-        // Si no aplican las reglas anteriores, mantener el orden
-        return 0;
-      });
-
-      return citas;
-    });
+          var citas = snapshot.docs
+              .map((doc) => CitaModel.fromFirestore(doc))
+              .toList();
+          citas.sort((a, b) {
+            if (a.status == 'confirmada' && b.status == 'pendiente') return -1;
+            if (a.status == 'pendiente' && b.status == 'confirmada') return 1;
+            if (a.status == 'confirmada' && b.status == 'confirmada') {
+              if (a.assignedDate != null && b.assignedDate != null) {
+                return a.assignedDate!.compareTo(b.assignedDate!);
+              }
+            }
+            return 0;
+          });
+          return citas;
+        });
   }
 
-  // CAMBIO: Nuevo método para obtener las citas pasadas en tiempo real.
+  // Tu método para obtener citas pasadas (sin cambios)
   Stream<List<CitaModel>> getPastAppointments(String userId) {
     return _firestore
         .collection('citas')
@@ -120,23 +109,51 @@ Stream<List<CitaModel>> getUpcomingAppointments(String userId) {
         });
   }
 
-  Stream<CitaModel?> getNextConfirmedAppointment(String userId) {
-    final now = DateTime.now();
+  // Lógica del Dashboard que evita parpadeos y se actualiza en tiempo real
+  void listenToNextAppointment(String userId) {
+    if (_appointmentSubscription != null) {
+      return;
+    }
 
-    return _firestore
+    Future.microtask(() {
+      if (_isDashboardLoading)
+        return; // Evita re-ejecutar si ya está en proceso
+      _isDashboardLoading = true;
+      notifyListeners();
+    });
+
+    final now = DateTime.now();
+    final query = _firestore
         .collection('citas')
         .where('uid', isEqualTo: userId)
         .where('status', isEqualTo: 'confirmada')
         .where('assignedDate', isGreaterThanOrEqualTo: Timestamp.fromDate(now))
-        .orderBy('assignedDate') 
-        .limit(1) 
-        .snapshots()
-        .map((snapshot) {
-      if (snapshot.docs.isEmpty) {
-        return null; // No hay citas próximas confirmadas
-      }
-      // Si hay documentos, toma el primero y lo convierte en un objeto CitaModel
-      return CitaModel.fromFirestore(snapshot.docs.first);
-    });
+        .orderBy('assignedDate')
+        .limit(1);
+
+    _appointmentSubscription = query.snapshots().listen(
+      (snapshot) {
+        if (snapshot.docs.isEmpty) {
+          _nextAppointment = null;
+        } else {
+          _nextAppointment = CitaModel.fromFirestore(snapshot.docs.first);
+        }
+        _isDashboardLoading = false;
+        notifyListeners();
+      },
+      onError: (error) {
+        print("Error al escuchar la próxima cita: $error");
+        _isDashboardLoading = false;
+        _nextAppointment = null;
+        notifyListeners();
+      },
+    );
+  }
+
+  void disposeListeners() {
+    _appointmentSubscription?.cancel();
+    _appointmentSubscription = null;
+    _nextAppointment = null;
+    _isDashboardLoading = true;
   }
 }

@@ -25,10 +25,10 @@ class DashboardHeader extends StatelessWidget {
           return const Text("Cargando...");
         }
 
-        final firstName = (userViewModel.currentUser?.firstName ?? '')
+        final firstName = (userViewModel.activeProfile?.firstName ?? '')
             .split(' ')
             .first;
-        final lastName = (userViewModel.currentUser?.lastName ?? '')
+        final lastName = (userViewModel.activeProfile?.lastName ?? '')
             .split(' ')
             .first;
         final displayName = "$firstName $lastName".trim();

@@ -91,7 +91,7 @@ class AppValidators {
         return 'El año no puede ser anterior a 1900.';
       }
       if (date.isAfter(DateTime.now())) {
-        return 'Fecha incorrecta, por favor introducir una correcta.';
+        return 'Fecha incorrecta, favor introducir una correcta.';
       }
     } catch (e) {
       return 'Formato de fecha inválido.';

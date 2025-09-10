@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:p_hn25/app/core/utils/validators.dart';
+import 'package:p_hn25/view_model/appointment_view_model.dart';
 import '../data/network/firebase_auth_service.dart';
 import '../data/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -149,9 +150,20 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   Future<void> signOut(BuildContext context) async {
+    // 1. Obtenemos las instancias de los ViewModels que guardan datos.
     final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+    final appointmentViewModel = Provider.of<AppointmentViewModel>(
+      context,
+      listen: false,
+    );
     userViewModel.clearUser();
+    appointmentViewModel.disposeListeners();
     await _authService.signOut();
+
+    await FirebaseFirestore.instance.terminate();
+    await FirebaseFirestore.instance.clearPersistence();
+    await FirebaseFirestore.instance.enableNetwork();
+
     clearControllers();
   }
 

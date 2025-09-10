@@ -11,6 +11,9 @@ class UserViewModel extends ChangeNotifier {
   UserModel? _currentUser;
   UserModel? get currentUser => _currentUser;
 
+  UserModel? _activeProfile;
+  UserModel? get activeProfile => _activeProfile;
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
@@ -29,16 +32,14 @@ class UserViewModel extends ChangeNotifier {
           .collection('usuarios_movil')
           .doc(user.uid)
           .get();
-
       if (userDoc.exists) {
         _currentUser = UserModel.fromFirestore(userDoc);
-      } else {
-        print("Error: No se encontró el documento del usuario en Firestore.");
-        _currentUser = null;
+        _activeProfile = _currentUser;
       }
     } catch (e) {
       print("Ocurrió un error al cargar los datos del usuario: $e");
       _currentUser = null;
+      _activeProfile = null;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -63,8 +64,14 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
+  void changeActiveProfile(UserModel newProfile) {
+    _activeProfile = newProfile;
+    notifyListeners();
+  }
+
   void clearUser() {
     _currentUser = null;
+    _activeProfile = null;
     notifyListeners();
   }
 }

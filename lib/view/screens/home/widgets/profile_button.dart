@@ -54,9 +54,11 @@ class ProfileButton extends StatelessWidget {
             ),
             const SizedBox(width: 12),
 
+            // CAMBIO: El Consumer ahora escucha el 'activeProfile'
             Consumer<UserViewModel>(
               builder: (context, userViewModel, child) {
-                if (userViewModel.isLoading) {
+                if (userViewModel.isLoading &&
+                    userViewModel.activeProfile == null) {
                   return const Text(
                     '...',
                     style: TextStyle(
@@ -66,13 +68,15 @@ class ProfileButton extends StatelessWidget {
                     ),
                   );
                 }
-                final firstName = (userViewModel.currentUser?.firstName ?? '')
-                    .split(' ')
-                    .first;
-                final lastName = (userViewModel.currentUser?.lastName ?? '')
-                    .split(' ')
-                    .first;
 
+                // Usamos el perfil activo para mostrar el nombre
+                final activeProfile = userViewModel.activeProfile;
+                final firstName = (activeProfile?.firstName ?? '')
+                    .split(' ')
+                    .first;
+                final lastName = (activeProfile?.lastName ?? '')
+                    .split(' ')
+                    .first;
                 final displayName = "$firstName $lastName".trim();
 
                 return Text(

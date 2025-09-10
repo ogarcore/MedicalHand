@@ -19,19 +19,27 @@ class DashboardView extends StatefulWidget {
 
 class _DashboardViewState extends State<DashboardView> {
   Stream<CitaModel?>? _appointmentStream;
+  late AppointmentViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
     initializeDateFormatting('es_ES', null);
+
+    _viewModel = Provider.of<AppointmentViewModel>(context, listen: false);
+
     final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     if (userId.isNotEmpty) {
-      final viewModel = Provider.of<AppointmentViewModel>(
-        context,
-        listen: false,
-      );
-      _appointmentStream = viewModel.getNextConfirmedAppointment(userId);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _viewModel.listenToNextAppointment(userId);
+      });
     }
+  }
+
+  @override
+  void dispose() {
+    _viewModel.disposeListeners();
+    super.dispose();
   }
 
   // Helper para verificar si la cita es hoy
