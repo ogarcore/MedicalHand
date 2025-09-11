@@ -1,13 +1,14 @@
 // lib/view/screens/home/dashboard_view.dart
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:p_hn25/data/models/cita_model.dart';
+import 'package:p_hn25/data/models/user_model.dart';
 import 'package:p_hn25/view/screens/home/widgets/dashboard_action_buttons.dart';
 import 'package:p_hn25/view/screens/home/widgets/dashboard_header.dart';
 import 'package:p_hn25/view/screens/home/widgets/next_appointment_card.dart';
 import 'package:p_hn25/view/screens/home/widgets/no_appointment_card.dart';
 import 'package:p_hn25/view_model/appointment_view_model.dart';
+import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
 
 class DashboardView extends StatefulWidget {
@@ -18,31 +19,12 @@ class DashboardView extends StatefulWidget {
 }
 
 class _DashboardViewState extends State<DashboardView> {
-  Stream<CitaModel?>? _appointmentStream;
-  late AppointmentViewModel _viewModel;
-
   @override
   void initState() {
     super.initState();
     initializeDateFormatting('es_ES', null);
-
-    _viewModel = Provider.of<AppointmentViewModel>(context, listen: false);
-
-    final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
-    if (userId.isNotEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _viewModel.listenToNextAppointment(userId);
-      });
-    }
   }
 
-  @override
-  void dispose() {
-    _viewModel.disposeListeners();
-    super.dispose();
-  }
-
-  // Helper para verificar si la cita es hoy
   bool _isAppointmentToday(CitaModel? appointment) {
     if (appointment?.assignedDate == null) return false;
     final now = DateTime.now();
@@ -54,6 +36,10 @@ class _DashboardViewState extends State<DashboardView> {
 
   @override
   Widget build(BuildContext context) {
+    // Obtenemos el UserViewModel una vez aquí
+    final userViewModel = context.watch<UserViewModel>();
+    final activeProfile = userViewModel.activeProfile;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 19.0, vertical: 14.0),
       child: Column(
@@ -61,40 +47,54 @@ class _DashboardViewState extends State<DashboardView> {
         children: [
           const DashboardHeader(),
           const SizedBox(height: 24),
-          StreamBuilder<CitaModel?>(
-            stream: _appointmentStream,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.none &&
-                  snapshot.data == null) {
-                return const NoAppointmentCard();
-              }
-
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (snapshot.hasError) {
-                return const Center(child: Text("Error al cargar la cita."));
-              }
-
-              final appointment = snapshot.data;
-              final bool hasAppointment = appointment != null;
-
-              if (hasAppointment) {
-                final bool canCheckIn = _isAppointmentToday(appointment);
-                return Column(
-                  children: [
-                    NextAppointmentCard(appointment: appointment),
-                    const SizedBox(height: 26),
-                    DashboardActionButtons(canCheckIn: canCheckIn),
-                  ],
-                );
-              } else {
-                return const NoAppointmentCard();
-              }
-            },
-          ),
+          // Si no hay perfil activo todavía (ej. al iniciar la app), mostramos un loader.
+          if (activeProfile == null)
+            const Center(child: CircularProgressIndicator())
+          else
+            // Una vez que tenemos el perfil, construimos el StreamBuilder
+            // que se actualizará automáticamente si activeProfile cambia.
+            _buildDashboardContent(context, activeProfile),
         ],
       ),
+    );
+  }
+
+  // CAMBIO: Extraemos la lógica del StreamBuilder a un widget separado para mayor claridad
+  Widget _buildDashboardContent(BuildContext context, UserModel activeProfile) {
+    // Obtenemos el AppointmentViewModel aquí
+    final appointmentViewModel = Provider.of<AppointmentViewModel>(
+      context,
+      listen: false,
+    );
+
+    return StreamBuilder<CitaModel?>(
+      // El Stream ahora se crea aquí, usando el UID del perfil activo.
+      // Cuando el perfil activo cambie, este widget se reconstruirá y creará un nuevo stream.
+      stream: appointmentViewModel.getDashboardAppointmentStream(
+        activeProfile.uid,
+      ),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return const Center(child: Text("Error al cargar la cita."));
+        }
+
+        final appointment = snapshot.data;
+        if (appointment != null) {
+          final bool canCheckIn = _isAppointmentToday(appointment);
+          return Column(
+            children: [
+              NextAppointmentCard(appointment: appointment),
+              const SizedBox(height: 26),
+              DashboardActionButtons(canCheckIn: canCheckIn),
+            ],
+          );
+        } else {
+          return const NoAppointmentCard();
+        }
+      },
     );
   }
 }

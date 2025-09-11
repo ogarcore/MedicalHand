@@ -48,7 +48,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
       listen: false,
     );
     final userViewModel = Provider.of<UserViewModel>(context, listen: false);
-    final currentUser = userViewModel.currentUser;
+    final currentUser = userViewModel.activeProfile;
 
     // Verificación de seguridad por si no hay un usuario cargado
     if (currentUser == null) {
@@ -105,12 +105,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          margin: EdgeInsets.only(
-            bottom:
-                10, 
-            left: 20,
-            right: 20,
-          ),
+          margin: EdgeInsets.only(bottom: 10, left: 20, right: 20),
           duration: Duration(seconds: 3),
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
@@ -142,12 +137,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          margin: EdgeInsets.only(
-            bottom:
-                10, 
-            left: 20,
-            right: 20,
-          ),
+          margin: EdgeInsets.only(bottom: 10, left: 20, right: 20),
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
       );

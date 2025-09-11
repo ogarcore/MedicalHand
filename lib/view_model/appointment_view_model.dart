@@ -8,14 +8,14 @@ import '../data/models/hospital_model.dart';
 class AppointmentViewModel extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Propiedades para gestionar el estado del dashboard
+  // Propiedades para gestionar el estado del dashboard (estas no se usan en la pantalla de citas)
   CitaModel? _nextAppointment;
   CitaModel? get nextAppointment => _nextAppointment;
   bool _isDashboardLoading = true;
   bool get isDashboardLoading => _isDashboardLoading;
   StreamSubscription? _appointmentSubscription;
+  String? _listeningForUserId;
 
-  // ... (Tus métodos de getHospitals y getNicaraguaDepartments no cambian)
   List<String> getNicaraguaDepartments() {
     return [
       'Boaco',
@@ -44,7 +44,6 @@ class AppointmentViewModel extends ChangeNotifier {
           .collection('hospitales_MedicalHand')
           .where('city', isEqualTo: department)
           .get();
-
       final hospitals = snapshot.docs.map((doc) {
         return HospitalModel(
           id: doc.data()['hospitalId'] as String,
@@ -69,7 +68,6 @@ class AppointmentViewModel extends ChangeNotifier {
     }
   }
 
-  // Tu método para obtener citas próximas (sin cambios)
   Stream<List<CitaModel>> getUpcomingAppointments(String userId) {
     return _firestore
         .collection('citas')
@@ -94,7 +92,6 @@ class AppointmentViewModel extends ChangeNotifier {
         });
   }
 
-  // Tu método para obtener citas pasadas (sin cambios)
   Stream<List<CitaModel>> getPastAppointments(String userId) {
     return _firestore
         .collection('citas')
@@ -109,18 +106,35 @@ class AppointmentViewModel extends ChangeNotifier {
         });
   }
 
-  // Lógica del Dashboard que evita parpadeos y se actualiza en tiempo real
-  void listenToNextAppointment(String userId) {
-    if (_appointmentSubscription != null) {
-      return;
+  Stream<CitaModel?> getDashboardAppointmentStream(String userId) {
+    if (_listeningForUserId != userId) {
+      _appointmentSubscription?.cancel();
+      _listeningForUserId = userId;
     }
-
-    Future.microtask(() {
-      if (_isDashboardLoading)
-        return; // Evita re-ejecutar si ya está en proceso
-      _isDashboardLoading = true;
-      notifyListeners();
+    final now = DateTime.now();
+    final query = _firestore
+        .collection('citas')
+        .where('uid', isEqualTo: userId)
+        .where('status', isEqualTo: 'confirmada')
+        .where('assignedDate', isGreaterThanOrEqualTo: Timestamp.fromDate(now))
+        .orderBy('assignedDate')
+        .limit(1);
+    return query.snapshots().map((snapshot) {
+      if (snapshot.docs.isEmpty) {
+        return null;
+      }
+      return CitaModel.fromFirestore(snapshot.docs.first);
     });
+  }
+
+  void listenToNextAppointment(String userId) {
+    if (_listeningForUserId == userId) return;
+
+    _appointmentSubscription?.cancel();
+    _listeningForUserId = userId;
+
+    _isDashboardLoading = true;
+    notifyListeners();
 
     final now = DateTime.now();
     final query = _firestore
@@ -154,6 +168,7 @@ class AppointmentViewModel extends ChangeNotifier {
     _appointmentSubscription?.cancel();
     _appointmentSubscription = null;
     _nextAppointment = null;
+    _listeningForUserId = null;
     _isDashboardLoading = true;
   }
 }
