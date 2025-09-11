@@ -1,11 +1,12 @@
-// lib/view/screens/family/widgets/empty_family_view.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/view/screens/family/add_family_member_screen.dart';
 
 class EmptyFamilyView extends StatelessWidget {
-  const EmptyFamilyView({super.key});
+  final bool isTutorViewing;
+
+  const EmptyFamilyView({super.key, required this.isTutorViewing});
 
   @override
   Widget build(BuildContext context) {
@@ -65,46 +66,46 @@ class EmptyFamilyView extends StatelessWidget {
               text: 'Acceso seguro y controlado',
             ),
             const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const AddFamilyMemberScreen(),
+            if (isTutorViewing)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const AddFamilyMemberScreen(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(
+                    HugeIcons.strokeRoundedAddCircleHalfDot,
+                    size: 18,
+                  ),
+                  label: const Text(
+                    'Comenzar - Añadir Primer Familiar',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 20,
                     ),
-                  );
-                },
-                icon: const Icon(
-                  HugeIcons.strokeRoundedAddCircleHalfDot,
-                  size: 18,
-                ),
-                label: const Text(
-                  'Comenzar - Añadir Primer Familiar',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 20,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    elevation: 2,
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  elevation: 2,
                 ),
               ),
-            ),
           ],
         ),
       ),
     );
   }
 
-  // Widget para construir las filas de características
   Widget _buildFeatureRow({required IconData icon, required String text}) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -119,7 +120,7 @@ class EmptyFamilyView extends StatelessWidget {
           const SizedBox(width: 10),
           Text(
             text,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               color: AppColors.textColor,
               fontWeight: FontWeight.w500,

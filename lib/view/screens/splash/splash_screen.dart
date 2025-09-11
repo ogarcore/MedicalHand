@@ -1,9 +1,9 @@
-// lib/view/screens/splash/splash_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:lottie/lottie.dart';
 import '../../../app/core/constants/app_colors.dart';
 import '../../../view_model/splash_view_model.dart';
+import '../../../view_model/user_view_model.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,20 +13,25 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
   @override
   void initState() {
     super.initState();
-    // Le decimos al ViewModel que inicie el proceso de verificación y navegación
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<SplashViewModel>(context, listen: false).checkStatusAndNavigate(context);
+      final splashViewModel = Provider.of<SplashViewModel>(
+        context,
+        listen: false,
+      );
+      final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+
+      splashViewModel.checkStatusAndNavigate(
+        context,
+        userViewModel: userViewModel,
+      );
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Esta pantalla ahora solo se encarga de mostrar la animación de carga.
-    // Ya no necesita manejar el estado de error.
     return Scaffold(
       backgroundColor: AppColors.primaryColor,
       body: Center(
@@ -45,7 +50,11 @@ class _SplashScreenState extends State<SplashScreen> {
               width: 120,
               height: 120,
               delegates: LottieDelegates(
-                values: [ValueDelegate.color(const ['**'], value: AppColors.accentColor)],
+                values: [
+                  ValueDelegate.color(const [
+                    '**',
+                  ], value: AppColors.accentColor),
+                ],
               ),
             ),
           ],

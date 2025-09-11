@@ -8,7 +8,7 @@ class RegistrationProgressIndicator extends StatelessWidget {
   const RegistrationProgressIndicator({
     super.key,
     required this.currentStep,
-    this.totalSteps = 4,
+    this.totalSteps = 5,
   });
 
   @override
@@ -30,7 +30,9 @@ class RegistrationProgressIndicator extends StatelessWidget {
           child: LinearProgressIndicator(
             value: currentStep / totalSteps,
             backgroundColor: Colors.grey[300],
-            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
+            valueColor: const AlwaysStoppedAnimation<Color>(
+              AppColors.primaryColor,
+            ),
             minHeight: 8,
           ),
         ),

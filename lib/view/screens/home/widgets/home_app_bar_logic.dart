@@ -20,6 +20,12 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
   bool isMenuOpen = false;
   final GlobalKey profileButtonKey = GlobalKey();
 
+  String _getShortName(UserModel user) {
+    final firstName = (user.firstName).split(' ').first;
+    final lastName = (user.lastName).split(' ').first;
+    return '$firstName $lastName'.trim();
+  }
+
   void showNotificationsPanel() {
     showModalBottomSheet(
       context: context,
@@ -40,7 +46,6 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
     );
   }
 
-  // CAMBIO: El método ahora es asíncrono para poder buscar a los familiares
   void showProfileMenu() async {
     setState(() => isMenuOpen = true);
 
@@ -52,9 +57,9 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
     final navigator = Navigator.of(context);
 
     final currentUser = userViewModel.currentUser;
-    if (currentUser == null) return;
+    final activeProfile = userViewModel.activeProfile;
+    if (currentUser == null || activeProfile == null) return;
 
-    // Buscamos la lista de familiares una sola vez
     final familyMembers = await familyViewModel.getFamilyMembers().first;
 
     final RenderBox renderBox =
@@ -64,42 +69,70 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
 
     final List<PopupMenuEntry<dynamic>> menuItems = [];
 
-    // 1. Añadimos al usuario principal (el tutor)
-    menuItems.add(
-      PopupMenuItem<UserModel>(
-        value: currentUser,
-        child: Text(
-          '${currentUser.firstName} (Yo)',
-          style: const TextStyle(fontWeight: FontWeight.bold),
+    PopupMenuItem<UserModel> buildProfileMenuItem(
+      UserModel profile,
+      String label,
+    ) {
+      final bool isSelected = profile.uid == activeProfile.uid;
+      return PopupMenuItem<UserModel>(
+        value: profile,
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected
+                      ? AppColors.secondaryColor
+                      : AppColors.textColor,
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
+            if (isSelected)
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: AppColors.secondaryColor,
+                  shape: BoxShape.circle,
+                ),
+              )
+            else
+              const SizedBox(width: 8),
+          ],
         ),
-      ),
+      );
+    }
+
+    menuItems.add(
+      buildProfileMenuItem(currentUser, '${_getShortName(currentUser)} (Yo)'),
     );
 
-    // 2. Si hay familiares, los añadimos
     if (familyMembers.isNotEmpty) {
-      menuItems.add(const PopupMenuDivider());
       for (var member in familyMembers) {
         menuItems.add(
-          PopupMenuItem<UserModel>(
-            value: member,
-            child: Text(
-              '${member.firstName} (${member.medicalInfo?['kinship'] ?? 'Familiar'})',
-            ),
+          buildProfileMenuItem(
+            member,
+            '${_getShortName(member)} (${member.medicalInfo?['kinship'] ?? 'Familiar'})',
           ),
         );
       }
     }
 
-    // 3. Añadimos las opciones de navegación
     menuItems.add(const PopupMenuDivider());
-    menuItems.add(
-      _buildNavigationMenuItem(
-        'profile',
-        'Mi Perfil',
-        HugeIcons.strokeRoundedUser,
-        AppColors.primaryColor,
-      ),
-    );
+
+    if (activeProfile.uid == currentUser.uid) {
+      menuItems.add(
+        _buildNavigationMenuItem(
+          'profile',
+          'Mi Perfil',
+          HugeIcons.strokeRoundedUser,
+          AppColors.primaryColor,
+        ),
+      );
+    }
     menuItems.add(
       _buildNavigationMenuItem(
         'family',
@@ -126,12 +159,12 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
       ),
     );
 
-    const double menuWidth = 210.0;
+    const double menuWidth = 220.0;
 
     showMenu<dynamic>(
       context: context,
       position: RelativeRect.fromLTRB(
-        position.dx - 60,
+        position.dx - 160,
         position.dy + size.height + 6.0,
         position.dx + size.width,
         position.dy,
@@ -149,12 +182,9 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
       setState(() => isMenuOpen = false);
       if (selectedValue == null) return;
 
-      // Si el valor es un UserModel, es un cambio de perfil
       if (selectedValue is UserModel) {
         userViewModel.changeActiveProfile(selectedValue);
-      }
-      // Si es un String, es una acción de navegación
-      else if (selectedValue is String) {
+      } else if (selectedValue is String) {
         if (selectedValue == 'profile') {
           navigator.push(
             MaterialPageRoute(builder: (_) => const ProfileScreen()),
@@ -174,7 +204,6 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
     });
   }
 
-  // Helper para construir los items de navegación del menú
   PopupMenuItem<String> _buildNavigationMenuItem(
     String value,
     String text,
@@ -230,19 +259,43 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
               onPressed: () async {
                 final navigator = Navigator.of(context);
                 Navigator.of(dialogContext).pop();
+
+                // Aquí personalizamos el modal de "cerrando sesión..."
                 showDialog(
                   context: context,
                   barrierDismissible: false,
                   builder: (BuildContext context) {
-                    return const Dialog(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                      child: Center(child: CircularProgressIndicator()),
+                    return Dialog(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                AppColors.primaryColor,
+                              ),
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              'Cerrando sesión…',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     );
                   },
                 );
 
-                // Limpieza de todos los ViewModels
                 userViewModel.clearUser();
                 appointmentViewModel.disposeListeners();
                 familyViewModel.clearData();

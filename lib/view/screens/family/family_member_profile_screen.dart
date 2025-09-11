@@ -5,7 +5,9 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/data/models/user_model.dart';
+import 'package:p_hn25/view/widgets/custom_modal.dart';
 import 'package:p_hn25/view_model/family_view_model.dart';
+import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
 
 class FamilyMemberProfileScreen extends StatelessWidget {
@@ -35,23 +37,24 @@ class FamilyMemberProfileScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Eliminar Familiar'),
+        return CustomModal(
+          title: 'Eliminar Perfil Familiar',
+          subtitle: 'Esta acción no se puede deshacer',
+          icon: HugeIcons.strokeRoundedDelete02,
           content: Text(
-            '¿Estás seguro de que deseas eliminar a ${member.firstName} de tu lista? Esta acción no se puede deshacer.',
+            '¿Estás seguro de que deseas eliminar a ${member.firstName} ${member.lastName} de tu lista de familiares?',
+            style: const TextStyle(fontSize: 16, height: 1.5),
           ),
           actions: [
-            TextButton(
-              child: const Text('Cancelar'),
+            ModalButton(
+              text: 'Cancelar',
               onPressed: () => Navigator.of(dialogContext).pop(),
             ),
-            TextButton(
-              child: const Text(
-                'Eliminar',
-                style: TextStyle(color: AppColors.warningColor),
-              ),
+            ModalButton(
+              text: 'Eliminar',
+              isWarning: true,
               onPressed: () async {
-                Navigator.of(dialogContext).pop(); // Cierra el diálogo
+                Navigator.of(dialogContext).pop();
                 final success = await viewModel.deleteFamilyMember(member.uid);
 
                 if (context.mounted) {
@@ -68,7 +71,7 @@ class FamilyMemberProfileScreen extends StatelessWidget {
                     ),
                   );
                   if (success) {
-                    Navigator.pop(context); // Regresa a la lista de familiares
+                    Navigator.pop(context);
                   }
                 }
               },
@@ -86,12 +89,18 @@ class FamilyMemberProfileScreen extends StatelessWidget {
       listen: false,
     );
 
+    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+    final currentUser = userViewModel.currentUser;
+    final activeProfile = userViewModel.activeProfile;
+
+    final bool isTutorViewing = currentUser?.uid == activeProfile?.uid;
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title: const Text(
-          'Perfil Familiar',
-          style: TextStyle(
+        title: Text(
+          'Perfil de ${member.firstName}',
+          style: const TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 22,
             letterSpacing: -0.5,
@@ -99,13 +108,8 @@ class FamilyMemberProfileScreen extends StatelessWidget {
         ),
         backgroundColor: AppColors.backgroundColor,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(HugeIcons.strokeRoundedDelete02),
-            onPressed: () => _showDeleteConfirmation(context, familyViewModel),
-            tooltip: 'Eliminar Familiar',
-          ),
-        ],
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -114,6 +118,7 @@ class FamilyMemberProfileScreen extends StatelessWidget {
             _buildSectionCard(
               title: 'Información Personal',
               icon: HugeIcons.strokeRoundedUserCircle02,
+              showEditButton: isTutorViewing,
               onEditPressed: () {},
               children: [
                 _buildInfoRow(
@@ -133,6 +138,7 @@ class FamilyMemberProfileScreen extends StatelessWidget {
             _buildSectionCard(
               title: 'Información Médica',
               icon: HugeIcons.strokeRoundedHealth,
+              showEditButton: isTutorViewing,
               onEditPressed: () {},
               children: [
                 _buildInfoRow(
@@ -149,17 +155,34 @@ class FamilyMemberProfileScreen extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 16),
+            // Sección de Configuración de Cuenta (con el mismo diseño)
+            if (isTutorViewing)
+              _buildSectionCard(
+                title: 'Configuración de Cuenta',
+                icon: HugeIcons.strokeRoundedSettings02,
+                showEditButton: false,
+                onEditPressed: () {},
+                children: [
+                  _buildActionRow(
+                    'Eliminar perfil familiar',
+                    HugeIcons.strokeRoundedDelete02,
+                    AppColors.warningColor,
+                    () => _showDeleteConfirmation(context, familyViewModel),
+                  ),
+                ],
+              ),
           ],
         ),
       ),
     );
   }
 
-  // Widgets de construcción de UI (reutilizados de ProfileScreen)
   Widget _buildSectionCard({
     required String title,
     required IconData icon,
     required List<Widget> children,
+    bool showEditButton = false,
     VoidCallback? onEditPressed,
   }) {
     return Container(
@@ -204,6 +227,25 @@ class FamilyMemberProfileScreen extends StatelessWidget {
                   ),
                 ],
               ),
+              if (showEditButton)
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryColor.withOpacity(0.08),
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(
+                      HugeIcons.strokeRoundedEdit01,
+                      size: 16,
+                      color: AppColors.primaryColor,
+                    ),
+                    onPressed: onEditPressed,
+                    padding: EdgeInsets.zero,
+                    tooltip: 'Editar',
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 12),
@@ -245,6 +287,49 @@ class FamilyMemberProfileScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildActionRow(
+    String title,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 18),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Icon(
+              HugeIcons.strokeRoundedArrowRight01,
+              color: color.withOpacity(0.7),
+              size: 18,
+            ),
+          ],
+        ),
       ),
     );
   }

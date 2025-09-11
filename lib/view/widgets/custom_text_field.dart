@@ -13,6 +13,7 @@ class CustomTextField extends StatefulWidget {
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
   final List<TextInputFormatter>? inputFormatters;
+  final int? minLines;
   final int? maxLines;
   final Color? iconColor;
   final Color? focusedBorderColor;
@@ -28,6 +29,7 @@ class CustomTextField extends StatefulWidget {
     this.keyboardType = TextInputType.text,
     this.validator,
     this.inputFormatters,
+    this.minLines,
     this.maxLines,
     this.iconColor,
     this.focusedBorderColor,
@@ -86,6 +88,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       textCapitalization: _getTextCapitalization(),
       validator: widget.validator,
       inputFormatters: widget.inputFormatters,
+      minLines: widget.isPassword ? 1 : 1,
       maxLines: widget.isPassword ? 1 : widget.maxLines,
       style: const TextStyle(
         fontSize: 16,

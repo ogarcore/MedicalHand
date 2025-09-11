@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:p_hn25/view/screens/registration/registration_step3_screen.dart';
 import 'package:p_hn25/view/widgets/custom_modal.dart';
 import '../../../app/core/constants/app_colors.dart';
 import '../../../app/core/utils/input_formatters.dart';
-import '../../../app/core/utils/validators.dart'; // Asegúrate de importar tus validadores
+import '../../../app/core/utils/validators.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/registration_progress_indicator.dart';
 import '../../widgets/custom_dropdown.dart';
-import 'registration_step3_screen.dart';
 import '../../../view_model/auth_view_model.dart';
 import 'package:provider/provider.dart';
 import '../welcome/welcome_screen.dart';
@@ -216,20 +216,6 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                               },
                             );
                           },
-                        ),
-                        const SizedBox(height: 20),
-                        CustomTextField(
-                          controller: authViewModel.idController,
-                          labelText: 'Cédula de Identidad',
-                          hintText: '001-010101-0001A',
-                          icon: Icons.badge_outlined,
-                          keyboardType: TextInputType.visiblePassword,
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(16),
-                            CedulaInputFormatter(),
-                          ],
-                          // Aplicando validador
-                          validator: AppValidators.validateCedula,
                         ),
                         const SizedBox(height: 20),
                         CustomTextField(
