@@ -164,6 +164,25 @@ class AppointmentViewModel extends ChangeNotifier {
     );
   }
 
+  Future<bool> checkIfExpedienteExists({
+    required String userId,
+    required String hospitalId,
+  }) async {
+    try {
+      final query = await _firestore
+          .collection('expedientes')
+          .where('userId', isEqualTo: userId)
+          .where('hospitalId', isEqualTo: hospitalId)
+          .limit(1)
+          .get();
+
+      return query.docs.isNotEmpty;
+    } catch (e) {
+      print("Error verificando expediente: $e");
+      return false;
+    }
+  }
+
   void disposeListeners() {
     _appointmentSubscription?.cancel();
     _appointmentSubscription = null;

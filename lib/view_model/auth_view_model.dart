@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:p_hn25/app/core/utils/validators.dart';
 import 'package:p_hn25/view_model/appointment_view_model.dart';
+import '../data/network/firebase_storage_service.dart';
 import '../data/network/firebase_auth_service.dart';
 import '../data/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,6 +14,7 @@ import 'user_view_model.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final FirebaseAuthService _authService = FirebaseAuthService();
+  final FirebaseStorageService _storageService = FirebaseStorageService();
 
   // Controladores para todos los campos del registro
   final TextEditingController emailController = TextEditingController();
@@ -37,6 +42,9 @@ class AuthViewModel extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
+  XFile? idFrontImage;
+  XFile? idBackImage;
+
   void setLoading(bool value) {
     _isLoading = value;
     notifyListeners();
@@ -58,6 +66,16 @@ class AuthViewModel extends ChangeNotifier {
     } else {
       selectedDiseases.remove(disease);
     }
+    notifyListeners();
+  }
+
+  void setIdFrontImage(XFile? file) {
+    idFrontImage = file;
+    notifyListeners();
+  }
+
+  void setIdBackImage(XFile? file) {
+    idBackImage = file;
     notifyListeners();
   }
 
@@ -203,6 +221,22 @@ class AuthViewModel extends ChangeNotifier {
     }
 
     if (user != null) {
+      final Map<String, String> imageUrls = {};
+      if (idFrontImage != null) {
+        imageUrls['idFrontUrl'] = await _storageService.uploadFile(
+          user.uid,
+          'id_front.jpg',
+          File(idFrontImage!.path),
+        );
+      }
+      if (idBackImage != null) {
+        imageUrls['idBackUrl'] = await _storageService.uploadFile(
+          user.uid,
+          'id_back.jpg',
+          File(idBackImage!.path),
+        );
+      }
+
       final dateParts = birthDateController.text.split('/');
       final dateOfBirth = Timestamp.fromDate(
         DateTime(
@@ -237,14 +271,16 @@ class AuthViewModel extends ChangeNotifier {
           'knownAllergies': allergiesController.text,
           'chronicDiseases': selectedDiseases.toList(),
         },
+        verification: {
+          'idFrontUrl': imageUrls['idFrontUrl'] ?? '',
+          'idBackUrl': imageUrls['idBackUrl'] ?? '',
+        },
         isTutor: true,
         managedBy: null,
       );
 
       await _authService.saveUserData(userModel);
 
-      // CAMBIO 2: ¡Aquí está la solución!
-      // Le decimos al UserViewModel que cargue los datos del usuario que acabamos de guardar.
       final userViewModel = Provider.of<UserViewModel>(context, listen: false);
       await userViewModel.fetchCurrentUser();
 
@@ -280,11 +316,11 @@ class AuthViewModel extends ChangeNotifier {
       }
 
       setLoading(false);
-      return false; // No, no existe (se puede continuar)
+      return false;
     } catch (e) {
       setErrorMessage('Error al verificar el correo. Intenta de nuevo.');
       setLoading(false);
-      return true; // Asumimos que existe para prevenir un error mayor
+      return true;
     }
   }
 
@@ -297,7 +333,6 @@ class AuthViewModel extends ChangeNotifier {
     setErrorMessage(null);
 
     try {
-      // Primero, revisamos en nuestra base de datos si el correo existe.
       final bool emailExists = await _authService.doesEmailExistInFirestore(
         email,
       );
@@ -400,6 +435,8 @@ class AuthViewModel extends ChangeNotifier {
     allergiesController.clear();
     selectedSex = null;
     selectedDiseases.clear();
+    idFrontImage = null;
+    idBackImage = null;
     notifyListeners();
   }
 }

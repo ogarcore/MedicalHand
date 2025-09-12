@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:p_hn25/data/network/image_picker_service.dart';
 import 'package:p_hn25/view/screens/registration/registration_step4_screen.dart';
 import 'package:p_hn25/view/widgets/primary_button.dart';
 import 'package:p_hn25/view/widgets/registration_progress_indicator.dart';
@@ -21,29 +23,43 @@ class RegistrationStep3Screen extends StatefulWidget {
 
 class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
   final _formKey = GlobalKey<FormState>();
+  final ImagePickerService _imagePickerService = ImagePickerService();
 
-  // Diseño compacto para los botones de captura
+  // CAMBIO: Especificamos el tipo de la función callback correctamente.
+  Future<void> _handleImagePick(void Function(XFile?) setImageCallback) async {
+    final file = await _imagePickerService.pickAndCompressImage();
+    if (file != null) {
+      setImageCallback(file);
+    }
+  }
+
   Widget _buildVerificationButton({
     required IconData icon,
     required String text,
     required String description,
     required VoidCallback onPressed,
+    bool isSelected = false,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      child: Material(
+      decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        elevation: 1,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
         child: InkWell(
           onTap: onPressed,
           borderRadius: BorderRadius.circular(12),
           child: Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200, width: 1),
-            ),
             child: Row(
               children: [
                 Container(
@@ -80,10 +96,15 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                     ],
                   ),
                 ),
+                const SizedBox(width: 12),
                 Icon(
-                  Icons.chevron_right,
-                  color: Colors.grey.shade400,
-                  size: 20,
+                  isSelected
+                      ? Icons.check_circle_rounded
+                      : Icons.chevron_right_rounded,
+                  color: isSelected
+                      ? AppColors.successColor
+                      : Colors.grey.shade400,
+                  size: 24,
                 ),
               ],
             ),
@@ -95,67 +116,13 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
 
   @override
   Widget build(BuildContext context) {
-    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
-    final Size size = MediaQuery.of(context).size;
-
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        body: Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.primaryColor.withAlpha(30),
-                    AppColors.backgroundColor,
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-            ),
-            Positioned(
-              top: -size.height * 0.25,
-              right: -size.width * 0.2,
-              child: Container(
-                width: size.width * 0.8,
-                height: size.width * 0.8,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withAlpha(15),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primaryColor.withAlpha(50),
-                      blurRadius: 40,
-                      spreadRadius: 20,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: -size.height * 0.2,
-              left: -size.width * 0.2,
-              child: Container(
-                width: size.width * 0.65,
-                height: size.width * 0.65,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withAlpha(10),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primaryColor.withAlpha(80),
-                      blurRadius: 50,
-                      spreadRadius: 30,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            SafeArea(
+    return Consumer<AuthViewModel>(
+      builder: (context, authViewModel, child) {
+        return GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Scaffold(
+            resizeToAvoidBottomInset: true,
+            body: SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20.0),
                 child: Form(
@@ -187,7 +154,10 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                         ],
                       ),
                       const SizedBox(height: 24),
-                      const RegistrationProgressIndicator(currentStep: 3),
+                      const RegistrationProgressIndicator(
+                        currentStep: 3,
+                        totalSteps: 5,
+                      ),
                       const SizedBox(height: 32),
                       const Text(
                         'Protección de tu información',
@@ -204,7 +174,8 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                             fontSize: 14,
                             color: AppColors.textLightColor,
                             height: 1.4,
-                          ),
+                            fontFamily: 'Poppins',
+                          ), // Reemplaza con tu fuente
                           children: [
                             const TextSpan(
                               text:
@@ -258,19 +229,36 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                         icon: HugeIcons.strokeRoundedCamera01,
                         text: 'Frente de la Cédula',
                         description: 'Datos visibles y legibles',
-                        onPressed: () {},
+                        onPressed: () =>
+                            _handleImagePick(authViewModel.setIdFrontImage),
+                        isSelected: authViewModel.idFrontImage != null,
                       ),
                       _buildVerificationButton(
                         icon: HugeIcons.strokeRoundedCamera01,
                         text: 'Reverso de la Cédula',
-                        description: 'Datos visibles y legibles',
-                        onPressed: () {},
+                        description: 'Asegúrate que se vea bien',
+                        onPressed: () =>
+                            _handleImagePick(authViewModel.setIdBackImage),
+                        isSelected: authViewModel.idBackImage != null,
                       ),
                       const SizedBox(height: 30),
                       PrimaryButton(
                         text: 'Continuar',
                         onPressed: () {
+                          FocusScope.of(context).unfocus();
                           if (_formKey.currentState!.validate()) {
+                            if (authViewModel.idFrontImage == null ||
+                                authViewModel.idBackImage == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Por favor, sube las tres imágenes requeridas.',
+                                  ),
+                                  backgroundColor: AppColors.warningColor,
+                                ),
+                              );
+                              return;
+                            }
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -287,9 +275,9 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                 ),
               ),
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

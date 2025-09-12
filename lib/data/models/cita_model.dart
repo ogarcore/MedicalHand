@@ -18,6 +18,9 @@ class CitaModel {
   final String? assignedDoctor;
   final String? clinicOffice;
   final String? specialty;
+  // CAMBIO: Nuevos campos para el expediente dinámico
+  final bool requiereExpediente;
+  final Map<String, String>? verificationUrls;
 
   CitaModel({
     required this.uid,
@@ -36,6 +39,9 @@ class CitaModel {
     this.assignedDoctor,
     this.clinicOffice,
     this.specialty = 'Consulta Externa',
+    // CAMBIO: Añadidos al constructor
+    required this.requiereExpediente,
+    this.verificationUrls,
   });
 
   Map<String, dynamic> toMap() {
@@ -52,15 +58,18 @@ class CitaModel {
       'status': status,
       'requestType': requestType,
       'isActive': isActive,
-      'assignedDate':
-          assignedDate != null ? Timestamp.fromDate(assignedDate!) : null,
+      'assignedDate': assignedDate != null
+          ? Timestamp.fromDate(assignedDate!)
+          : null,
       'assignedDoctor': assignedDoctor,
       'clinicOffice': clinicOffice,
       'specialty': specialty,
+      // CAMBIO: Añadidos al mapa
+      'requiereExpediente': requiereExpediente,
+      'verificationUrls': verificationUrls,
     };
   }
 
-  // CAMBIO: Añadido factory constructor para leer desde Firestore.
   factory CitaModel.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return CitaModel(
@@ -81,7 +90,11 @@ class CitaModel {
           : null,
       assignedDoctor: data['assignedDoctor'],
       clinicOffice: data['clinicOffice'],
-      specialty: data['specialty'] ?? 'Consulta General',
+      specialty: data['specialty'] ?? 'Consulta Externa',
+      requiereExpediente: data['requiereExpediente'] ?? false,
+      verificationUrls: data['verificationUrls'] != null
+          ? Map<String, String>.from(data['verificationUrls'])
+          : null,
     );
   }
 }

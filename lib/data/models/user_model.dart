@@ -15,6 +15,7 @@ class UserModel {
   final Map<String, dynamic>? medicalInfo;
   final bool isTutor;
   final String? managedBy;
+  final Map<String, dynamic>? verification;
 
   UserModel({
     required this.uid,
@@ -30,11 +31,11 @@ class UserModel {
     this.medicalInfo,
     required this.isTutor,
     this.managedBy,
+    this.verification,
   });
 
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-
     return UserModel(
       uid: doc.id,
       email: data['email'] ?? '',
@@ -46,14 +47,15 @@ class UserModel {
       phoneNumber: data['contactInfo']?['phoneNumber'] ?? '',
       address: data['contactInfo']?['address'] ?? '',
       emergencyContact: data['contactInfo']?['emergencyContact'] != null
-          ? Map<String, String>.from(data['contactInfo']?['emergencyContact'])
+          ? Map<String, String>.from(data['contactInfo']!['emergencyContact'])
           : null,
       medicalInfo: data['medicalInfo'],
-      // CAMBIO: Leemos los nuevos campos desde Firestore
       isTutor: data['isTutor'] ?? false,
       managedBy: data['managedBy'],
+      verification: data['verification'],
     );
   }
+
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
@@ -74,6 +76,7 @@ class UserModel {
       'medicalInfo': medicalInfo,
       'isTutor': isTutor,
       'managedBy': managedBy,
+      'verification': verification,
     };
   }
 }

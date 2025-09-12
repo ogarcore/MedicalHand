@@ -17,6 +17,7 @@ class CustomTextField extends StatefulWidget {
   final int? maxLines;
   final Color? iconColor;
   final Color? focusedBorderColor;
+  final ValueChanged<String>? onChanged;
 
   const CustomTextField({
     super.key,
@@ -33,6 +34,7 @@ class CustomTextField extends StatefulWidget {
     this.maxLines,
     this.iconColor,
     this.focusedBorderColor,
+    this.onChanged,
   });
 
   @override
@@ -90,6 +92,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       inputFormatters: widget.inputFormatters,
       minLines: widget.isPassword ? 1 : 1,
       maxLines: widget.isPassword ? 1 : widget.maxLines,
+      onChanged: widget.onChanged,
       style: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w500,

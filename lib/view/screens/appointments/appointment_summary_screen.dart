@@ -63,19 +63,32 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
       return;
     }
 
-    // Creamos el objeto CitaModel con los datos del usuario y del formulario
+    final bool expedienteExists = await appointmentViewModel
+        .checkIfExpedienteExists(
+          userId: currentUser.uid,
+          hospitalId: widget.hospitalId,
+        );
+
+    Map<String, String>? verificationUrls;
+    if (!expedienteExists) {
+      verificationUrls = {
+        'idFrontUrl': currentUser.verification?['idFrontUrl'] ?? '',
+        'idBackUrl': currentUser.verification?['idBackUrl'] ?? '',
+      };
+    }
+
     final newAppointment = CitaModel(
       uid: currentUser.uid,
       fullName: '${currentUser.firstName} ${currentUser.lastName}',
       idNumber: currentUser.idNumber,
-      dateOfBirth: currentUser.dateOfBirth
-          .toDate(), // Convertimos el Timestamp a DateTime
+      dateOfBirth: currentUser.dateOfBirth.toDate(),
       phoneNumber: currentUser.phoneNumber,
       idHospital: widget.hospitalId,
       hospital: widget.hospitalName,
       reason: widget.reason,
       requestTimestamp: DateTime.now(),
-      // Los valores por defecto (status, requestType, isActive) se ponen automáticamente desde el modelo
+      requiereExpediente: !expedienteExists,
+      verificationUrls: verificationUrls,
     );
 
     // Enviamos la solicitud a través del ViewModel
