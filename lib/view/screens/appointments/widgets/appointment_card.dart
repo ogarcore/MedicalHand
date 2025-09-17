@@ -1,26 +1,22 @@
 // lib/view/screens/appointments/widgets/appointment_card.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:intl/intl.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
+import 'package:p_hn25/app/core/utils/validators.dart';
+import 'package:p_hn25/view/widgets/custom_modal.dart';
+import 'package:p_hn25/data/models/cita_model.dart';
+import 'package:p_hn25/view_model/appointment_view_model.dart';
+import 'package:provider/provider.dart';
 
 class AppointmentCard extends StatefulWidget {
+  final CitaModel appointment;
   final bool isUpcoming;
-  final String specialty;
-  final String hospital;
-  final String date;
-  final String status;
-  final String doctor;
-  final String office;
 
   const AppointmentCard({
     super.key,
+    required this.appointment,
     required this.isUpcoming,
-    required this.specialty,
-    required this.hospital,
-    required this.date,
-    required this.status,
-    required this.doctor,
-    required this.office,
   });
 
   @override
@@ -30,8 +26,107 @@ class AppointmentCard extends StatefulWidget {
 class _AppointmentCardState extends State<AppointmentCard> {
   bool _isExpanded = false;
 
+  void _cancelAppointment() {
+    final viewModel = Provider.of<AppointmentViewModel>(context, listen: false);
+    showDialog(
+      context: context,
+      builder: (ctx) => CustomModal(
+        title: 'Confirmar Cancelación',
+        subtitle: '¿Estás seguro de que deseas cancelar esta cita?',
+        icon: HugeIcons.strokeRoundedCancelCircleHalfDot,
+        content: SizedBox(),
+        actions: [
+          ModalButton(
+            text: 'Cancelar',
+            onPressed: () => Navigator.of(ctx).pop(),
+          ),
+          ModalButton(
+            text: 'Aceptar',
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              viewModel.updateAppointmentStatus(
+                widget.appointment.id!,
+                'cancelada',
+              );
+            },
+            isWarning: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _rescheduleAppointment() {
+    final viewModel = Provider.of<AppointmentViewModel>(context, listen: false);
+    final reasonController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return CustomModal(
+          title: 'Solicitar Reprogramación',
+          subtitle:
+              'Tu cita volverá al estado "Pendiente" para que el hospital te asigne una nueva fecha.',
+          icon: HugeIcons.strokeRoundedRepeat,
+          content: Form(
+            key: formKey,
+            child: TextFormField(
+              controller: reasonController,
+              decoration: const InputDecoration(
+                labelText: 'Motivo de la reprogramación',
+                hintText: 'Explica brevemente por qué necesitas el cambio...',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+              validator: AppValidators.validateRescheduleReason,
+            ),
+          ),
+          actions: [
+            ModalButton(
+              text: 'Cancelar',
+              onPressed: () => Navigator.of(ctx).pop(),
+            ),
+            ModalButton(
+              text: 'Sí, Solicitar',
+              onPressed: () {
+                if (formKey.currentState!.validate()) {
+                  Navigator.of(ctx).pop();
+                  viewModel.requestReschedule(
+                    appointmentId: widget.appointment.id!,
+                    reason: reasonController.text.trim(),
+                    previousDate: widget.appointment.assignedDate!,
+                  );
+                }
+              },
+              isPrimary: true,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  String _formatDate() {
+    if (widget.appointment.status == 'pendiente' ||
+        widget.appointment.status == 'pendiente_reprogramacion') {
+      return 'Por asignar';
+    }
+    if (widget.appointment.assignedDate != null) {
+      return DateFormat(
+        'd MMM, y - hh:mm a',
+        'es_ES',
+      ).format(widget.appointment.assignedDate!);
+    }
+    return 'Fecha no disponible';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final bool showOptions =
+        widget.isUpcoming && widget.appointment.status == 'confirmada';
+    final cita = widget.appointment;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16.0),
       decoration: BoxDecoration(
@@ -59,7 +154,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                   child: Padding(
                     padding: const EdgeInsets.only(right: 32.0),
                     child: Text(
-                      widget.specialty,
+                      cita.specialty ?? 'Consulta General',
                       style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
@@ -70,7 +165,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                     ),
                   ),
                 ),
-                _buildStatusChip(widget.status),
+                _buildStatusChip(cita.status),
               ],
             ),
             const SizedBox(height: 12),
@@ -112,7 +207,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.hospital,
+                        cita.hospital,
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -132,7 +227,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
-                              widget.date,
+                              _formatDate(),
                               style: TextStyle(
                                 fontSize: 13.5,
                                 color: Colors.grey[700],
@@ -154,7 +249,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
-                                widget.doctor,
+                                cita.assignedDoctor ?? 'Por Asignar',
                                 style: TextStyle(
                                   fontSize: 13.5,
                                   color: Colors.grey[700],
@@ -178,7 +273,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
-                              widget.office,
+                              cita.clinicOffice ?? 'Por Asignar',
                               style: TextStyle(
                                 fontSize: 13.5,
                                 color: Colors.grey[700],
@@ -193,7 +288,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                 ),
               ],
             ),
-            if (widget.isUpcoming) _buildOptionsSection(),
+            if (showOptions) _buildOptionsSection(),
           ],
         ),
       ),
@@ -205,18 +300,17 @@ class _AppointmentCardState extends State<AppointmentCard> {
       children: [
         const SizedBox(height: 12),
         Align(
-        alignment: Alignment.centerRight,
+          alignment: Alignment.centerRight,
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () {
-                setState(() {
-                  _isExpanded = !_isExpanded;
-                });
-              },
+              onTap: () => setState(() => _isExpanded = !_isExpanded),
               borderRadius: BorderRadius.circular(12),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8.0,
+                  horizontal: 12,
+                ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -251,16 +345,20 @@ class _AppointmentCardState extends State<AppointmentCard> {
             children: [
               if (_isExpanded)
                 Padding(
-                  padding: const EdgeInsets.only(top: 12.0,right: 15,left: 15),
+                  padding: const EdgeInsets.only(
+                    top: 12.0,
+                    right: 15,
+                    left: 15,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: () {
-                            // Lógica para reprogramar
-                          },
+                          onPressed: _rescheduleAppointment,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.accentColor.withAlpha(170),
+                            backgroundColor: AppColors.accentColor.withAlpha(
+                              170,
+                            ),
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 1),
                             shape: RoundedRectangleBorder(
@@ -281,16 +379,14 @@ class _AppointmentCardState extends State<AppointmentCard> {
                       const SizedBox(width: 20),
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: () {
-                            // Lógica para cancelar
-                          },
+                          onPressed: _cancelAppointment,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white.withAlpha(20),
                             foregroundColor: AppColors.warningColor,
                             padding: const EdgeInsets.symmetric(vertical: 1),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(
+                              side: const BorderSide(
                                 color: AppColors.warningColor,
                                 width: 1.2,
                               ),
@@ -321,7 +417,9 @@ class _AppointmentCardState extends State<AppointmentCard> {
     Color textColor;
     IconData? icon;
 
-    final displayStatus = status.isNotEmpty ? status[0].toUpperCase() + status.substring(1) : '';
+    final displayStatus = status.isNotEmpty
+        ? status[0].toUpperCase() + status.substring(1).replaceAll('_', ' ')
+        : '';
 
     switch (status) {
       case 'confirmada':
@@ -344,7 +442,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
         textColor = AppColors.warningColor;
         icon = HugeIcons.strokeRoundedCancelCircleHalfDot;
         break;
-      case 'reprogramada':
+      case 'pendiente_reprogramacion':
         backgroundColor = AppColors.accentColor.withAlpha(40);
         textColor = AppColors.accentColor;
         icon = HugeIcons.strokeRoundedRepeat;

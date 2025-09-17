@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "MedicalHand(prueba web)": "medicalhand-f2fd3",
+    "default": "medicalhand-f2fd3",
+    "MedicalHand Pruebweb": "medicalhand-f2fd3"
+  },
+  "targets": {},
+  "etags": {}
+}

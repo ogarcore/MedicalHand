@@ -1,0 +1,12 @@
+{
+  "name": "funciones-medicalhand",
+  "description": "Cloud Functions para MedicalHand",
+  "dependencies": {
+    "firebase-admin": "^11.8.0",
+    "firebase-functions": "^4.3.1"
+  },
+  "private": true,
+  "engines": {
+    "node": "20"
+  }
+}

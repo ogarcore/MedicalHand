@@ -64,6 +64,17 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> saveFcmToken(String token) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    try {
+      await _firestore.collection('usuarios_movil').doc(user.uid).set({
+        'fcmToken': token,
+      }, SetOptions(merge: true));
+    } catch (e) {}
+  }
+
   void changeActiveProfile(UserModel newProfile) {
     _activeProfile = newProfile;
     notifyListeners();

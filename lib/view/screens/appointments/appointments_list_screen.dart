@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:intl/intl.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/data/models/cita_model.dart';
 import 'package:p_hn25/view_model/appointment_view_model.dart';
@@ -38,17 +37,6 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }
-
-  String _formatDate(CitaModel cita) {
-    if (cita.status == 'pendiente') return 'Por asignar';
-    if (cita.assignedDate != null) {
-      return DateFormat(
-        'd MMM, y - hh:mm a',
-        'es_ES',
-      ).format(cita.assignedDate!);
-    }
-    return 'Fecha no disponible';
   }
 
   @override
@@ -206,15 +194,7 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
       itemCount: appointments.length,
       itemBuilder: (context, index) {
         final cita = appointments[index];
-        return AppointmentCard(
-          isUpcoming: isUpcoming,
-          specialty: cita.specialty ?? 'Consulta General',
-          hospital: cita.hospital,
-          date: _formatDate(cita),
-          status: cita.status,
-          doctor: cita.assignedDoctor ?? 'Por Asignar',
-          office: cita.clinicOffice ?? 'Por Asignar',
-        );
+        return AppointmentCard(appointment: cita, isUpcoming: isUpcoming);
       },
     );
   }

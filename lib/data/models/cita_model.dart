@@ -2,6 +2,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CitaModel {
+  final String? id;
   final String uid;
   final String fullName;
   final String idNumber;
@@ -18,11 +19,12 @@ class CitaModel {
   final String? assignedDoctor;
   final String? clinicOffice;
   final String? specialty;
-  // CAMBIO: Nuevos campos para el expediente dinámico
   final bool requiereExpediente;
   final Map<String, String>? verificationUrls;
+  final List<Map<String, dynamic>>? rescheduleHistory;
 
   CitaModel({
+    this.id,
     required this.uid,
     required this.fullName,
     required this.idNumber,
@@ -39,9 +41,9 @@ class CitaModel {
     this.assignedDoctor,
     this.clinicOffice,
     this.specialty = 'Consulta Externa',
-    // CAMBIO: Añadidos al constructor
     required this.requiereExpediente,
     this.verificationUrls,
+    this.rescheduleHistory,
   });
 
   Map<String, dynamic> toMap() {
@@ -64,15 +66,16 @@ class CitaModel {
       'assignedDoctor': assignedDoctor,
       'clinicOffice': clinicOffice,
       'specialty': specialty,
-      // CAMBIO: Añadidos al mapa
       'requiereExpediente': requiereExpediente,
       'verificationUrls': verificationUrls,
+      'rescheduleHistory': rescheduleHistory,
     };
   }
 
   factory CitaModel.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return CitaModel(
+      id: doc.id,
       uid: data['uid'] ?? '',
       fullName: data['fullName'] ?? '',
       idNumber: data['idNumber'] ?? '',
@@ -94,6 +97,9 @@ class CitaModel {
       requiereExpediente: data['requiereExpediente'] ?? false,
       verificationUrls: data['verificationUrls'] != null
           ? Map<String, String>.from(data['verificationUrls'])
+          : null,
+      rescheduleHistory: data['rescheduleHistory'] != null
+          ? List<Map<String, dynamic>>.from(data['rescheduleHistory'])
           : null,
     );
   }

@@ -144,4 +144,14 @@ class AppValidators {
 
     return null; // El formato es válido
   }
+
+  static String? validateRescheduleReason(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'El motivo es obligatorio.';
+    }
+    if (value.trim().length < 20) {
+      return 'El motivo debe tener al menos 20 caracteres.';
+    }
+    return null; // El valor es válido
+  }
 }

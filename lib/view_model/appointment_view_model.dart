@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import '../data/models/cita_model.dart';
 import '../data/models/hospital_model.dart';
 
@@ -72,7 +73,10 @@ class AppointmentViewModel extends ChangeNotifier {
     return _firestore
         .collection('citas')
         .where('uid', isEqualTo: userId)
-        .where('status', whereIn: ['pendiente', 'confirmada'])
+        .where(
+          'status',
+          whereIn: ['pendiente', 'confirmada', 'pendiente_reprogramacion'],
+        )
         .snapshots()
         .map((snapshot) {
           var citas = snapshot.docs
@@ -80,6 +84,11 @@ class AppointmentViewModel extends ChangeNotifier {
               .toList();
           citas.sort((a, b) {
             if (a.status == 'confirmada' && b.status == 'pendiente') return -1;
+            if ((a.status == 'pendiente' ||
+                    a.status == 'pendiente_reprogramacion') &&
+                b.status == 'confirmada') {
+              return 1;
+            }
             if (a.status == 'pendiente' && b.status == 'confirmada') return 1;
             if (a.status == 'confirmada' && b.status == 'confirmada') {
               if (a.assignedDate != null && b.assignedDate != null) {
@@ -90,6 +99,21 @@ class AppointmentViewModel extends ChangeNotifier {
           });
           return citas;
         });
+  }
+
+  Future<bool> updateAppointmentStatus(
+    String appointmentId,
+    String newStatus,
+  ) async {
+    try {
+      await _firestore.collection('citas').doc(appointmentId).update({
+        'status': newStatus,
+      });
+      return true;
+    } catch (e) {
+      print('Error al actualizar estado de la cita: $e');
+      return false;
+    }
   }
 
   Stream<List<CitaModel>> getPastAppointments(String userId) {
@@ -104,6 +128,36 @@ class AppointmentViewModel extends ChangeNotifier {
               .map((doc) => CitaModel.fromFirestore(doc))
               .toList();
         });
+  }
+
+  Future<bool> requestReschedule({
+    required String appointmentId,
+    required String reason,
+    required DateTime previousDate,
+  }) async {
+    try {
+      final formattedPreviousDate = DateFormat(
+        'd MMM, y - hh:mm a',
+        'es_ES',
+      ).format(previousDate);
+      final historyEntry = {
+        'requestedAt': Timestamp.now(),
+        'reason': reason,
+        'previousDate': formattedPreviousDate,
+      };
+
+      await _firestore.collection('citas').doc(appointmentId).update({
+        'status': 'pendiente_reprogramacion',
+        'rescheduleHistory': FieldValue.arrayUnion([historyEntry]),
+        'assignedDate': null,
+        'assignedDoctor': null,
+        'clinicOffice': null,
+      });
+      return true;
+    } catch (e) {
+      print('Error al solicitar reprogramación: $e');
+      return false;
+    }
   }
 
   Stream<CitaModel?> getDashboardAppointmentStream(String userId) {
