@@ -2,6 +2,7 @@
 import 'dart:async'; // Necesario para manejo de errores de red
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:p_hn25/view_model/notification_view_model.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
 import '../view/screens/home/home_screen.dart';
 import '../view/screens/splash/no_internet_screen.dart';
@@ -15,6 +16,7 @@ class SplashViewModel extends ChangeNotifier {
   Future<void> checkStatusAndNavigate(
     BuildContext context, {
     required UserViewModel userViewModel,
+    required NotificationViewModel notificationViewModel,
   }) async {
     if (!context.mounted) return;
 
@@ -30,7 +32,10 @@ class SplashViewModel extends ChangeNotifier {
         // Future.wait espera a que AMBAS tareas terminen.
         await Future.wait([dataFetchFuture, minSplashTimeFuture]);
 
-        await _notificationService.initNotifications(userViewModel);
+        await _notificationService.initNotifications(
+          userViewModel: userViewModel,
+          notificationViewModel: notificationViewModel, // Se lo pasamos
+        );
 
         if (context.mounted) {
           Navigator.pushReplacement(

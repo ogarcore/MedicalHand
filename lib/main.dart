@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:p_hn25/view_model/appointment_view_model.dart';
 import 'package:p_hn25/view_model/auth_view_model.dart';
 import 'package:p_hn25/view_model/family_view_model.dart';
+import 'package:p_hn25/view_model/notification_view_model.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AppointmentViewModel()),
         ChangeNotifierProvider(create: (_) => UserViewModel()),
         ChangeNotifierProvider(create: (_) => FamilyViewModel()),
+        ChangeNotifierProvider(create: (_) => NotificationViewModel()),
       ],
       child: MaterialApp(
         title: 'MedicalHand',

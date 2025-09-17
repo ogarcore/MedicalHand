@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:p_hn25/view_model/notification_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:lottie/lottie.dart';
 import '../../../app/core/constants/app_colors.dart';
@@ -22,10 +23,15 @@ class _SplashScreenState extends State<SplashScreen> {
         listen: false,
       );
       final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+      final notificationViewModel = Provider.of<NotificationViewModel>(
+        context,
+        listen: false,
+      );
 
       splashViewModel.checkStatusAndNavigate(
         context,
         userViewModel: userViewModel,
+        notificationViewModel: notificationViewModel,
       );
     });
   }

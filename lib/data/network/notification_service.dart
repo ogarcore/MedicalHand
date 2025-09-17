@@ -6,12 +6,11 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:p_hn25/data/models/notification_model.dart';
 import 'package:p_hn25/data/network/notification_storage_service.dart';
 import 'package:p_hn25/firebase_options.dart';
+import 'package:p_hn25/view_model/notification_view_model.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
 
-// CAMBIO: Esta función ahora SIEMPRE guarda la notificación que llega.
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // Es necesario inicializar Firebase aquí para que los servicios funcionen en segundo plano.
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   print(
     "Notificación recibida en segundo plano/terminado: ${message.messageId}",
@@ -23,15 +22,17 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       body: message.notification!.body ?? 'Sin Contenido',
       receivedAt: DateTime.now(),
     );
-    // Guardamos la notificación para poder verla después, aunque el usuario no la toque.
     await NotificationStorageService.addNotification(notification);
   }
 }
 
 class NotificationService {
+  UserViewModel? _userViewModel;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _localNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+
+  NotificationViewModel? _notificationViewModel;
 
   Future<void> _initLocalNotifications() async {
     const AndroidInitializationSettings androidSettings =
@@ -45,7 +46,12 @@ class NotificationService {
     await _localNotificationsPlugin.initialize(settings);
   }
 
-  Future<void> initNotifications(UserViewModel userViewModel) async {
+  Future<void> initNotifications({
+    required UserViewModel userViewModel,
+    required NotificationViewModel notificationViewModel,
+  }) async {
+    _userViewModel = userViewModel;
+    _notificationViewModel = notificationViewModel;
     await _initLocalNotifications();
     await _requestPermission();
 
@@ -55,19 +61,33 @@ class NotificationService {
     }
     _setupMessageHandlers();
 
-    // Se revisa si la app se abrió desde una notificación (estando cerrada)
     final initialMessage = await _firebaseMessaging.getInitialMessage();
     if (initialMessage != null) {
-      // El _handler ya guardó la notificación. Aquí solo manejaríamos la navegación.
-      print('La app se abrió desde una notificación (estaba cerrada).');
+      // El _handler ya guardó la notificación. Aquí solo manejamos el cambio de perfil.
+      _handleNotificationTap(initialMessage, fromTerminated: true);
+    }
+  }
+
+  void _handleNotificationTap(
+    RemoteMessage message, {
+    bool fromTerminated = false,
+  }) {
+    // Si la app NO viene de estar terminada (es decir, estaba en segundo plano),
+    // guardamos la notificación aquí. Si venía de estar terminada, el _handler ya la guardó.
+    if (!fromTerminated) {
+      _saveNotification(message);
+    }
+
+    final String? profileId = message.data['patientProfileId'];
+    if (profileId != null && _userViewModel != null) {
+      print('Cambiando al perfil: $profileId');
+      _userViewModel!.changeActiveProfileById(profileId);
     }
   }
 
   void _saveNotification(RemoteMessage message) {
     if (message.notification != null) {
-      print(
-        "Guardando notificación desde primer plano: ${message.notification!.title}",
-      );
+      print("Guardando notificación: ${message.notification!.title}");
       final notification = NotificationModel(
         title: message.notification!.title ?? 'Sin Título',
         body: message.notification!.body ?? 'Sin Contenido',
@@ -101,7 +121,7 @@ class NotificationService {
 
     final NotificationDetails notificationDetails = NotificationDetails(
       android: androidDetails,
-      iOS: DarwinNotificationDetails(presentSound: true),
+      iOS: const DarwinNotificationDetails(presentSound: true),
     );
 
     final random = Random();
@@ -116,21 +136,18 @@ class NotificationService {
   }
 
   void _setupMessageHandlers() {
-    // App ABIERTA: Se muestra localmente y se guarda.
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Notificación recibida en primer plano!');
       _saveNotification(message);
       _showLocalNotification(message);
+      _notificationViewModel?.loadNotifications();
     });
 
-    // App EN SEGUNDO PLANO Y SE TOCA LA NOTIFICACIÓN:
-    // El _handler ya la guardó, así que aquí solo manejamos la navegación.
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('Notificación abierta desde segundo plano!');
-      // No es necesario llamar a _saveNotification aquí, pero no hace daño.
+      _handleNotificationTap(message);
     });
 
-    // App EN SEGUNDO PLANO O CERRADA (llega la notificación):
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 

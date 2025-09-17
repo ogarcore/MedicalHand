@@ -12,6 +12,7 @@ import 'package:p_hn25/view/widgets/custom_modal.dart';
 import 'package:p_hn25/view_model/appointment_view_model.dart';
 import 'package:p_hn25/view_model/auth_view_model.dart';
 import 'package:p_hn25/view_model/family_view_model.dart';
+import 'package:p_hn25/view_model/notification_view_model.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
 import 'notifications_panel.dart';
@@ -43,7 +44,12 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
           ),
         );
       },
-    );
+    ).then((_) {
+      Provider.of<NotificationViewModel>(
+        context,
+        listen: false,
+      ).loadNotifications();
+    });
   }
 
   void showProfileMenu() async {

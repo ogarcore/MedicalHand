@@ -1,10 +1,10 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:p_hn25/app/core/utils/validators.dart';
 import 'package:p_hn25/view_model/appointment_view_model.dart';
+import 'package:p_hn25/view_model/family_view_model.dart';
 import '../data/network/firebase_storage_service.dart';
 import '../data/network/firebase_auth_service.dart';
 import '../data/models/user_model.dart';
@@ -15,6 +15,7 @@ import 'user_view_model.dart';
 class AuthViewModel extends ChangeNotifier {
   final FirebaseAuthService _authService = FirebaseAuthService();
   final FirebaseStorageService _storageService = FirebaseStorageService();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Controladores para todos los campos del registro
   final TextEditingController emailController = TextEditingController();
@@ -168,14 +169,35 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   Future<void> signOut(BuildContext context) async {
-    // 1. Obtenemos las instancias de los ViewModels que guardan datos.
     final userViewModel = Provider.of<UserViewModel>(context, listen: false);
     final appointmentViewModel = Provider.of<AppointmentViewModel>(
       context,
       listen: false,
     );
+    final familyViewModel = Provider.of<FamilyViewModel>(
+      context,
+      listen: false,
+    );
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      try {
+        await _firestore.collection('usuarios_movil').doc(user.uid).update({
+          'fcmToken': FieldValue.delete(),
+        });
+        print('Token FCM borrado para el usuario: ${user.uid}');
+      } catch (e) {
+        print('Error al borrar el token FCM: $e');
+      }
+    }
+
+    // AHORA sí limpias el resto
     userViewModel.clearUser();
     appointmentViewModel.disposeListeners();
+    familyViewModel.clearData();
+
+    // AHORA cierras la sesión de FirebaseAuth
     await _authService.signOut();
 
     await FirebaseFirestore.instance.terminate();

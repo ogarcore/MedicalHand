@@ -32,9 +32,11 @@ class _AppointmentCardState extends State<AppointmentCard> {
       context: context,
       builder: (ctx) => CustomModal(
         title: 'Confirmar Cancelación',
-        subtitle: '¿Estás seguro de que deseas cancelar esta cita?',
         icon: HugeIcons.strokeRoundedCancelCircleHalfDot,
-        content: SizedBox(),
+        content: Text(
+          '¿Estás seguro de que deseas cancelar esta cita?',
+          textAlign: TextAlign.center,
+        ),
         actions: [
           ModalButton(
             text: 'Cancelar',
@@ -65,7 +67,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
       context: context,
       builder: (ctx) {
         return CustomModal(
-          title: 'Solicitar Reprogramación',
+          title: 'Reprogramación',
           subtitle:
               'Tu cita volverá al estado "Pendiente" para que el hospital te asigne una nueva fecha.',
           icon: HugeIcons.strokeRoundedRepeat,
@@ -88,7 +90,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
               onPressed: () => Navigator.of(ctx).pop(),
             ),
             ModalButton(
-              text: 'Sí, Solicitar',
+              text: 'Aceptar',
               onPressed: () {
                 if (formKey.currentState!.validate()) {
                   Navigator.of(ctx).pop();

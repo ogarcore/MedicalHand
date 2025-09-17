@@ -64,6 +64,32 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> changeActiveProfileById(String profileId) async {
+    // Si el perfil solicitado ya es el activo, no hacemos nada.
+    if (_activeProfile?.uid == profileId) return;
+
+    // Si el perfil solicitado es el del tutor, lo cambiamos directamente.
+    if (_currentUser?.uid == profileId) {
+      _activeProfile = _currentUser;
+      notifyListeners();
+      return;
+    }
+
+    // Si es otro (un familiar), lo buscamos en Firestore.
+    try {
+      final userDoc = await _firestore
+          .collection('usuarios_movil')
+          .doc(profileId)
+          .get();
+      if (userDoc.exists) {
+        _activeProfile = UserModel.fromFirestore(userDoc);
+        notifyListeners();
+      }
+    } catch (e) {
+      print("Error al cambiar al perfil del familiar: $e");
+    }
+  }
+
   Future<void> saveFcmToken(String token) async {
     final user = _auth.currentUser;
     if (user == null) return;

@@ -3,52 +3,71 @@ const admin = require("firebase-admin");
 
 admin.initializeApp();
 
-// Cambiamos la región para optimizar la latencia y añadimos más memoria
 exports.notificarCitaConfirmada = functions
-    .region("us-central1") // Define una región específica
-    .runWith({ memory: "512MB", timeoutSeconds: 30 }) // Asigna más recursos
+    .region("us-central1")
+    .runWith({ memory: "512MB", timeoutSeconds: 30 })
     .firestore.document("citas/{citaId}")
     .onUpdate(async (change, context) => {
       console.log(`Función activada para la cita: ${context.params.citaId}`);
-
       const datosAntes = change.before.data();
       const datosDespues = change.after.data();
 
-      // Condición de envío: solo si el estado cambia a 'confirmada'
       if (datosAntes.status !== "confirmada" && datosDespues.status === "confirmada") {
-        const userId = datosDespues.uid;
-        console.log(`La cita fue confirmada para el usuario: ${userId}`);
+        const patientId = datosDespues.uid; // ID del paciente (puede ser el tutor o un familiar)
+        console.log(`Cita confirmada para el paciente: ${patientId}`);
 
-        const userDoc = await admin.firestore().collection("usuarios_movil").doc(userId).get();
-        if (!userDoc.exists) {
-          console.error(`Error: No se encontró al usuario ${userId}`);
+        // --- INICIO DE LA NUEVA LÓGICA ---
+        const patientDoc = await admin.firestore().collection("usuarios_movil").doc(patientId).get();
+        if (!patientDoc.exists) {
+          console.error(`Error: No se encontró al paciente ${patientId}`);
           return null;
         }
 
-        const fcmToken = userDoc.data().fcmToken;
-        // Verificación clave: nos aseguramos de que el token exista y sea válido
-        if (!fcmToken || typeof fcmToken !== "string" || fcmToken.length === 0) {
-          console.warn(`El usuario ${userId} no tiene un token FCM válido.`);
+        const patientData = patientDoc.data();
+        // Determinamos a quién enviarle la notificación.
+        // Si el paciente es gestionado por alguien (managedBy), ese es el tutor.
+        // Si no, el paciente es su propio tutor.
+        const tutorId = patientData.managedBy || patientId;
+        console.log(`El tutor responsable es: ${tutorId}`);
+
+        // Buscamos el documento del tutor para obtener su token FCM.
+        const tutorDoc = await admin.firestore().collection("usuarios_movil").doc(tutorId).get();
+        if (!tutorDoc.exists) {
+          console.error(`Error: No se encontró al tutor ${tutorId}`);
           return null;
         }
+
+        const fcmToken = tutorDoc.data().fcmToken;
+        if (!fcmToken) {
+          console.warn(`El tutor ${tutorId} no tiene un token FCM válido.`);
+          return null;
+        }
+        
+        // Creamos un título personalizado si es para un familiar
+        const notificationTitle = tutorId === patientId 
+            ? "¡Tu Cita ha sido Confirmada!" 
+            : `¡Cita Confirmada para ${patientData.personalInfo.firstName}!`;
 
         const payload = {
           notification: {
-            title: "¡Tu Cita ha sido Confirmada!",
-            body: `Tu cita de ${datosDespues.specialty || "General"} en ${datosDespues.hospital} ha sido agendada. ¡Revisa los detalles!`,
+            title: notificationTitle,
+            body: `La cita de ${datosDespues.specialty || "General"} en ${datosDespues.hospital} ha sido agendada.`,
+          },
+          // Esta es la "etiqueta" con el ID del paciente para que la app sepa a quién mostrar
+          data: {
+            "patientProfileId": patientId,
           },
           token: fcmToken,
         };
+        // --- FIN DE LA NUEVA LÓGICA ---
 
         try {
-          console.log(`Intentando enviar notificación al token: ${fcmToken}`);
+          console.log(`Enviando notificación al token del tutor: ${fcmToken}`);
           await admin.messaging().send(payload);
-          console.log(`Notificación enviada con éxito a ${userId}.`);
+          console.log("Notificación enviada con éxito.");
         } catch (error) {
           console.error("Error CRÍTICO al enviar la notificación:", error);
         }
-      } else {
-        console.log("La actualización no cumplió la condición para enviar notificación.");
       }
       return null;
     });
