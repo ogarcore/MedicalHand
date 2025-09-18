@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:p_hn25/app/core/utils/validators.dart';
+import 'package:p_hn25/data/network/notification_service.dart';
 import 'package:p_hn25/view_model/appointment_view_model.dart';
 import 'package:p_hn25/view_model/family_view_model.dart';
+import 'package:p_hn25/view_model/notification_view_model.dart';
 import '../data/network/firebase_storage_service.dart';
 import '../data/network/firebase_auth_service.dart';
 import '../data/models/user_model.dart';
@@ -16,6 +18,7 @@ class AuthViewModel extends ChangeNotifier {
   final FirebaseAuthService _authService = FirebaseAuthService();
   final FirebaseStorageService _storageService = FirebaseStorageService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final NotificationService _notificationService = NotificationService();
 
   // Controladores para todos los campos del registro
   final TextEditingController emailController = TextEditingController();
@@ -105,7 +108,16 @@ class AuthViewModel extends ChangeNotifier {
             context,
             listen: false,
           );
+          final notificationViewModel = Provider.of<NotificationViewModel>(
+            context,
+            listen: false,
+          );
+
           await userViewModel.fetchCurrentUser();
+          await _notificationService.initNotifications(
+            userViewModel: userViewModel,
+            notificationViewModel: notificationViewModel,
+          );
           setLoading(false);
           return 'HOME'; // Navegamos a la pantalla principal.
 
@@ -394,7 +406,15 @@ class AuthViewModel extends ChangeNotifier {
           context,
           listen: false,
         );
+        final notificationViewModel = Provider.of<NotificationViewModel>(
+          context,
+          listen: false,
+        );
         await userViewModel.fetchCurrentUser();
+        await _notificationService.initNotifications(
+          userViewModel: userViewModel,
+          notificationViewModel: notificationViewModel,
+        );
       }
 
       setLoading(false);

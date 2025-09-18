@@ -13,6 +13,7 @@ import 'view/screens/splash/splash_screen.dart';
 import 'view_model/splash_view_model.dart';
 import 'app/core/constants/app_colors.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,7 +55,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           scaffoldBackgroundColor: AppColors.backgroundColor,
-          fontFamily: 'Inter',
+          textTheme: GoogleFonts.sourceSans3TextTheme(),
         ),
         home: const SplashScreen(),
       ),

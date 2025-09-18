@@ -25,14 +25,6 @@ class DashboardHeader extends StatelessWidget {
           return const Text("Cargando...");
         }
 
-        final firstName = (userViewModel.activeProfile?.firstName ?? '')
-            .split(' ')
-            .first;
-        final lastName = (userViewModel.activeProfile?.lastName ?? '')
-            .split(' ')
-            .first;
-        final displayName = "$firstName $lastName".trim();
-
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -40,21 +32,12 @@ class DashboardHeader extends StatelessWidget {
               text: TextSpan(
                 children: [
                   TextSpan(
-                    text: '$greeting, ',
+                    text: '¡$greeting! ',
                     style: const TextStyle(
                       fontSize: 28,
-                      fontWeight: FontWeight.w300,
+                      fontWeight: FontWeight.w500,
                       color: AppColors.textColor,
                       height: 1.3,
-                    ),
-                  ),
-                  TextSpan(
-                    // CAMBIO: Se reemplaza el nombre estático por el del usuario
-                    text: '$displayName!',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryColor,
                     ),
                   ),
                 ],

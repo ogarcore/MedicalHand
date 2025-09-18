@@ -132,7 +132,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16.0),
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(160),
+        color: Colors.white.withAlpha(220),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(

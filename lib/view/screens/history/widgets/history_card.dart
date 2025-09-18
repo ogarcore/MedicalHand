@@ -38,12 +38,9 @@ class HistoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       key: cardKey,
-      color: Colors.white.withAlpha(160),
-      // ----- INICIO DE LOS CAMBIOS -----
-      // 1. Sombra reducida para un efecto más sutil.
+      color: Colors.white.withAlpha(220),
       elevation: 3,
       shadowColor: AppColors.primaryColor.withAlpha(20),
-      // ----- FIN DE LOS CAMBIOS -----
       margin: const EdgeInsets.only(bottom: 16.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       clipBehavior: Clip.antiAlias,

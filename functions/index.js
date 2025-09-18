@@ -1,73 +1,134 @@
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
+const {onDocumentCreated, onDocumentUpdated} = require("firebase-functions/v2/firestore");
+const {onSchedule} = require("firebase-functions/v2/scheduler");
+const {initializeApp} = require("firebase-admin/app");
+const {getFirestore, Timestamp} = require("firebase-admin/firestore");
+const {getMessaging} = require("firebase-admin/messaging");
+const {logger} = require("firebase-functions");
 
-admin.initializeApp();
+initializeApp();
 
-exports.notificarCitaConfirmada = functions
-    .region("us-central1")
-    .runWith({ memory: "512MB", timeoutSeconds: 30 })
-    .firestore.document("citas/{citaId}")
-    .onUpdate(async (change, context) => {
-      console.log(`Función activada para la cita: ${context.params.citaId}`);
-      const datosAntes = change.before.data();
-      const datosDespues = change.after.data();
+// --- Función Reutilizable para Enviar Notificaciones ---
+async function sendNotificationToTutor(patientId, notificationPayload, dataPayload = {}) {
+  const patientDoc = await getFirestore().collection("usuarios_movil").doc(patientId).get();
+  if (!patientDoc.exists) {
+    logger.error(`Error: No se encontró al paciente ${patientId}`);
+    return;
+  }
+  
+  const patientData = patientDoc.data();
+  const tutorId = patientData.managedBy || patientId;
 
-      if (datosAntes.status !== "confirmada" && datosDespues.status === "confirmada") {
-        const patientId = datosDespues.uid; // ID del paciente (puede ser el tutor o un familiar)
-        console.log(`Cita confirmada para el paciente: ${patientId}`);
+  const tutorDoc = await getFirestore().collection("usuarios_movil").doc(tutorId).get();
+  if (!tutorDoc.exists) {
+    logger.error(`Error: No se encontró al tutor ${tutorId}`);
+    return;
+  }
 
-        // --- INICIO DE LA NUEVA LÓGICA ---
-        const patientDoc = await admin.firestore().collection("usuarios_movil").doc(patientId).get();
-        if (!patientDoc.exists) {
-          console.error(`Error: No se encontró al paciente ${patientId}`);
-          return null;
-        }
+  const fcmToken = tutorDoc.data().fcmToken;
+  if (!fcmToken) {
+    logger.warn(`El tutor ${tutorId} no tiene un token FCM.`);
+    return;
+  }
 
-        const patientData = patientDoc.data();
-        // Determinamos a quién enviarle la notificación.
-        // Si el paciente es gestionado por alguien (managedBy), ese es el tutor.
-        // Si no, el paciente es su propio tutor.
-        const tutorId = patientData.managedBy || patientId;
-        console.log(`El tutor responsable es: ${tutorId}`);
+  dataPayload.patientProfileId = patientId;
 
-        // Buscamos el documento del tutor para obtener su token FCM.
-        const tutorDoc = await admin.firestore().collection("usuarios_movil").doc(tutorId).get();
-        if (!tutorDoc.exists) {
-          console.error(`Error: No se encontró al tutor ${tutorId}`);
-          return null;
-        }
+  const payload = {
+    notification: notificationPayload,
+    data: dataPayload,
+    token: fcmToken,
+  };
 
-        const fcmToken = tutorDoc.data().fcmToken;
-        if (!fcmToken) {
-          console.warn(`El tutor ${tutorId} no tiene un token FCM válido.`);
-          return null;
-        }
-        
-        // Creamos un título personalizado si es para un familiar
-        const notificationTitle = tutorId === patientId 
-            ? "¡Tu Cita ha sido Confirmada!" 
-            : `¡Cita Confirmada para ${patientData.personalInfo.firstName}!`;
+  try {
+    logger.info(`Enviando notificación al tutor ${tutorId} para el paciente ${patientId}`);
+    await getMessaging().send(payload);
+    logger.info("Notificación enviada con éxito.");
+  } catch (error) {
+    logger.error(`Error al enviar notificación para ${tutorId}:`, error);
+  }
+}
 
-        const payload = {
-          notification: {
-            title: notificationTitle,
-            body: `La cita de ${datosDespues.specialty || "General"} en ${datosDespues.hospital} ha sido agendada.`,
-          },
-          // Esta es la "etiqueta" con el ID del paciente para que la app sepa a quién mostrar
-          data: {
-            "patientProfileId": patientId,
-          },
-          token: fcmToken,
-        };
-        // --- FIN DE LA NUEVA LÓGICA ---
+// --- Notificaciones Transaccionales ---
 
-        try {
-          console.log(`Enviando notificación al token del tutor: ${fcmToken}`);
-          await admin.messaging().send(payload);
-          console.log("Notificación enviada con éxito.");
-        } catch (error) {
-          console.error("Error CRÍTICO al enviar la notificación:", error);
-        }
-      }
-      return null;
+// 1. Notificación: Solicitud de Cita Enviada
+exports.notificarSolicitudRecibida = onDocumentCreated("citas/{citaId}", async (event) => {
+  const cita = event.data.data();
+  
+  const notification = {
+    title: "✅ ¡Solicitud Recibida!",
+    body: `Hemos enviado tu petición para ${cita.specialty} al ${cita.hospital}. Te avisaremos cuando sea asignada.`,
+  };
+
+  await sendNotificationToTutor(cita.uid, notification);
+});
+
+// 2. Notificación: Cita Asignada o Reprogramada
+exports.notificarCitaActualizada = onDocumentUpdated("citas/{citaId}", async (event) => {
+  const datosAntes = event.data.before.data();
+  const datosDespues = event.data.after.data();
+
+  if (datosAntes.status !== "confirmada" && datosDespues.status === "confirmada") {
+    const pacienteDoc = await getFirestore().collection("usuarios_movil").doc(datosDespues.uid).get();
+    if (!pacienteDoc.exists) return;
+    
+    const fecha = new Date(datosDespues.assignedDate.seconds * 1000).toLocaleString("es-NI", {
+        timeZone: "America/Managua",
+        month: "long", day: "numeric", hour: "numeric", minute: "2-digit", hour12: true,
     });
+    
+    const title = datosAntes.status === "pendiente_reprogramacion"
+        ? "🗓️ ¡Cita Reprogramada!"
+        : "🗓️ ¡Cita Asignada!";
+
+    let notification = {
+        title: title,
+        body: `Tu cita de ${datosDespues.specialty} ha sido confirmada para el ${fecha}.`,
+    };
+
+    const patientName = pacienteDoc.data().personalInfo.firstName;
+    if (datosDespues.uid !== (pacienteDoc.data().managedBy || datosDespues.uid)) {
+        notification.title = `${notification.title.split('!')[0]} para ${patientName}!`;
+    }
+
+    await sendNotificationToTutor(datosDespues.uid, notification);
+  }
+});
+
+
+// --- Notificaciones de Recordatorio ---
+
+// 3. Notificación: Recordatorio de Cita
+exports.enviarRecordatoriosDeCitas = onSchedule("every 60 minutes", async (event) => {
+  logger.info("Ejecutando la función de recordatorios de citas...");
+
+  const now = Timestamp.now();
+  const a24Horas = Timestamp.fromMillis(now.toMillis() + 24 * 60 * 60 * 1000);
+  const a48Horas = Timestamp.fromMillis(now.toMillis() + 48 * 60 * 60 * 1000);
+
+  const citasProximas = await getFirestore().collection("citas")
+      .where("status", "==", "confirmada")
+      .where("assignedDate", ">=", a24Horas)
+      .where("assignedDate", "<", a48Horas)
+      .get();
+
+  if (citasProximas.empty) {
+    logger.info("No hay citas para enviar recordatorios de 24h.");
+    return;
+  }
+  
+  const promises = citasProximas.docs.map(doc => {
+    const cita = doc.data();
+    const fecha = new Date(cita.assignedDate.seconds * 1000).toLocaleString("es-NI", {
+        timeZone: "America/Managua", 
+        weekday: "long", hour: "numeric", minute: "2-digit", hour12: true,
+    });
+
+    const notification = {
+        title: "⏰ Recordatorio de Cita",
+        body: `No olvides tu cita de ${cita.specialty} mañana ${fecha} en ${cita.hospital}.`,
+    };
+    
+    return sendNotificationToTutor(cita.uid, notification);
+  });
+
+  await Promise.all(promises);
+});
