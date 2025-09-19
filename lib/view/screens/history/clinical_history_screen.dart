@@ -123,22 +123,37 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            // ----- INICIO DEL CAMBIO -----
-            automaticallyImplyLeading: false, // <-- ¡Esta es la línea que soluciona el problema!
-            // ----- FIN DEL CAMBIO -----
+            automaticallyImplyLeading: false,
             backgroundColor: AppColors.backgroundColor,
             surfaceTintColor: Colors.transparent,
             pinned: true,
             floating: true,
             elevation: 0,
             centerTitle: false,
-            title: const Text(
-              'Mi Historial Clínico',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textColor,
-              ),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 6),
+                const Text(
+                  'Mi Historial Clínico',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textColor,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Consulta tus antecedentes médicos.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                    color: AppColors.textLightColor,
+                  ),
+                ),
+                const SizedBox(height: 4),
+              ],
             ),
             actions: [
               Row(
@@ -174,7 +189,7 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
           filteredHistoryEntries.isEmpty
               ? const SliverToBoxAdapter(child: EmptyHistoryView())
               : SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
                       final entry = filteredHistoryEntries[index];

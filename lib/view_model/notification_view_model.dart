@@ -1,4 +1,3 @@
-// lib/view_model/notification_view_model.dart
 import 'package:flutter/material.dart';
 import 'package:p_hn25/data/models/notification_model.dart';
 import 'package:p_hn25/data/network/notification_storage_service.dart';
@@ -13,24 +12,27 @@ class NotificationViewModel extends ChangeNotifier {
   int get unreadCount => _notifications.where((n) => !n.isRead).length;
   bool get hasUnreadNotifications => unreadCount > 0;
 
-  // Carga las notificaciones desde el almacenamiento local
-  Future<void> loadNotifications() async {
+  Future<void> loadNotifications(String userId) async {
     _isLoading = true;
     notifyListeners();
-    _notifications = await NotificationStorageService.getNotifications();
+
+    _notifications = await NotificationStorageService.getNotifications(userId);
     _isLoading = false;
     notifyListeners();
   }
 
-  // Marca todas las notificaciones como leídas
-  Future<void> markAllAsRead() async {
-    await NotificationStorageService.markAllAsRead();
-    await loadNotifications(); // Recarga para reflejar los cambios
+  Future<void> markAllAsRead(String userId) async {
+    await NotificationStorageService.markAllAsRead(userId);
+    await loadNotifications(userId);
   }
 
-  // Limpia todas las notificaciones
-  Future<void> clearAll() async {
-    await NotificationStorageService.clearNotifications();
-    await loadNotifications(); // Recarga para reflejar los cambios
+  Future<void> clearAll(String userId) async {
+    await NotificationStorageService.clearNotifications(userId);
+    await loadNotifications(userId);
+  }
+
+  void clearDataOnSignOut() {
+    _notifications = [];
+    notifyListeners();
   }
 }

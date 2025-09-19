@@ -26,6 +26,17 @@ class AppointmentCard extends StatefulWidget {
 class _AppointmentCardState extends State<AppointmentCard> {
   bool _isExpanded = false;
 
+  void _showConfirmationSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppColors.successColor,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   void _cancelAppointment() {
     final viewModel = Provider.of<AppointmentViewModel>(context, listen: false);
     showDialog(
@@ -33,23 +44,21 @@ class _AppointmentCardState extends State<AppointmentCard> {
       builder: (ctx) => CustomModal(
         title: 'Confirmar Cancelación',
         icon: HugeIcons.strokeRoundedCancelCircleHalfDot,
-        content: Text(
+        content: const Text(
           '¿Estás seguro de que deseas cancelar esta cita?',
           textAlign: TextAlign.center,
         ),
         actions: [
+          ModalButton(text: 'Volver', onPressed: () => Navigator.of(ctx).pop()),
           ModalButton(
-            text: 'Cancelar',
-            onPressed: () => Navigator.of(ctx).pop(),
-          ),
-          ModalButton(
-            text: 'Aceptar',
+            text: 'Sí, cancelar',
             onPressed: () {
               Navigator.of(ctx).pop();
               viewModel.updateAppointmentStatus(
                 widget.appointment.id!,
                 'cancelada',
               );
+              _showConfirmationSnackBar('Cita cancelada exitosamente.');
             },
             isWarning: true,
           ),
@@ -98,6 +107,9 @@ class _AppointmentCardState extends State<AppointmentCard> {
                     appointmentId: widget.appointment.id!,
                     reason: reasonController.text.trim(),
                     previousDate: widget.appointment.assignedDate!,
+                  );
+                  _showConfirmationSnackBar(
+                    'Solicitud de reprogramación enviada.',
                   );
                 }
               },

@@ -1,52 +1,62 @@
-// lib/data/services/notification_storage_service.dart
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/notification_model.dart';
 
 class NotificationStorageService {
-  static const _key = 'notifications';
+  static String _getUserKey(String userId) => 'notifications_$userId';
 
-  // Guarda una nueva notificación en la lista
-  static Future<void> addNotification(NotificationModel notification) async {
+  static Future<void> addNotification(
+    String userId,
+    NotificationModel notification,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
-    final List<String> currentNotifications = prefs.getStringList(_key) ?? [];
+    // 👇 LÍNEA AÑADIDA para recargar los datos antes de escribir.
+    await prefs.reload();
+
+    final userKey = _getUserKey(userId);
+    final List<String> currentNotifications =
+        prefs.getStringList(userKey) ?? [];
     currentNotifications.insert(0, notification.toJson());
-    await prefs.setStringList(_key, currentNotifications);
+    await prefs.setStringList(userKey, currentNotifications);
   }
 
-  // Obtiene todas las notificaciones guardadas
-  static Future<List<NotificationModel>> getNotifications() async {
+  static Future<List<NotificationModel>> getNotifications(String userId) async {
     final prefs = await SharedPreferences.getInstance();
-    final List<String> notificationStrings = prefs.getStringList(_key) ?? [];
+    // 👇 LÍNEA AÑADIDA para asegurar que se leen los datos más recientes.
+    await prefs.reload();
+
+    final userKey = _getUserKey(userId);
+    final List<String> notificationStrings = prefs.getStringList(userKey) ?? [];
     return notificationStrings
         .map((str) => NotificationModel.fromJson(str))
         .toList();
   }
 
-  // CAMBIO: Añadido el método que faltaba para marcar todas como leídas
-  static Future<void> markAllAsRead() async {
+  static Future<void> markAllAsRead(String userId) async {
     final prefs = await SharedPreferences.getInstance();
-    final List<String> notificationStrings = prefs.getStringList(_key) ?? [];
+    // 👇 LÍNEA AÑADIDA para trabajar sobre la lista más actualizada.
+    await prefs.reload();
 
-    // Convertimos las notificaciones de texto a objetos
+    final userKey = _getUserKey(userId);
+    final List<String> notificationStrings = prefs.getStringList(userKey) ?? [];
+
+    // La lógica interna para marcar como leído no cambia.
     final List<NotificationModel> notifications = notificationStrings
         .map((str) => NotificationModel.fromJson(str))
         .toList();
 
-    // Marcamos cada una como leída
     for (var notification in notifications) {
       notification.isRead = true;
     }
 
-    // Volvemos a guardar la lista actualizada como texto
     final List<String> updatedNotifications = notifications
         .map((n) => n.toJson())
         .toList();
-    await prefs.setStringList(_key, updatedNotifications);
+    await prefs.setStringList(userKey, updatedNotifications);
   }
 
-  // Limpia todas las notificaciones
-  static Future<void> clearNotifications() async {
+  static Future<void> clearNotifications(String userId) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_key);
+    final userKey = _getUserKey(userId);
+    await prefs.remove(userKey);
   }
 }

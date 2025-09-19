@@ -4,6 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:p_hn25/data/network/image_picker_service.dart';
 import 'package:p_hn25/view/screens/registration/registration_step4_screen.dart';
+import 'package:p_hn25/view/widgets/gradient_background.dart';
 import 'package:p_hn25/view/widgets/primary_button.dart';
 import 'package:p_hn25/view/widgets/registration_progress_indicator.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +26,6 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
   final _formKey = GlobalKey<FormState>();
   final ImagePickerService _imagePickerService = ImagePickerService();
 
-  // CAMBIO: Especificamos el tipo de la función callback correctamente.
   Future<void> _handleImagePick(void Function(XFile?) setImageCallback) async {
     final file = await _imagePickerService.pickAndCompressImage();
     if (file != null) {
@@ -43,11 +43,11 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.backgroundColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withAlpha(25),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -122,155 +122,157 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
           onTap: () => FocusScope.of(context).unfocus(),
           child: Scaffold(
             resizeToAvoidBottomInset: true,
-            body: SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: () => Navigator.pop(context),
-                            icon: const Icon(
-                              Icons.arrow_back,
-                              color: AppColors.textColor,
-                              size: 26.5,
-                            ),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            "Verificación de Identidad",
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      const RegistrationProgressIndicator(
-                        currentStep: 3,
-                        totalSteps: 5,
-                      ),
-                      const SizedBox(height: 32),
-                      const Text(
-                        'Protección de tu información',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textColor,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      RichText(
-                        text: TextSpan(
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: AppColors.textLightColor,
-                            height: 1.4,
-                            fontFamily: 'Poppins',
-                          ), // Reemplaza con tu fuente
+            body: GradientBackground(
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
                           children: [
-                            const TextSpan(
-                              text:
-                                  'Para garantizar la seguridad de tu expediente, ',
+                            IconButton(
+                              onPressed: () => Navigator.pop(context),
+                              icon: const Icon(
+                                Icons.arrow_back,
+                                color: AppColors.textColor,
+                                size: 26.5,
+                              ),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
                             ),
-                            TextSpan(
-                              text: 'verificamos tu identidad',
+                            const SizedBox(width: 8),
+                            const Text(
+                              "Verificación de Identidad",
                               style: TextStyle(
-                                fontWeight: FontWeight.w600,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
                                 color: AppColors.textColor,
                               ),
                             ),
-                            const TextSpan(
-                              text: ' para proteger tus datos médicos.',
-                            ),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 24),
-                      CustomTextField(
-                        controller: authViewModel.idController,
-                        labelText: 'Cédula de Identidad',
-                        hintText: '001-010101-0001A',
-                        icon: HugeIcons.strokeRoundedId,
-                        keyboardType: TextInputType.visiblePassword,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(16),
-                          CedulaInputFormatter(),
-                        ],
-                        validator: AppValidators.validateCedula,
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Documentación requerida',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textColor,
+                        const SizedBox(height: 24),
+                        const RegistrationProgressIndicator(
+                          currentStep: 3,
+                          totalSteps: 5,
                         ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Toma fotos nítidas de ambos lados de tu cédula',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey.shade600,
+                        const SizedBox(height: 32),
+                        const Text(
+                          'Protección de tu información',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textColor,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      _buildVerificationButton(
-                        icon: HugeIcons.strokeRoundedCamera01,
-                        text: 'Frente de la Cédula',
-                        description: 'Datos visibles y legibles',
-                        onPressed: () =>
-                            _handleImagePick(authViewModel.setIdFrontImage),
-                        isSelected: authViewModel.idFrontImage != null,
-                      ),
-                      _buildVerificationButton(
-                        icon: HugeIcons.strokeRoundedCamera01,
-                        text: 'Reverso de la Cédula',
-                        description: 'Asegúrate que se vea bien',
-                        onPressed: () =>
-                            _handleImagePick(authViewModel.setIdBackImage),
-                        isSelected: authViewModel.idBackImage != null,
-                      ),
-                      const SizedBox(height: 30),
-                      PrimaryButton(
-                        text: 'Continuar',
-                        onPressed: () {
-                          FocusScope.of(context).unfocus();
-                          if (_formKey.currentState!.validate()) {
-                            if (authViewModel.idFrontImage == null ||
-                                authViewModel.idBackImage == null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Por favor, sube las tres imágenes requeridas.',
+                        const SizedBox(height: 8),
+                        RichText(
+                          text: TextSpan(
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: AppColors.textLightColor,
+                              height: 1.4,
+                              fontFamily: 'Poppins',
+                            ), // Reemplaza con tu fuente
+                            children: [
+                              const TextSpan(
+                                text:
+                                    'Para garantizar la seguridad de tu expediente, ',
+                              ),
+                              TextSpan(
+                                text: 'verificamos tu identidad',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textColor,
+                                ),
+                              ),
+                              const TextSpan(
+                                text: ' para proteger tus datos médicos.',
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        CustomTextField(
+                          controller: authViewModel.idController,
+                          labelText: 'Cédula de Identidad',
+                          hintText: '001-010101-0001A',
+                          icon: HugeIcons.strokeRoundedId,
+                          keyboardType: TextInputType.visiblePassword,
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(16),
+                            CedulaInputFormatter(),
+                          ],
+                          validator: AppValidators.validateCedula,
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Documentación requerida',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textColor,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Toma fotos nítidas de ambos lados de tu cédula',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildVerificationButton(
+                          icon: HugeIcons.strokeRoundedCamera01,
+                          text: 'Frente de la Cédula',
+                          description: 'Datos visibles y legibles',
+                          onPressed: () =>
+                              _handleImagePick(authViewModel.setIdFrontImage),
+                          isSelected: authViewModel.idFrontImage != null,
+                        ),
+                        _buildVerificationButton(
+                          icon: HugeIcons.strokeRoundedCamera01,
+                          text: 'Reverso de la Cédula',
+                          description: 'Asegúrate que se vea bien',
+                          onPressed: () =>
+                              _handleImagePick(authViewModel.setIdBackImage),
+                          isSelected: authViewModel.idBackImage != null,
+                        ),
+                        const SizedBox(height: 30),
+                        PrimaryButton(
+                          text: 'Continuar',
+                          onPressed: () {
+                            FocusScope.of(context).unfocus();
+                            if (_formKey.currentState!.validate()) {
+                              if (authViewModel.idFrontImage == null ||
+                                  authViewModel.idBackImage == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Por favor, sube las imágenes requeridas.',
+                                    ),
+                                    backgroundColor: AppColors.warningColor,
                                   ),
-                                  backgroundColor: AppColors.warningColor,
+                                );
+                                return;
+                              }
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const RegistrationStep4Screen(),
                                 ),
                               );
-                              return;
                             }
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const RegistrationStep4Screen(),
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                    ],
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
                   ),
                 ),
               ),

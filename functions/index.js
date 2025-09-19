@@ -119,7 +119,7 @@ exports.enviarRecordatorios = onSchedule({
     const dia = new Date(cita.assignedDate.seconds * 1000).toLocaleString("es-NI", { timeZone: "America/Managua", weekday: "long", day: "numeric", month: "long" });
     const notification = {
       title: "Recordatorio Próximo",
-      body: `Tienes una cita de ${cita.specialty} programada para pasado mañana, ${dia}.`,
+      body: `Tienes una cita de ${cita.specialty} programada en ${cita.hospital} para pasado mañana, ${dia}.`,
     };
     await sendNotificationToTutor(cita.uid, notification);
     return doc.ref.update({ reminder48hSent: true });

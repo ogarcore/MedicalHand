@@ -13,14 +13,14 @@ import '../data/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'user_view_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final FirebaseAuthService _authService = FirebaseAuthService();
   final FirebaseStorageService _storageService = FirebaseStorageService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final NotificationService _notificationService = NotificationService();
+  final NotificationService _notificationService = NotificationService.instance;
 
-  // Controladores para todos los campos del registro
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
@@ -88,20 +88,17 @@ class AuthViewModel extends ChangeNotifier {
     setErrorMessage(null);
 
     try {
-      // 1. Intentamos autenticar con Google.
       final User? user = await _authService.signInWithGoogle();
 
       if (user == null) {
-        setLoading(false); // El usuario canceló.
+        setLoading(false);
         return null;
       }
 
-      // 2. Buscamos el proveedor en nuestra base de datos por su email.
       final provider = await _authService.getAuthProviderFromFirestore(
         user.email!,
       );
 
-      // 3. Aplicamos la lógica de inicio de sesión.
       switch (provider) {
         case 'google.com':
           final userViewModel = Provider.of<UserViewModel>(
@@ -113,16 +110,26 @@ class AuthViewModel extends ChangeNotifier {
             listen: false,
           );
 
-          await userViewModel.fetchCurrentUser();
-          await _notificationService.initNotifications(
-            userViewModel: userViewModel,
-            notificationViewModel: notificationViewModel,
-          );
+          final postLoginTasks = <Future>[
+            userViewModel.fetchCurrentUser(),
+            _notificationService.initNotifications(
+              userViewModel: userViewModel,
+              notificationViewModel: notificationViewModel,
+            ),
+          ];
+
+          await Future.wait(postLoginTasks);
+
+          final currentUser = userViewModel.currentUser;
+          if (currentUser != null) {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('last_active_user_id', currentUser.uid);
+          }
+
           setLoading(false);
-          return 'HOME'; // Navegamos a la pantalla principal.
+          return 'HOME';
 
         case 'password':
-          // El usuario existe, pero se registró con contraseña.
           setErrorMessage(
             'Ese correo ya está registrado con contraseña. Por favor, inicia sesión con tu contraseña.',
           );
@@ -130,8 +137,7 @@ class AuthViewModel extends ChangeNotifier {
           setLoading(false);
           return null;
 
-        default: // 'desconocido' o cualquier otro valor
-          // El correo no fue encontrado en nuestra base de datos.
+        default:
           setErrorMessage(
             'Este correo no se encuentra registrado. Por favor, crea una cuenta.',
           );
@@ -160,7 +166,6 @@ class AuthViewModel extends ChangeNotifier {
       return null;
     }
 
-    // El "Portero": Verificamos si el usuario ya tiene datos en nuestra base de datos
     final bool userExists = await _authService.doesUserExist(user.uid);
 
     if (userExists) {
@@ -190,9 +195,14 @@ class AuthViewModel extends ChangeNotifier {
       context,
       listen: false,
     );
+    final notificationViewModel = Provider.of<NotificationViewModel>(
+      context,
+      listen: false,
+    );
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('last_active_user_id');
 
     final user = FirebaseAuth.instance.currentUser;
-
     if (user != null) {
       try {
         await _firestore.collection('usuarios_movil').doc(user.uid).update({
@@ -204,19 +214,18 @@ class AuthViewModel extends ChangeNotifier {
       }
     }
 
-    // AHORA sí limpias el resto
+    _notificationService.dispose();
     userViewModel.clearUser();
     appointmentViewModel.disposeListeners();
     familyViewModel.clearData();
+    notificationViewModel.clearDataOnSignOut();
+    clearControllers();
 
-    // AHORA cierras la sesión de FirebaseAuth
     await _authService.signOut();
 
     await FirebaseFirestore.instance.terminate();
     await FirebaseFirestore.instance.clearPersistence();
     await FirebaseFirestore.instance.enableNetwork();
-
-    clearControllers();
   }
 
   Future<void> cancelGoogleRegistration() async {
@@ -255,20 +264,34 @@ class AuthViewModel extends ChangeNotifier {
     }
 
     if (user != null) {
-      final Map<String, String> imageUrls = {};
+      final List<Future<String>> uploadTasks = [];
+      final List<String> taskKeys = [];
+
       if (idFrontImage != null) {
-        imageUrls['idFrontUrl'] = await _storageService.uploadFile(
-          user.uid,
-          'id_front.jpg',
-          File(idFrontImage!.path),
+        uploadTasks.add(
+          _storageService.uploadFile(
+            user.uid,
+            'id_front.jpg',
+            File(idFrontImage!.path),
+          ),
         );
+        taskKeys.add('idFrontUrl');
       }
       if (idBackImage != null) {
-        imageUrls['idBackUrl'] = await _storageService.uploadFile(
-          user.uid,
-          'id_back.jpg',
-          File(idBackImage!.path),
+        uploadTasks.add(
+          _storageService.uploadFile(
+            user.uid,
+            'id_back.jpg',
+            File(idBackImage!.path),
+          ),
         );
+        taskKeys.add('idBackUrl');
+      }
+      final List<String> uploadedUrls = await Future.wait(uploadTasks);
+
+      final Map<String, String> imageUrls = {};
+      for (int i = 0; i < taskKeys.length; i++) {
+        imageUrls[taskKeys[i]] = uploadedUrls[i];
       }
 
       final dateParts = birthDateController.text.split('/');
@@ -370,17 +393,12 @@ class AuthViewModel extends ChangeNotifier {
       final bool emailExists = await _authService.doesEmailExistInFirestore(
         email,
       );
-
       if (!emailExists) {
         setErrorMessage('El correo electrónico no se encuentra registrado.');
         setLoading(false);
         return false;
       }
-
-      // Si el correo existe, consultamos CÓMO se registró ese usuario.
       final provider = await _authService.getAuthProviderFromFirestore(email);
-
-      // Si el proveedor es 'google.com', no intentamos el login con contraseña.
       if (provider == 'google.com') {
         setErrorMessage(
           'Ese correo está registrado con Google. Por favor, inicia sesión con Google.',
@@ -389,7 +407,6 @@ class AuthViewModel extends ChangeNotifier {
         return false;
       }
 
-      // Si el proveedor es 'password', procedemos con el login normal.
       final user = await _authService.signInWithEmailAndPassword(
         email,
         password,
@@ -410,11 +427,18 @@ class AuthViewModel extends ChangeNotifier {
           context,
           listen: false,
         );
-        await userViewModel.fetchCurrentUser();
-        await _notificationService.initNotifications(
-          userViewModel: userViewModel,
-          notificationViewModel: notificationViewModel,
-        );
+        final postLoginTasks = <Future>[
+          userViewModel.fetchCurrentUser(),
+          SharedPreferences.getInstance().then(
+            (prefs) => prefs.setString('last_active_user_id', user.uid),
+          ),
+          _notificationService.initNotifications(
+            userViewModel: userViewModel,
+            notificationViewModel: notificationViewModel,
+          ),
+        ];
+
+        await Future.wait(postLoginTasks);
       }
 
       setLoading(false);
@@ -425,7 +449,6 @@ class AuthViewModel extends ChangeNotifier {
       } else {
         setErrorMessage('Ocurrió un error inesperado.');
       }
-
       setLoading(false);
       return false;
     }

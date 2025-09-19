@@ -9,7 +9,6 @@ import 'package:p_hn25/view/screens/profile/profile_screen.dart';
 import 'package:p_hn25/view/screens/splash/splash_screen.dart';
 import 'package:p_hn25/view/screens/support/support_screen.dart';
 import 'package:p_hn25/view/widgets/custom_modal.dart';
-import 'package:p_hn25/view_model/appointment_view_model.dart';
 import 'package:p_hn25/view_model/auth_view_model.dart';
 import 'package:p_hn25/view_model/family_view_model.dart';
 import 'package:p_hn25/view_model/notification_view_model.dart';
@@ -45,10 +44,16 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
         );
       },
     ).then((_) {
-      Provider.of<NotificationViewModel>(
+      final userId = Provider.of<UserViewModel>(
         context,
         listen: false,
-      ).loadNotifications();
+      ).currentUser?.uid;
+      if (userId != null) {
+        Provider.of<NotificationViewModel>(
+          context,
+          listen: false,
+        ).loadNotifications(userId);
+      }
     });
   }
 
@@ -233,15 +238,6 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
 
   void showLogoutDialog() {
     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
-    final userViewModel = Provider.of<UserViewModel>(context, listen: false);
-    final appointmentViewModel = Provider.of<AppointmentViewModel>(
-      context,
-      listen: false,
-    );
-    final familyViewModel = Provider.of<FamilyViewModel>(
-      context,
-      listen: false,
-    );
 
     showDialog(
       context: context,
@@ -266,47 +262,95 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                 final navigator = Navigator.of(context);
                 Navigator.of(dialogContext).pop();
 
-                // Aquí personalizamos el modal de "cerrando sesión..."
                 showDialog(
                   context: context,
                   barrierDismissible: false,
+                  barrierColor: AppColors.backgroundColor,
                   builder: (BuildContext context) {
-                    return Dialog(
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                AppColors.primaryColor,
+                    return Scaffold(
+                      backgroundColor: AppColors.backgroundColor,
+                      body: Center(
+                        child: Container(
+                          width: 280,
+                          padding: const EdgeInsets.all(32),
+                          decoration: BoxDecoration(
+                            color: AppColors.backgroundColor,
+                            borderRadius: BorderRadius.circular(28),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withAlpha(40),
+                                blurRadius: 30,
+                                spreadRadius: 2,
+                                offset: const Offset(0, 15),
                               ),
-                            ),
-                            SizedBox(height: 16),
-                            Text(
-                              'Cerrando sesión…',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textColor,
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Contenedor circular con gradiente y borde
+                              Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: AppColors.primaryColor.withAlpha(60),
+                                    width: 2,
+                                  ),
+                                  gradient: RadialGradient(
+                                    colors: [
+                                      AppColors.primaryColor.withAlpha(30),
+                                      AppColors.primaryColor.withAlpha(10),
+                                    ],
+                                    center: Alignment.center,
+                                    radius: 0.7,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 50,
+                                    height: 50,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 3,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        AppColors.primaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 24),
+                              // Texto principal
+                              const Text(
+                                'Cerrando sesión',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textColor,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              // Texto secundario
+                              Text(
+                                'Su sesión se está cerrando de forma segura',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.textColor.withAlpha(180),
+                                  height: 1.4,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );
                   },
                 );
-
-                userViewModel.clearUser();
-                appointmentViewModel.disposeListeners();
-                familyViewModel.clearData();
                 await authViewModel.signOut(context);
-
                 if (!navigator.mounted) return;
                 navigator.pop();
                 navigator.pushAndRemoveUntil(

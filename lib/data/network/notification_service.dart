@@ -1,4 +1,5 @@
 // lib/data/network/notification_service.dart
+import 'dart:async';
 import 'dart:math';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -8,31 +9,61 @@ import 'package:p_hn25/data/network/notification_storage_service.dart';
 import 'package:p_hn25/firebase_options.dart';
 import 'package:p_hn25/view_model/notification_view_model.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  print(
-    "Notificación recibida en segundo plano/terminado: ${message.messageId}",
-  );
+  print("--- BACKGROUND HANDLER ACTIVADO ---");
 
+  // Imprime todo el contenido del mensaje
+  print("Mensaje completo: ${message.toMap()}");
+  print("Contenido de 'notification': ${message.notification?.toMap()}");
+  print("Contenido de 'data': ${message.data}");
+
+  final prefs = await SharedPreferences.getInstance();
+  final userId = prefs.getString('last_active_user_id');
+
+  print("UserID encontrado en SharedPreferences: $userId");
+
+  if (userId == null) {
+    print(
+      "Error: No se encontró un usuario activo. No se guardará la notificación.",
+    );
+    return;
+  }
+
+  // Comprueba si la notificación tiene contenido visible
   if (message.notification != null) {
     final notification = NotificationModel(
       title: message.notification!.title ?? 'Sin Título',
       body: message.notification!.body ?? 'Sin Contenido',
       receivedAt: DateTime.now(),
     );
-    await NotificationStorageService.addNotification(notification);
+    await NotificationStorageService.addNotification(userId, notification);
+    print(">>> Notificación guardada exitosamente para el usuario $userId");
+  } else {
+    print(
+      "Alerta: El mensaje no contenía un campo 'notification'. No se guardó nada.",
+    );
   }
+  print("--- BACKGROUND HANDLER FINALIZADO ---");
 }
 
 class NotificationService {
+  NotificationService._privateConstructor();
+  static final NotificationService instance =
+      NotificationService._privateConstructor();
+
   UserViewModel? _userViewModel;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _localNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
   NotificationViewModel? _notificationViewModel;
+
+  StreamSubscription? _onMessageSubscription;
+  StreamSubscription? _onMessageOpenedAppSubscription;
 
   Future<void> _initLocalNotifications() async {
     const AndroidInitializationSettings androidSettings =
@@ -63,21 +94,24 @@ class NotificationService {
 
     final initialMessage = await _firebaseMessaging.getInitialMessage();
     if (initialMessage != null) {
-      // El _handler ya guardó la notificación. Aquí solo manejamos el cambio de perfil.
       _handleNotificationTap(initialMessage, fromTerminated: true);
     }
+  }
+
+  void dispose() {
+    _onMessageSubscription?.cancel();
+    _onMessageOpenedAppSubscription?.cancel();
   }
 
   void _handleNotificationTap(
     RemoteMessage message, {
     bool fromTerminated = false,
   }) {
-    // Si la app NO viene de estar terminada (es decir, estaba en segundo plano),
-    // guardamos la notificación aquí. Si venía de estar terminada, el _handler ya la guardó.
+    final userId = _userViewModel?.currentUser?.uid;
+    if (userId == null) return;
     if (!fromTerminated) {
-      _saveNotification(message);
+      _saveNotification(message, userId);
     }
-
     final String? profileId = message.data['patientProfileId'];
     if (profileId != null && _userViewModel != null) {
       print('Cambiando al perfil: $profileId');
@@ -85,15 +119,17 @@ class NotificationService {
     }
   }
 
-  void _saveNotification(RemoteMessage message) {
+  void _saveNotification(RemoteMessage message, String userId) {
     if (message.notification != null) {
-      print("Guardando notificación: ${message.notification!.title}");
+      print(
+        "Guardando notificación desde primer plano para el usuario: $userId",
+      );
       final notification = NotificationModel(
         title: message.notification!.title ?? 'Sin Título',
         body: message.notification!.body ?? 'Sin Contenido',
         receivedAt: DateTime.now(),
       );
-      NotificationStorageService.addNotification(notification);
+      NotificationStorageService.addNotification(userId, notification);
     }
   }
 
@@ -136,17 +172,27 @@ class NotificationService {
   }
 
   void _setupMessageHandlers() {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    dispose();
+
+    _onMessageSubscription = FirebaseMessaging.onMessage.listen((
+      RemoteMessage message,
+    ) {
       print('Notificación recibida en primer plano!');
-      _saveNotification(message);
+
+      final userId = _userViewModel?.currentUser?.uid;
+      if (userId == null) return;
+
+      _saveNotification(message, userId);
       _showLocalNotification(message);
-      _notificationViewModel?.loadNotifications();
+
+      _notificationViewModel?.loadNotifications(userId);
     });
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('Notificación abierta desde segundo plano!');
-      _handleNotificationTap(message);
-    });
+    _onMessageOpenedAppSubscription = FirebaseMessaging.onMessageOpenedApp
+        .listen((RemoteMessage message) {
+          print('Notificación abierta desde segundo plano!');
+          _handleNotificationTap(message);
+        });
 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }

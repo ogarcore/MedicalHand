@@ -11,7 +11,7 @@ import 'package:p_hn25/data/network/notification_service.dart';
 
 class SplashViewModel extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final NotificationService _notificationService = NotificationService();
+  final NotificationService _notificationService = NotificationService.instance;
 
   Future<void> checkStatusAndNavigate(
     BuildContext context, {
@@ -26,7 +26,7 @@ class SplashViewModel extends ChangeNotifier {
       final dataFetchFuture = userViewModel.fetchCurrentUser();
       final minSplashTimeFuture = Future.delayed(
         const Duration(milliseconds: 1500),
-      ); // 1.5 segundos
+      );
 
       try {
         // Future.wait espera a que AMBAS tareas terminen.

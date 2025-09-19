@@ -6,6 +6,9 @@ import 'package:p_hn25/view/screens/appointments/appointments_list_screen.dart';
 import 'package:p_hn25/view/screens/history/clinical_history_screen.dart';
 import 'package:p_hn25/view/screens/home/widgets/home_app_bar.dart';
 import 'package:p_hn25/view/screens/home/widgets/main_bottom_nav_bar.dart';
+import 'package:p_hn25/view_model/notification_view_model.dart';
+import 'package:p_hn25/view_model/user_view_model.dart';
+import 'package:provider/provider.dart';
 import 'widgets/dashboard_view.dart';
 import '../../widgets/custom_modal.dart';
 
@@ -16,7 +19,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   int _currentIndex = 1;
 
   final List<Widget> _pages = [
@@ -24,6 +27,42 @@ class _HomeScreenState extends State<HomeScreen> {
     const DashboardView(),
     const ClinicalHistoryScreen(),
   ];
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadUserNotifications();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      print("App reanudada. Recargando notificaciones...");
+      _loadUserNotifications();
+    }
+  }
+
+  void _loadUserNotifications() {
+    final userId = Provider.of<UserViewModel>(
+      context,
+      listen: false,
+    ).currentUser?.uid;
+    if (userId != null) {
+      Provider.of<NotificationViewModel>(
+        context,
+        listen: false,
+      ).loadNotifications(userId);
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -70,11 +109,10 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         }
       },
-
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         appBar: const HomeAppBar(),
-        body: _pages[_currentIndex],
+        body: IndexedStack(index: _currentIndex, children: _pages),
         bottomNavigationBar: MainBottomNavBar(
           currentIndex: _currentIndex,
           onItemTapped: _onItemTapped,
