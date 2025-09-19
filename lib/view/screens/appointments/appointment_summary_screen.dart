@@ -89,6 +89,8 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
       requestTimestamp: DateTime.now(),
       requiereExpediente: !expedienteExists,
       verificationUrls: verificationUrls,
+      reminder24hSent: false,
+      reminder48hSent: false,
     );
 
     // Enviamos la solicitud a través del ViewModel

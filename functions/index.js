@@ -1,3 +1,4 @@
+// Importa los módulos necesarios de la sintaxis más reciente (2nd Gen)
 const {onDocumentCreated, onDocumentUpdated} = require("firebase-functions/v2/firestore");
 const {onSchedule} = require("firebase-functions/v2/scheduler");
 const {initializeApp} = require("firebase-admin/app");
@@ -5,9 +6,10 @@ const {getFirestore, Timestamp} = require("firebase-admin/firestore");
 const {getMessaging} = require("firebase-admin/messaging");
 const {logger} = require("firebase-functions");
 
+// Inicializa Firebase Admin
 initializeApp();
 
-// --- Función Reutilizable para Enviar Notificaciones ---
+// --- Función Reutilizable para Enviar Notificaciones (No necesita cambios) ---
 async function sendNotificationToTutor(patientId, notificationPayload, dataPayload = {}) {
   const patientDoc = await getFirestore().collection("usuarios_movil").doc(patientId).get();
   if (!patientDoc.exists) {
@@ -47,14 +49,15 @@ async function sendNotificationToTutor(patientId, notificationPayload, dataPaylo
   }
 }
 
-// --- Notificaciones Transaccionales ---
+
+// --- Notificaciones Transaccionales  ---
 
 // 1. Notificación: Solicitud de Cita Enviada
 exports.notificarSolicitudRecibida = onDocumentCreated("citas/{citaId}", async (event) => {
   const cita = event.data.data();
   
   const notification = {
-    title: "✅ ¡Solicitud Recibida!",
+    title: "¡Solicitud Recibida!",
     body: `Hemos enviado tu petición para ${cita.specialty} al ${cita.hospital}. Te avisaremos cuando sea asignada.`,
   };
 
@@ -75,10 +78,8 @@ exports.notificarCitaActualizada = onDocumentUpdated("citas/{citaId}", async (ev
         month: "long", day: "numeric", hour: "numeric", minute: "2-digit", hour12: true,
     });
     
-    const title = datosAntes.status === "pendiente_reprogramacion"
-        ? "🗓️ ¡Cita Reprogramada!"
-        : "🗓️ ¡Cita Asignada!";
-
+    const title = datosAntes.status === "pendiente_reprogramacion" ? "¡Cita Reprogramada!" : "¡Cita Asignada!";
+    
     let notification = {
         title: title,
         body: `Tu cita de ${datosDespues.specialty} ha sido confirmada para el ${fecha}.`,
@@ -88,47 +89,64 @@ exports.notificarCitaActualizada = onDocumentUpdated("citas/{citaId}", async (ev
     if (datosDespues.uid !== (pacienteDoc.data().managedBy || datosDespues.uid)) {
         notification.title = `${notification.title.split('!')[0]} para ${patientName}!`;
     }
-
     await sendNotificationToTutor(datosDespues.uid, notification);
   }
 });
 
 
-// --- Notificaciones de Recordatorio ---
-
-// 3. Notificación: Recordatorio de Cita
-exports.enviarRecordatoriosDeCitas = onSchedule("every 60 minutes", async (event) => {
-  logger.info("Ejecutando la función de recordatorios de citas...");
-
+// --- Notificación de Recordatorio 
+exports.enviarRecordatorios = onSchedule({
+  schedule: "every 15 minutes", 
+  timeZone: "America/Managua",
+}, async (event) => {
+  logger.info("Ejecutando la función de recordatorios...");
+  const db = getFirestore();
   const now = Timestamp.now();
-  const a24Horas = Timestamp.fromMillis(now.toMillis() + 24 * 60 * 60 * 1000);
-  const a48Horas = Timestamp.fromMillis(now.toMillis() + 48 * 60 * 60 * 1000);
 
-  const citasProximas = await getFirestore().collection("citas")
+  // --- Lógica para recordatorios de 48 horas ---
+  const a48HorasInicio = Timestamp.fromMillis(now.toMillis() + (48 * 60 - 15) * 60 * 1000); 
+  const a48HorasFin = Timestamp.fromMillis(now.toMillis() + 48 * 60 * 60 * 1000); 
+
+  const citas48h = await db.collection("citas")
       .where("status", "==", "confirmada")
-      .where("assignedDate", ">=", a24Horas)
-      .where("assignedDate", "<", a48Horas)
+      .where("reminder48hSent", "==", false)
+      .where("assignedDate", ">=", a48HorasInicio)
+      .where("assignedDate", "<=", a48HorasFin)
       .get();
 
-  if (citasProximas.empty) {
-    logger.info("No hay citas para enviar recordatorios de 24h.");
-    return;
-  }
-  
-  const promises = citasProximas.docs.map(doc => {
+  const promises48h = citas48h.docs.map(async (doc) => {
     const cita = doc.data();
-    const fecha = new Date(cita.assignedDate.seconds * 1000).toLocaleString("es-NI", {
-        timeZone: "America/Managua", 
-        weekday: "long", hour: "numeric", minute: "2-digit", hour12: true,
-    });
-
+    const dia = new Date(cita.assignedDate.seconds * 1000).toLocaleString("es-NI", { timeZone: "America/Managua", weekday: "long", day: "numeric", month: "long" });
     const notification = {
-        title: "⏰ Recordatorio de Cita",
-        body: `No olvides tu cita de ${cita.specialty} mañana ${fecha} en ${cita.hospital}.`,
+      title: "Recordatorio Próximo",
+      body: `Tienes una cita de ${cita.specialty} programada para pasado mañana, ${dia}.`,
     };
-    
-    return sendNotificationToTutor(cita.uid, notification);
+    await sendNotificationToTutor(cita.uid, notification);
+    return doc.ref.update({ reminder48hSent: true });
   });
 
-  await Promise.all(promises);
+  // --- Lógica para recordatorios de 24 horas ---
+  const a24HorasInicio = Timestamp.fromMillis(now.toMillis() + (24 * 60 - 15) * 60 * 1000); 
+  const a24HorasFin = Timestamp.fromMillis(now.toMillis() + 24 * 60 * 60 * 1000); 
+
+  const citas24h = await db.collection("citas")
+      .where("status", "==", "confirmada")
+      .where("reminder24hSent", "==", false)
+      .where("assignedDate", ">=", a24HorasInicio)
+      .where("assignedDate", "<=", a24HorasFin)
+      .get();
+      
+  const promises24h = citas24h.docs.map(async (doc) => {
+    const cita = doc.data();
+    const fecha = new Date(cita.assignedDate.seconds * 1000).toLocaleString("es-NI", { timeZone: "America/Managua", hour: "numeric", minute: "2-digit", hour12: true });
+    const notification = {
+      title: "Recordatorio: Tu Cita es Mañana",
+      body: `No olvides tu cita de ${cita.specialty} mañana a las ${fecha} en ${cita.hospital}.`,
+    };
+    await sendNotificationToTutor(cita.uid, notification);
+    return doc.ref.update({ reminder24hSent: true });
+  });
+
+  await Promise.all([...promises48h, ...promises24h]);
+  logger.info(`Proceso de recordatorios finalizado. Se encontraron ${citas48h.size} (48h) y ${citas24h.size} (24h) citas.`);
 });

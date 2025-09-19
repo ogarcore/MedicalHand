@@ -22,6 +22,8 @@ class CitaModel {
   final bool requiereExpediente;
   final Map<String, String>? verificationUrls;
   final List<Map<String, dynamic>>? rescheduleHistory;
+  final bool? reminder24hSent;
+  final bool? reminder48hSent;
 
   CitaModel({
     this.id,
@@ -44,6 +46,8 @@ class CitaModel {
     required this.requiereExpediente,
     this.verificationUrls,
     this.rescheduleHistory,
+    this.reminder24hSent,
+    this.reminder48hSent,
   });
 
   Map<String, dynamic> toMap() {
@@ -69,6 +73,8 @@ class CitaModel {
       'requiereExpediente': requiereExpediente,
       'verificationUrls': verificationUrls,
       'rescheduleHistory': rescheduleHistory,
+      'reminder24hSent': reminder24hSent,
+      'reminder48hSent': reminder48hSent,
     };
   }
 
@@ -101,6 +107,8 @@ class CitaModel {
       rescheduleHistory: data['rescheduleHistory'] != null
           ? List<Map<String, dynamic>>.from(data['rescheduleHistory'])
           : null,
+      reminder24hSent: data['reminder24hSent'] ?? false,
+      reminder48hSent: data['reminder48hSent'] ?? false,
     );
   }
 }
