@@ -14,7 +14,7 @@ import 'package:p_hn25/view_model/family_view_model.dart';
 import 'package:p_hn25/view_model/notification_view_model.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
-import 'notifications_panel.dart';
+import '../../notifications/notifications_screen.dart';
 
 mixin HomeAppBarLogic on State<HomeAppBar> {
   bool isMenuOpen = false;
@@ -26,35 +26,22 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
     return '$firstName $lastName'.trim();
   }
 
-  void showNotificationsPanel() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      isDismissible: true,
-      enableDrag: true,
-      builder: (context) {
-        return GestureDetector(
-          onTap: () {},
-          child: NotificationsPanel(
-            onClose: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        );
-      },
-    ).then((_) {
-      final userId = Provider.of<UserViewModel>(
+  void navigateToNotificationsScreen() {
+    final userId = Provider.of<UserViewModel>(
+      context,
+      listen: false,
+    ).currentUser?.uid;
+    if (userId != null) {
+      Provider.of<NotificationViewModel>(
         context,
         listen: false,
-      ).currentUser?.uid;
-      if (userId != null) {
-        Provider.of<NotificationViewModel>(
-          context,
-          listen: false,
-        ).loadNotifications(userId);
-      }
-    });
+      ).loadNotifications(userId);
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+    );
   }
 
   void showProfileMenu() async {
@@ -140,7 +127,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
           'profile',
           'Mi Perfil',
           HugeIcons.strokeRoundedUser,
-          AppColors.primaryColor,
+          AppColors.successColor,
         ),
       );
     }

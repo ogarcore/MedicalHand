@@ -110,12 +110,12 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
               Expanded(
                 child: Text(
                   '¡Solicitud enviada con éxito!',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
           ),
-          backgroundColor: AppColors.successColor,
+          backgroundColor: AppColors.primaryColor,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),

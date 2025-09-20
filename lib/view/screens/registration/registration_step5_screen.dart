@@ -176,7 +176,7 @@ class _RegistrationStep5ScreenState extends State<RegistrationStep5Screen> {
                                         authViewModel.errorMessage ??
                                             'Ocurrió un error.',
                                       ),
-                                      backgroundColor: Colors.red,
+                                      backgroundColor: AppColors.warningColor,
                                     ),
                                   );
                                 }

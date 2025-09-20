@@ -20,43 +20,12 @@ class AppointmentsListScreen extends StatefulWidget {
 class _AppointmentsListScreenState extends State<AppointmentsListScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  late AppointmentViewModel _appointmentViewModel;
-
-  Stream<List<CitaModel>>? _upcomingAppointmentsStream;
-  Stream<List<CitaModel>>? _pastAppointmentsStream;
-  String? _currentProfileId;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     initializeDateFormatting('es_ES', null);
-
-    _appointmentViewModel = Provider.of<AppointmentViewModel>(
-      context,
-      listen: false,
-    );
-
-    final initialProfile = Provider.of<UserViewModel>(
-      context,
-      listen: false,
-    ).activeProfile;
-    if (initialProfile != null) {
-      _initializeStreams(initialProfile.uid);
-    }
-  }
-
-  void _initializeStreams(String profileId) {
-    if (_currentProfileId == profileId) return;
-
-    setState(() {
-      _currentProfileId = profileId;
-      _upcomingAppointmentsStream = _appointmentViewModel
-          .getUpcomingAppointments(profileId);
-      _pastAppointmentsStream = _appointmentViewModel.getPastAppointments(
-        profileId,
-      );
-    });
   }
 
   @override
@@ -67,42 +36,28 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserViewModel>(
-      builder: (context, userViewModel, child) {
-        final activeProfile = userViewModel.activeProfile;
+    final activeProfile = context.watch<UserViewModel>().activeProfile;
 
-        if (activeProfile == null) {
-          return Scaffold(
-            backgroundColor: AppColors.backgroundColor,
-            appBar: _buildAppBar(),
-            body: const _AppointmentsShimmer(),
-          );
-        }
-
-        if (activeProfile.uid != _currentProfileId) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _initializeStreams(activeProfile.uid);
-          });
-        }
-
-        return Scaffold(
-          backgroundColor: AppColors.backgroundColor,
-          appBar: _buildAppBar(),
-          body: TabBarView(
-            controller: _tabController,
-            children: [
-              _buildAppointmentsStream(
-                stream: _upcomingAppointmentsStream,
-                isUpcoming: true,
-              ),
-              _buildAppointmentsStream(
-                stream: _pastAppointmentsStream,
-                isUpcoming: false,
-              ),
-            ],
-          ),
-        );
-      },
+    return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
+      appBar: _buildAppBar(),
+      body: activeProfile == null
+          ? const _AppointmentsShimmer()
+          : TabBarView(
+              controller: _tabController,
+              children: [
+                _AppointmentTabPage(
+                  key: ValueKey('upcoming_${activeProfile.uid}'),
+                  profileId: activeProfile.uid,
+                  isUpcoming: true,
+                ),
+                _AppointmentTabPage(
+                  key: ValueKey('past_${activeProfile.uid}'),
+                  profileId: activeProfile.uid,
+                  isUpcoming: false,
+                ),
+              ],
+            ),
     );
   }
 
@@ -181,17 +136,47 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
       ),
     );
   }
+}
 
-  Widget _buildAppointmentsStream({
-    required Stream<List<CitaModel>>? stream,
-    required bool isUpcoming,
-  }) {
-    if (stream == null) {
-      return const _AppointmentsShimmer();
-    }
+class _AppointmentTabPage extends StatefulWidget {
+  final String profileId;
+  final bool isUpcoming;
+
+  const _AppointmentTabPage({
+    super.key,
+    required this.profileId,
+    required this.isUpcoming,
+  });
+
+  @override
+  State<_AppointmentTabPage> createState() => _AppointmentTabPageState();
+}
+
+class _AppointmentTabPageState extends State<_AppointmentTabPage>
+    with AutomaticKeepAliveClientMixin {
+  late Stream<List<CitaModel>> _appointmentsStream;
+
+  @override
+  void initState() {
+    super.initState();
+    final appointmentViewModel = Provider.of<AppointmentViewModel>(
+      context,
+      listen: false,
+    );
+    _appointmentsStream = widget.isUpcoming
+        ? appointmentViewModel.getUpcomingAppointments(widget.profileId)
+        : appointmentViewModel.getPastAppointments(widget.profileId);
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
 
     return StreamBuilder<List<CitaModel>>(
-      stream: stream,
+      stream: _appointmentsStream,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Center(
@@ -203,7 +188,7 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
         }
         final appointments = snapshot.data ?? [];
         if (appointments.isEmpty) {
-          return isUpcoming
+          return widget.isUpcoming
               ? const EmptyStateWidget(
                   icon: HugeIcons.strokeRoundedCardiogram01,
                   title: '¡Cuida tu salud!',
@@ -219,7 +204,7 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
         }
         return _buildAppointmentsList(
           appointments: appointments,
-          isUpcoming: isUpcoming,
+          isUpcoming: widget.isUpcoming,
         );
       },
     );
@@ -230,7 +215,6 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
     required bool isUpcoming,
   }) {
     final screenHeight = MediaQuery.of(context).size.height;
-
     return ListView.builder(
       padding: const EdgeInsets.all(16.0),
       cacheExtent: screenHeight,

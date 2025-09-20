@@ -30,9 +30,23 @@ class _AppointmentCardState extends State<AppointmentCard> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.successColor,
+        content: Row(
+          children: [
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.successColor.withAlpha(220),
         behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: EdgeInsets.only(bottom: 10, left: 20, right: 20),
+        duration: Duration(seconds: 3),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
   }

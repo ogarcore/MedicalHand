@@ -239,6 +239,7 @@ class AuthViewModel extends ChangeNotifier {
 
     User? user = _authService.getCurrentUser();
 
+    // Esta parte se mantiene igual
     if (user == null) {
       if (passwordController.text != confirmPasswordController.text) {
         setErrorMessage("Las contraseñas no coinciden.");
@@ -264,34 +265,44 @@ class AuthViewModel extends ChangeNotifier {
     }
 
     if (user != null) {
-      final List<Future<String>> uploadTasks = [];
-      final List<String> taskKeys = [];
-
-      if (idFrontImage != null) {
-        uploadTasks.add(
-          _storageService.uploadFile(
-            user.uid,
-            'id_front.jpg',
-            File(idFrontImage!.path),
-          ),
-        );
-        taskKeys.add('idFrontUrl');
-      }
-      if (idBackImage != null) {
-        uploadTasks.add(
-          _storageService.uploadFile(
-            user.uid,
-            'id_back.jpg',
-            File(idBackImage!.path),
-          ),
-        );
-        taskKeys.add('idBackUrl');
-      }
-      final List<String> uploadedUrls = await Future.wait(uploadTasks);
-
       final Map<String, String> imageUrls = {};
-      for (int i = 0; i < taskKeys.length; i++) {
-        imageUrls[taskKeys[i]] = uploadedUrls[i];
+
+      try {
+        final List<Future<String>> uploadTasks = [];
+        final List<String> taskKeys = [];
+
+        if (idFrontImage != null) {
+          uploadTasks.add(
+            _storageService.uploadFile(
+              user.uid,
+              'id_front.jpg',
+              File(idFrontImage!.path),
+            ),
+          );
+          taskKeys.add('idFrontUrl');
+        }
+        if (idBackImage != null) {
+          uploadTasks.add(
+            _storageService.uploadFile(
+              user.uid,
+              'id_back.jpg',
+              File(idBackImage!.path),
+            ),
+          );
+          taskKeys.add('idBackUrl');
+        }
+
+        final List<String> uploadedUrls = await Future.wait(uploadTasks);
+        for (int i = 0; i < taskKeys.length; i++) {
+          imageUrls[taskKeys[i]] = uploadedUrls[i];
+        }
+      } finally {
+        if (idFrontImage != null) {
+          await File(idFrontImage!.path).delete();
+        }
+        if (idBackImage != null) {
+          await File(idBackImage!.path).delete();
+        }
       }
 
       final dateParts = birthDateController.text.split('/');
@@ -348,6 +359,11 @@ class AuthViewModel extends ChangeNotifier {
         return 'VERIFY';
       } else {
         await _authService.updateUserAuthProvider(user.uid, 'google.com');
+
+        // Se añade el guardado de SharedPreferences aquí también
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('last_active_user_id', user.uid);
+
         setLoading(false);
         return 'SPLASH';
       }

@@ -39,13 +39,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       title: message.notification!.title ?? 'Sin Título',
       body: message.notification!.body ?? 'Sin Contenido',
       receivedAt: DateTime.now(),
+      type: message.data['type'] ?? 'general',
     );
     await NotificationStorageService.addNotification(userId, notification);
-    print(">>> Notificación guardada exitosamente para el usuario $userId");
-  } else {
-    print(
-      "Alerta: El mensaje no contenía un campo 'notification'. No se guardó nada.",
-    );
   }
   print("--- BACKGROUND HANDLER FINALIZADO ---");
 }
@@ -121,13 +117,11 @@ class NotificationService {
 
   void _saveNotification(RemoteMessage message, String userId) {
     if (message.notification != null) {
-      print(
-        "Guardando notificación desde primer plano para el usuario: $userId",
-      );
       final notification = NotificationModel(
         title: message.notification!.title ?? 'Sin Título',
         body: message.notification!.body ?? 'Sin Contenido',
         receivedAt: DateTime.now(),
+        type: message.data['type'] ?? 'general',
       );
       NotificationStorageService.addNotification(userId, notification);
     }

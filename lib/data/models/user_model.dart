@@ -16,6 +16,7 @@ class UserModel {
   final bool isTutor;
   final String? managedBy;
   final Map<String, dynamic>? verification;
+  final Timestamp? createdAt;
 
   UserModel({
     required this.uid,
@@ -32,6 +33,7 @@ class UserModel {
     required this.isTutor,
     this.managedBy,
     this.verification,
+    this.createdAt,
   });
 
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
@@ -53,6 +55,7 @@ class UserModel {
       isTutor: data['isTutor'] ?? false,
       managedBy: data['managedBy'],
       verification: data['verification'],
+      createdAt: data['createdAt'],
     );
   }
 

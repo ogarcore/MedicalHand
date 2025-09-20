@@ -6,12 +6,14 @@ class NotificationModel {
   final String body;
   final DateTime receivedAt;
   bool isRead;
+  final String type;
 
   NotificationModel({
     required this.title,
     required this.body,
     required this.receivedAt,
     this.isRead = false,
+    required this.type,
   });
 
   Map<String, dynamic> toMap() {
@@ -20,6 +22,7 @@ class NotificationModel {
       'body': body,
       'receivedAt': receivedAt.toIso8601String(),
       'isRead': isRead,
+      'type': type,
     };
   }
 
@@ -29,6 +32,7 @@ class NotificationModel {
       body: map['body'] ?? '',
       receivedAt: DateTime.parse(map['receivedAt']),
       isRead: map['isRead'] ?? false,
+      type: map['type'] ?? '',
     );
   }
 

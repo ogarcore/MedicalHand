@@ -1,7 +1,7 @@
 // lib/view/screens/home/widgets/home_app_bar.dart
 import 'package:flutter/material.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
-import 'home_app_bar_logic.dart'; 
+import 'home_app_bar_logic.dart';
 import 'profile_button.dart';
 import 'notification_icon_button.dart';
 
@@ -34,10 +34,8 @@ class _HomeAppBarState extends State<HomeAppBar> with HomeAppBarLogic {
         },
       ),
       actions: [
-        NotificationIconButton(
-          onPressed: showNotificationsPanel, // Usa el método del mixin
-        ),
-        const SizedBox(width: 8)
+        NotificationIconButton(onPressed: navigateToNotificationsScreen),
+        const SizedBox(width: 8),
       ],
     );
   }

@@ -1,3 +1,5 @@
+// lib/index.js (Cloud Functions)
+
 // Importa los módulos necesarios de la sintaxis más reciente (2nd Gen)
 const {onDocumentCreated, onDocumentUpdated} = require("firebase-functions/v2/firestore");
 const {onSchedule} = require("firebase-functions/v2/scheduler");
@@ -33,6 +35,7 @@ async function sendNotificationToTutor(patientId, notificationPayload, dataPaylo
   }
 
   dataPayload.patientProfileId = patientId;
+  dataPayload.click_action = "FLUTTER_NOTIFICATION_CLICK";
 
   const payload = {
     notification: notificationPayload,
@@ -50,18 +53,20 @@ async function sendNotificationToTutor(patientId, notificationPayload, dataPaylo
 }
 
 
-// --- Notificaciones Transaccionales  ---
+// --- Notificaciones Transaccionales (Sin cambios) ---
 
 // 1. Notificación: Solicitud de Cita Enviada
 exports.notificarSolicitudRecibida = onDocumentCreated("citas/{citaId}", async (event) => {
   const cita = event.data.data();
   
   const notification = {
-    title: "¡Solicitud Recibida!",
+    title: "¡Solicitud Enviada!",
     body: `Hemos enviado tu petición para ${cita.specialty} al ${cita.hospital}. Te avisaremos cuando sea asignada.`,
   };
 
-  await sendNotificationToTutor(cita.uid, notification);
+  const data = {type: "solicitud_recibida"};
+
+  await sendNotificationToTutor(cita.uid, notification, data);
 });
 
 // 2. Notificación: Cita Asignada o Reprogramada
@@ -82,19 +87,22 @@ exports.notificarCitaActualizada = onDocumentUpdated("citas/{citaId}", async (ev
     
     let notification = {
         title: title,
-        body: `Tu cita de ${datosDespues.specialty} ha sido confirmada para el ${fecha}.`,
+        body: `Tu cita de ${datosDespues.specialty} en el ${cita.hospital} ha sido confirmada para el ${fecha}.`,
     };
 
     const patientName = pacienteDoc.data().personalInfo.firstName;
     if (datosDespues.uid !== (pacienteDoc.data().managedBy || datosDespues.uid)) {
         notification.title = `${notification.title.split('!')[0]} para ${patientName}!`;
     }
-    await sendNotificationToTutor(datosDespues.uid, notification);
+
+    const data = {type: "cita_confirmada"};
+
+    await sendNotificationToTutor(datosDespues.uid, notification, data);
   }
 });
 
 
-// --- Notificación de Recordatorio 
+// --- Notificación de Recordatorio (CORREGIDO) ---
 exports.enviarRecordatorios = onSchedule({
   schedule: "every 15 minutes", 
   timeZone: "America/Managua",
@@ -102,6 +110,7 @@ exports.enviarRecordatorios = onSchedule({
   logger.info("Ejecutando la función de recordatorios...");
   const db = getFirestore();
   const now = Timestamp.now();
+  // Se elimina la declaración de 'data' de aquí.
 
   // --- Lógica para recordatorios de 48 horas ---
   const a48HorasInicio = Timestamp.fromMillis(now.toMillis() + (48 * 60 - 15) * 60 * 1000); 
@@ -121,7 +130,9 @@ exports.enviarRecordatorios = onSchedule({
       title: "Recordatorio Próximo",
       body: `Tienes una cita de ${cita.specialty} programada en ${cita.hospital} para pasado mañana, ${dia}.`,
     };
-    await sendNotificationToTutor(cita.uid, notification);
+    const data = {type: "recordatorio"};
+    
+    await sendNotificationToTutor(cita.uid, notification, data);
     return doc.ref.update({ reminder48hSent: true });
   });
 
@@ -143,7 +154,10 @@ exports.enviarRecordatorios = onSchedule({
       title: "Recordatorio: Tu Cita es Mañana",
       body: `No olvides tu cita de ${cita.specialty} mañana a las ${fecha} en ${cita.hospital}.`,
     };
-    await sendNotificationToTutor(cita.uid, notification);
+  
+    const data = {type: "recordatorio"};
+    
+    await sendNotificationToTutor(cita.uid, notification, data);
     return doc.ref.update({ reminder24hSent: true });
   });
 
