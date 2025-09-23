@@ -4,7 +4,7 @@ Aplicación móvil para facilitar la programación, gestión y recordatorio de c
 
 ---
 
-## 📋 Descripción
+## Descripción
 
 MedicalHand es una app desarrollada en **Flutter** con **Firebase** como backend, diseñada para pacientes, familiares y cuidadores que buscan una experiencia de atención médica más ágil, confiable y transparente. La aplicación permite:
 
@@ -23,7 +23,7 @@ El público objetivo incluye:
 
 ---
 
-## 🛠 Funcionalidades principales
+## Funcionalidades principales
 
 | Funcionalidad | Descripción |
 |---------------|-------------|
@@ -39,7 +39,7 @@ El público objetivo incluye:
 
 ---
 
-## 🧪 Requisitos técnicos
+## Requisitos técnicos
 
 - **Lenguaje / Framework**: Dart / Flutter (versión 3.35.3)  
 - **Backend / servicios**: Firebase (Auth, Firestore, Storage, Messaging, App Check,Functions)  
@@ -85,7 +85,7 @@ El público objetivo incluye:
 
 ---
 
-## 🚀 Instalación
+## Instalación
 
 Aquí un paso a paso para configurar el proyecto localmente:
 
@@ -116,7 +116,7 @@ Aquí un paso a paso para configurar el proyecto localmente:
 
 ---
 
-## 📱 Uso
+## Uso
 
 - Al abrir la app, el usuario registra su cuenta (o inicia sesión), completa perfil.  
 - Luego puede realizar una cita, seleccionar ubicacion/hospital/descripcion para agendar cita.  
@@ -126,7 +126,7 @@ Aquí un paso a paso para configurar el proyecto localmente:
 
 ---
 
-## 🧼 Estructura del proyecto
+## Estructura del proyecto
 
 ```text
 android/
@@ -146,7 +146,7 @@ README.md
 
 ---
 
-## 💡 Buenas prácticas y posibles mejoras
+## Buenas prácticas y posibles mejoras
 
 - Manejador de errores robusto, con fallback si no hay conexión.  
 - Internacionalización (i18n) para múltiples idiomas.  
@@ -156,13 +156,13 @@ README.md
 
 ---
 
-## ℹ️ Licencia
+## ℹLicencia
 
 Este proyecto está bajo la licencia **MIT**. Puedes usarlo y adaptarlo libremente, aunque no ofrezco garantía de ningún tipo.
 
 ---
 
-## 🤝 Contribuciones
+## Contribuciones
 
 Si quieres ayudar:  
 
@@ -173,7 +173,7 @@ Si quieres ayudar:
 
 ---
 
-## 🚧 Información adicional
+## Información adicional
 
 - Si haces cambio en esquemas de datos en Firestore, asegúrate de migrar o documentar esos cambios.  
 - Verifica las reglas de seguridad Firestore antes de desplegar a producción.  
@@ -181,6 +181,6 @@ Si quieres ayudar:
 
 ---
 
-## 🎯 Créditos
+## Créditos
 
 - Desarrollado por: *Alter Default*  
