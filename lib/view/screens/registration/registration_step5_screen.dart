@@ -65,7 +65,7 @@ class _RegistrationStep5ScreenState extends State<RegistrationStep5Screen> {
                             ],
                           ),
                           const SizedBox(height: 24),
-                          const RegistrationProgressIndicator(currentStep: 4),
+                          const RegistrationProgressIndicator(currentStep: 5),
                           const SizedBox(height: 32),
                           const Text(
                             'Por último, algunos datos básicos',

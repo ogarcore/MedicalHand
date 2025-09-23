@@ -35,12 +35,15 @@ class NoInternetScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.white.withAlpha(20),
-                    border: Border.all(color: Colors.white.withAlpha(40), width: 2),
+                    border: Border.all(
+                      color: Colors.white.withAlpha(40),
+                      width: 2,
+                    ),
                   ),
                   child: const Icon(
-                    Icons.wifi_off_rounded, 
-                    color: Colors.white, 
-                    size: 70
+                    Icons.wifi_off_rounded,
+                    color: Colors.white,
+                    size: 70,
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -63,7 +66,7 @@ class NoInternetScreen extends StatelessWidget {
                     'Parece que no tienes conexión a internet.\nRevisa tu conexión e inténtalo de nuevo.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 16, 
+                      fontSize: 16,
                       color: Colors.white70,
                       height: 1.4,
                       fontWeight: FontWeight.w500,
@@ -86,7 +89,10 @@ class NoInternetScreen extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 16,
+                      ),
                       elevation: 4,
                       shadowColor: Colors.black.withAlpha(60),
                     ),
@@ -97,9 +103,9 @@ class NoInternetScreen extends StatelessWidget {
                         Icon(Icons.refresh_rounded, size: 20),
                         SizedBox(width: 8),
                         Text(
-                          'Reintentar Conexión', 
+                          'Reintentar Conexión',
                           style: TextStyle(
-                            fontSize: 16, 
+                            fontSize: 16,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.3,
                           ),

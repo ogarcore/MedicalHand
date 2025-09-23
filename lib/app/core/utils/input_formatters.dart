@@ -4,7 +4,9 @@ import 'package:flutter/services.dart';
 class CedulaInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     String rawText = newValue.text.replaceAll('-', '');
     String filteredText = '';
 
@@ -44,7 +46,9 @@ class CedulaInputFormatter extends TextInputFormatter {
 class DateInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     final text = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
     var newText = '';
 
@@ -75,12 +79,15 @@ class DateInputFormatter extends TextInputFormatter {
 class PhoneInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     final digitsOnly = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
     var newText = '';
 
     if (digitsOnly.length > 4) {
-      newText = '${digitsOnly.substring(0, 4)}-${digitsOnly.substring(4, digitsOnly.length > 8 ? 8 : digitsOnly.length)}';
+      newText =
+          '${digitsOnly.substring(0, 4)}-${digitsOnly.substring(4, digitsOnly.length > 8 ? 8 : digitsOnly.length)}';
     } else {
       newText = digitsOnly;
     }
@@ -90,6 +97,4 @@ class PhoneInputFormatter extends TextInputFormatter {
       selection: TextSelection.collapsed(offset: newText.length),
     );
   }
-
-  
 }

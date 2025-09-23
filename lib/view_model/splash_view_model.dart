@@ -24,17 +24,13 @@ class SplashViewModel extends ChangeNotifier {
 
     if (currentUser != null) {
       final dataFetchFuture = userViewModel.fetchCurrentUser();
-      final minSplashTimeFuture = Future.delayed(
-        const Duration(milliseconds: 1500),
-      );
 
       try {
-        // Future.wait espera a que AMBAS tareas terminen.
-        await Future.wait([dataFetchFuture, minSplashTimeFuture]);
+        await dataFetchFuture;
 
         await _notificationService.initNotifications(
           userViewModel: userViewModel,
-          notificationViewModel: notificationViewModel, // Se lo pasamos
+          notificationViewModel: notificationViewModel,
         );
 
         if (context.mounted) {
@@ -44,7 +40,6 @@ class SplashViewModel extends ChangeNotifier {
           );
         }
       } catch (e) {
-        print("Error al cargar datos en splash: $e");
         if (context.mounted) {
           Navigator.pushReplacement(
             context,

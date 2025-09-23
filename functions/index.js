@@ -1,6 +1,3 @@
-// lib/index.js (Cloud Functions)
-
-// Importa los módulos necesarios de la sintaxis más reciente (2nd Gen)
 const {onDocumentCreated, onDocumentUpdated} = require("firebase-functions/v2/firestore");
 const {onSchedule} = require("firebase-functions/v2/scheduler");
 const {initializeApp} = require("firebase-admin/app");
@@ -11,7 +8,7 @@ const {logger} = require("firebase-functions");
 // Inicializa Firebase Admin
 initializeApp();
 
-// --- Función Reutilizable para Enviar Notificaciones (No necesita cambios) ---
+// Función Reutilizable para Enviar Notificaciones
 async function sendNotificationToTutor(patientId, notificationPayload, dataPayload = {}) {
   const patientDoc = await getFirestore().collection("usuarios_movil").doc(patientId).get();
   if (!patientDoc.exists) {
@@ -53,9 +50,9 @@ async function sendNotificationToTutor(patientId, notificationPayload, dataPaylo
 }
 
 
-// --- Notificaciones Transaccionales (Sin cambios) ---
+// Notificaciones Transaccionales 
 
-// 1. Notificación: Solicitud de Cita Enviada
+// Notificación: Solicitud de Cita Enviada
 exports.notificarSolicitudRecibida = onDocumentCreated("citas/{citaId}", async (event) => {
   const cita = event.data.data();
   
@@ -69,7 +66,7 @@ exports.notificarSolicitudRecibida = onDocumentCreated("citas/{citaId}", async (
   await sendNotificationToTutor(cita.uid, notification, data);
 });
 
-// 2. Notificación: Cita Asignada o Reprogramada
+// Notificación: Cita Asignada o Reprogramada
 exports.notificarCitaActualizada = onDocumentUpdated("citas/{citaId}", async (event) => {
   const datosAntes = event.data.before.data();
   const datosDespues = event.data.after.data();
@@ -87,7 +84,7 @@ exports.notificarCitaActualizada = onDocumentUpdated("citas/{citaId}", async (ev
     
     let notification = {
         title: title,
-        body: `Tu cita de ${datosDespues.specialty} en el ${cita.hospital} ha sido confirmada para el ${fecha}.`,
+        body: `Tu cita de ${datosDespues.specialty} en el ${datosDespues.hospital} ha sido confirmada para el ${fecha}.`,
     };
 
     const patientName = pacienteDoc.data().personalInfo.firstName;
@@ -102,7 +99,7 @@ exports.notificarCitaActualizada = onDocumentUpdated("citas/{citaId}", async (ev
 });
 
 
-// --- Notificación de Recordatorio (CORREGIDO) ---
+// Notificación de Recordatorio
 exports.enviarRecordatorios = onSchedule({
   schedule: "every 15 minutes", 
   timeZone: "America/Managua",
@@ -110,9 +107,8 @@ exports.enviarRecordatorios = onSchedule({
   logger.info("Ejecutando la función de recordatorios...");
   const db = getFirestore();
   const now = Timestamp.now();
-  // Se elimina la declaración de 'data' de aquí.
 
-  // --- Lógica para recordatorios de 48 horas ---
+  // Lógica para recordatorios de 48 horas
   const a48HorasInicio = Timestamp.fromMillis(now.toMillis() + (48 * 60 - 15) * 60 * 1000); 
   const a48HorasFin = Timestamp.fromMillis(now.toMillis() + 48 * 60 * 60 * 1000); 
 
@@ -136,7 +132,7 @@ exports.enviarRecordatorios = onSchedule({
     return doc.ref.update({ reminder48hSent: true });
   });
 
-  // --- Lógica para recordatorios de 24 horas ---
+  // Lógica para recordatorios de 24 horas
   const a24HorasInicio = Timestamp.fromMillis(now.toMillis() + (24 * 60 - 15) * 60 * 1000); 
   const a24HorasFin = Timestamp.fromMillis(now.toMillis() + 24 * 60 * 60 * 1000); 
 
