@@ -1,5 +1,6 @@
 // lib/view/screens/profile/widgets/settings_row.dart
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 
 class SettingsRow extends StatelessWidget {
@@ -14,7 +15,7 @@ class SettingsRow extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(10),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14.0),
+        padding: const EdgeInsets.symmetric(vertical: 17.0, horizontal: 8.0),
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(color: Colors.grey[200]!, width: 1),
@@ -27,11 +28,15 @@ class SettingsRow extends StatelessWidget {
               title,
               style: const TextStyle(
                 color: AppColors.textColor,
-                fontSize: 14,
+                fontSize: 14.5,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey[500]),
+            Icon(
+              HugeIcons.strokeRoundedArrowRightDouble,
+              size: 14.5,
+              color: Colors.grey[600],
+            ),
           ],
         ),
       ),

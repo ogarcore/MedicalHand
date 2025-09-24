@@ -10,6 +10,12 @@ class ProfileHeader extends StatelessWidget {
 
   const ProfileHeader({super.key, required this.user});
 
+  String _getShortName(UserModel user) {
+    final firstName = (user.firstName).split(' ').first;
+    final lastName = (user.lastName).split(' ').first;
+    return '$firstName $lastName'.trim();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -19,7 +25,7 @@ class ProfileHeader extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(25),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -50,7 +56,7 @@ class ProfileHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${user.firstName} ${user.lastName}',
+                  _getShortName(user),
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,

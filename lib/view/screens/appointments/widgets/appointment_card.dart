@@ -294,7 +294,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                       Row(
                         children: [
                           const Icon(
-                            HugeIcons.strokeRoundedLocation01,
+                            HugeIcons.strokeRoundedHospitalBed01,
                             size: 14,
                             color: AppColors.primaryColor,
                           ),

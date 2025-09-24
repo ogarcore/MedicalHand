@@ -28,7 +28,7 @@ class ProfileSectionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(20),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -46,10 +46,14 @@ class ProfileSectionCard extends StatelessWidget {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: AppColors.primaryColor.withOpacity(0.1),
+                      color: AppColors.primaryColor.withAlpha(25),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(icon, color: AppColors.primaryColor, size: 18),
+                    child: Icon(
+                      icon,
+                      color: AppColors.secondaryColor,
+                      size: 18,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Text(
@@ -68,14 +72,14 @@ class ProfileSectionCard extends StatelessWidget {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withOpacity(0.08),
+                    color: AppColors.primaryColor.withAlpha(25),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
                     icon: const Icon(
                       HugeIcons.strokeRoundedEdit01,
                       size: 16,
-                      color: AppColors.primaryColor,
+                      color: AppColors.secondaryColor,
                     ),
                     onPressed: onEditPressed,
                     padding: EdgeInsets.zero,

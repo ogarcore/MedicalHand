@@ -18,10 +18,9 @@ class UserViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   Future<void> fetchCurrentUser() async {
-    // Obtenemos el usuario de Firebase Auth
     final user = _auth.currentUser;
     if (user == null) {
-      return; // No hay nadie logueado, no hacemos nada.
+      return;
     }
 
     _isLoading = true;
@@ -37,7 +36,6 @@ class UserViewModel extends ChangeNotifier {
         _activeProfile = _currentUser;
       }
     } catch (e) {
-      print("Ocurrió un error al cargar los datos del usuario: $e");
       _currentUser = null;
       _activeProfile = null;
     } finally {
@@ -55,7 +53,6 @@ class UserViewModel extends ChangeNotifier {
           .collection('usuarios_movil')
           .doc(user.uid)
           .update(updatedData);
-      // Después de actualizar, volvemos a cargar los datos para refrescar la UI
       await fetchCurrentUser();
       return true;
     } catch (e) {

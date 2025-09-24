@@ -16,15 +16,15 @@ class NoAppointmentCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.primaryColor.withAlpha(20),
-            AppColors.primaryColor.withAlpha(20),
+            AppColors.primaryColor.withAlpha(70),
+            AppColors.secondaryColor.withAlpha(30),
           ],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 8,
+            color: Colors.black.withAlpha(12),
+            blurRadius: 12,
             offset: const Offset(0, 3),
           ),
         ],
@@ -35,13 +35,13 @@ class NoAppointmentCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppColors.primaryColor.withAlpha(20),
+              color: AppColors.primaryColor.withAlpha(50),
               shape: BoxShape.circle,
             ),
             child: const Icon(
               HugeIcons.strokeRoundedCalendarMinus02,
               size: 32,
-              color: AppColors.primaryColor,
+              color: AppColors.secondaryColor,
             ),
           ),
           const SizedBox(height: 16),
@@ -57,10 +57,10 @@ class NoAppointmentCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Mantén tu salud al día. Agenda tu cita médica.',
+            'No tienes citas médicas pendientes.\n¡Es un buen momento para programar tu próximo chequeo!',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 13.5,
               color: Colors.grey[600],
               height: 1.4,
             ),
@@ -79,13 +79,13 @@ class NoAppointmentCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryColor.withOpacity(0.25),
+                  color: AppColors.primaryColor.withAlpha(30),
                   blurRadius: 6,
                   offset: const Offset(0, 3),
                 ),
               ],
             ),
-            child: ElevatedButton(
+            child: ElevatedButton.icon(
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -103,11 +103,16 @@ class NoAppointmentCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              child: const Text(
+              icon: const Icon(
+                HugeIcons.strokeRoundedAddCircle,
+                color: Colors.white,
+                size: 18,
+              ),
+              label: const Text(
                 'Solicitar Nueva Cita',
                 style: TextStyle(
                   fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                   color: Colors.white,
                 ),
               ),

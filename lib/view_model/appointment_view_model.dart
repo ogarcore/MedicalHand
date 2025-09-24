@@ -64,7 +64,6 @@ class AppointmentViewModel extends ChangeNotifier {
       await _firestore.collection('citas').add(cita.toMap());
       return true;
     } catch (e) {
-      print("Error al enviar la solicitud: $e");
       return false;
     }
   }
@@ -111,7 +110,6 @@ class AppointmentViewModel extends ChangeNotifier {
       });
       return true;
     } catch (e) {
-      print('Error al actualizar estado de la cita: $e');
       return false;
     }
   }

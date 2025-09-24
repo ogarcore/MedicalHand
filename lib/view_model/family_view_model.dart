@@ -166,12 +166,9 @@ class FamilyViewModel extends ChangeNotifier {
       await _firestore.collection('usuarios_movil').doc(memberId).delete();
       return true;
     } catch (e) {
-      print("Error al eliminar familiar: $e");
       return false;
     }
   }
 
-  void clearData() {
-    // Método para la limpieza al cerrar sesión
-  }
+  void clearData() {}
 }

@@ -4,12 +4,13 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/data/models/user_model.dart';
+import 'package:p_hn25/view/screens/profile/settings/account_security_screen.dart';
+import 'package:p_hn25/view/screens/profile/settings/app_preferences_screen.dart';
 import 'package:p_hn25/view/screens/profile/edit_medical_info_screen.dart';
 import 'package:p_hn25/view/screens/profile/edit_personal_info_screen.dart';
+import 'package:p_hn25/view/screens/profile/settings/notification_preferences_screen.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
-
-// Importamos los nuevos widgets que hemos creado
 import 'widgets/info_row.dart';
 import 'widgets/profile_header.dart';
 import 'widgets/profile_section_card.dart';
@@ -17,8 +18,6 @@ import 'widgets/settings_row.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
-
-  // Las funciones de formato de datos se quedan aquí porque no son widgets.
   String _formatDateOfBirth(UserModel user) {
     initializeDateFormatting('es_ES', null);
     return DateFormat(
@@ -72,8 +71,6 @@ class ProfileScreen extends StatelessWidget {
               child: Text('No se pudo cargar la información del perfil.'),
             );
           }
-
-          // El cuerpo de la pantalla ahora es un ensamblaje de los nuevos widgets.
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(
               horizontal: 16.0,
@@ -135,14 +132,43 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 ProfileSectionCard(
-                  title: 'Ajustes de la Cuenta',
+                  title: 'Ajustes',
                   icon: HugeIcons.strokeRoundedSettings02,
                   isSettings: true,
                   children: [
-                    SettingsRow(title: 'Cambiar Contraseña', onTap: () {}),
                     SettingsRow(
-                      title: 'Gestionar Notificaciones',
-                      onTap: () {},
+                      title: 'Preferencias de la Aplicación',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AppPreferencesScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    SettingsRow(
+                      title: 'Preferencias de Notificaciones',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const NotificationPreferencesScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    SettingsRow(
+                      title: 'Gestión de la Cuenta y Seguridad',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AccountSecurityScreen(),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),

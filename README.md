@@ -156,7 +156,7 @@ README.md
 
 ---
 
-## ℹLicencia
+## Licencia
 
 Este proyecto está bajo la licencia **MIT**. Puedes usarlo y adaptarlo libremente, aunque no ofrezco garantía de ningún tipo.
 
