@@ -31,8 +31,8 @@ class InfoRow extends StatelessWidget {
             flex: 3,
             child: Text(
               value.isEmpty ? 'No especificado' : value,
-              style: const TextStyle(
-                color: AppColors.textColor,
+              style: TextStyle(
+                color: AppColors.textColor(context),
                 fontSize: 14.2,
                 fontWeight: FontWeight.w600,
               ),

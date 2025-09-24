@@ -11,9 +11,9 @@ import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'view/screens/splash/splash_screen.dart';
 import 'view_model/splash_view_model.dart';
-import 'app/core/constants/app_colors.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:p_hn25/view_model/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +24,7 @@ void main() async {
       statusBarIconBrightness: Brightness.dark,
     ),
   );
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await FirebaseAppCheck.instance.activate(
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => SplashViewModel()),
         ChangeNotifierProvider(create: (_) => AuthViewModel()),
         ChangeNotifierProvider(create: (_) => AppointmentViewModel()),
@@ -50,14 +52,21 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => FamilyViewModel()),
         ChangeNotifierProvider(create: (_) => NotificationViewModel()),
       ],
-      child: MaterialApp(
-        title: 'MedicalHand',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          scaffoldBackgroundColor: AppColors.backgroundColor,
-          textTheme: GoogleFonts.sourceSans3TextTheme(),
-        ),
-        home: const SplashScreen(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            title: 'MedicalHand',
+            debugShowCheckedModeBanner: false,
+            theme: themeProvider.currentTheme.copyWith(
+              textTheme: GoogleFonts.sourceSans3TextTheme(
+                ThemeData(
+                  brightness: themeProvider.currentTheme.brightness,
+                ).textTheme,
+              ),
+            ),
+            home: const SplashScreen(),
+          );
+        },
       ),
     );
   }

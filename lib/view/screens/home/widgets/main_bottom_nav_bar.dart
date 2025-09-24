@@ -18,7 +18,7 @@ class MainBottomNavBar extends StatelessWidget {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: AppColors.textColor.withAlpha(10),
+            color: AppColors.textColor(context).withAlpha(10),
             blurRadius: 10,
             spreadRadius: 0,
             offset: const Offset(0, -2),
@@ -38,15 +38,22 @@ class MainBottomNavBar extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNavItem(HugeIcons.strokeRoundedCalendarUser, "Mis Citas", 0),
+                _buildNavItem(
+                  context,
+                  HugeIcons.strokeRoundedCalendarUser,
+                  "Mis Citas",
+                  0,
+                ),
                 const SizedBox(width: 40), // espacio FAB
-                _buildNavItem(HugeIcons.strokeRoundedTransactionHistory, "Historial", 2),
+                _buildNavItem(
+                  context,
+                  HugeIcons.strokeRoundedTransactionHistory,
+                  "Historial",
+                  2,
+                ),
               ],
             ),
-            Positioned(
-              bottom: 6,
-              child: _buildFabLabel(),
-            ),
+            Positioned(bottom: 6, child: _buildFabLabel(context)),
           ],
         ),
       ),
@@ -54,7 +61,7 @@ class MainBottomNavBar extends StatelessWidget {
   }
 
   // Este es tu widget original _buildFabLabel
-  Widget _buildFabLabel() {
+  Widget _buildFabLabel(BuildContext context) {
     final isSelected = currentIndex == 1;
     return GestureDetector(
       onTap: () => onItemTapped(1),
@@ -64,7 +71,7 @@ class MainBottomNavBar extends StatelessWidget {
           Text(
             'Inicio',
             style: TextStyle(
-              color: isSelected ? AppColors.primaryColor : Colors.grey,
+              color: isSelected ? AppColors.primaryColor(context) : Colors.grey,
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
@@ -74,8 +81,8 @@ class MainBottomNavBar extends StatelessWidget {
             Container(
               width: 6,
               height: 6,
-              decoration: const BoxDecoration(
-                color: AppColors.primaryColor,
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor(context),
                 shape: BoxShape.circle,
               ),
             ),
@@ -85,7 +92,12 @@ class MainBottomNavBar extends StatelessWidget {
   }
 
   // Este es tu widget original _buildNavItem
-  Widget _buildNavItem(IconData icon, String label, int index) {
+  Widget _buildNavItem(
+    BuildContext context,
+    IconData icon,
+    String label,
+    int index,
+  ) {
     final isSelected = currentIndex == index;
     return Material(
       color: Colors.transparent,
@@ -93,7 +105,7 @@ class MainBottomNavBar extends StatelessWidget {
       child: InkWell(
         customBorder: const CircleBorder(),
         onTap: () => onItemTapped(index),
-        splashColor: AppColors.primaryColor.withAlpha(20),
+        splashColor: AppColors.primaryColor(context).withAlpha(20),
         highlightColor: Colors.transparent,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -102,14 +114,18 @@ class MainBottomNavBar extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: isSelected ? AppColors.primaryColor : Colors.grey,
+                color: isSelected
+                    ? AppColors.primaryColor(context)
+                    : Colors.grey,
                 size: 25,
               ),
               const SizedBox(height: 4),
               Text(
                 label,
                 style: TextStyle(
-                  color: isSelected ? AppColors.primaryColor : Colors.grey,
+                  color: isSelected
+                      ? AppColors.primaryColor(context)
+                      : Colors.grey,
                   fontSize: 12,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
@@ -119,8 +135,8 @@ class MainBottomNavBar extends StatelessWidget {
                 Container(
                   width: 5,
                   height: 5,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primaryColor,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryColor(context),
                     shape: BoxShape.circle,
                   ),
                 ),

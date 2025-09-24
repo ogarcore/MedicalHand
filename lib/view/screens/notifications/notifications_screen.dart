@@ -59,18 +59,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: AppColors.backgroundColor(context),
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Centro de Notificaciones',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: AppColors.textColor,
+            color: AppColors.textColor(context),
             letterSpacing: -0.4,
           ),
         ),
-        backgroundColor: AppColors.backgroundColor,
+        backgroundColor: AppColors.backgroundColor(context),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         centerTitle: false,

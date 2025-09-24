@@ -53,7 +53,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        backgroundColor: AppColors.backgroundColor,
+        backgroundColor: AppColors.backgroundColor(context),
         appBar: AppBar(
           title: const Text(
             'Añadir Nuevo Familiar',
@@ -63,7 +63,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
               letterSpacing: -0.5,
             ),
           ),
-          backgroundColor: AppColors.backgroundColor,
+          backgroundColor: AppColors.backgroundColor(context),
           elevation: 0,
           surfaceTintColor: Colors.transparent,
           centerTitle: false,
@@ -252,18 +252,22 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withAlpha(15),
+                  color: AppColors.primaryColor(context).withAlpha(15),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, size: 20, color: AppColors.primaryColor),
+                child: Icon(
+                  icon,
+                  size: 20,
+                  color: AppColors.primaryColor(context),
+                ),
               ),
               const SizedBox(width: 12),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textColor,
+                  color: AppColors.textColor(context),
                   letterSpacing: -0.3,
                 ),
               ),

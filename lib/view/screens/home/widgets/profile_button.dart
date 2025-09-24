@@ -43,12 +43,12 @@ class ProfileButton extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AppColors.primaryColor.withAlpha(51),
+                color: AppColors.primaryColor(context).withAlpha(51),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 HugeIcons.strokeRoundedUser,
-                color: AppColors.primaryColor,
+                color: AppColors.primaryColor(context),
                 size: 20,
               ),
             ),
@@ -59,10 +59,10 @@ class ProfileButton extends StatelessWidget {
               builder: (context, userViewModel, child) {
                 if (userViewModel.isLoading &&
                     userViewModel.activeProfile == null) {
-                  return const Text(
+                  return Text(
                     '...',
                     style: TextStyle(
-                      color: AppColors.textColor,
+                      color: AppColors.textColor(context),
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -81,8 +81,8 @@ class ProfileButton extends StatelessWidget {
 
                 return Text(
                   displayName,
-                  style: const TextStyle(
-                    color: AppColors.textColor,
+                  style: TextStyle(
+                    color: AppColors.textColor(context),
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -101,7 +101,7 @@ class ProfileButton extends StatelessWidget {
                     ? Icons.keyboard_arrow_up
                     : Icons.keyboard_arrow_down,
                 key: ValueKey<bool>(isMenuOpen),
-                color: AppColors.textColor.withAlpha(178),
+                color: AppColors.textColor(context).withAlpha(178),
                 size: 20,
               ),
             ),

@@ -14,12 +14,12 @@ class AppointmentStepLayout extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.content,
-    this.iconColor, 
+    this.iconColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    final effectiveIconColor = iconColor ?? AppColors.primaryColor;
+    final effectiveIconColor = iconColor ?? AppColors.primaryColor(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
@@ -57,11 +57,7 @@ class AppointmentStepLayout extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: Icon(
-                    icon,
-                    size: 30,
-                    color: effectiveIconColor,
-                  ),
+                  child: Icon(icon, size: 30, color: effectiveIconColor),
                 ),
                 const SizedBox(height: 16),
               ],
@@ -75,10 +71,10 @@ class AppointmentStepLayout extends StatelessWidget {
             child: Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textColor,
+                color: AppColors.textColor(context),
                 letterSpacing: -0.3,
                 height: 1.2,
               ),
@@ -92,10 +88,10 @@ class AppointmentStepLayout extends StatelessWidget {
             child: Text(
               subtitle,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 height: 1.5,
-                color: AppColors.textLightColor,
+                color: AppColors.textLightColor(context),
                 fontWeight: FontWeight.w400,
               ),
             ),

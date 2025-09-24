@@ -9,16 +9,16 @@ class NoInternetScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primaryColor,
+      backgroundColor: AppColors.primaryColor(context),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.primaryColor,
-              AppColors.primaryColor.withOpacity(0.9),
-              AppColors.primaryColor.withOpacity(0.8),
+              AppColors.primaryColor(context),
+              AppColors.primaryColor(context).withOpacity(0.9),
+              AppColors.primaryColor(context).withOpacity(0.8),
             ],
           ),
         ),
@@ -85,7 +85,7 @@ class NoInternetScreen extends StatelessWidget {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: AppColors.primaryColor,
+                      foregroundColor: AppColors.primaryColor(context),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),

@@ -37,7 +37,7 @@ class SupportScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: AppColors.backgroundColor(context),
       appBar: AppBar(
         title: const Text(
           'Soporte y Ayuda',
@@ -47,7 +47,7 @@ class SupportScreen extends StatelessWidget {
             letterSpacing: -0.5,
           ),
         ),
-        backgroundColor: AppColors.backgroundColor,
+        backgroundColor: AppColors.backgroundColor(context),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         centerTitle: false,
@@ -55,11 +55,12 @@ class SupportScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20.0),
         children: [
-          _buildSupportHeader(),
+          _buildSupportHeader(context),
           const SizedBox(height: 32),
-          _buildSectionTitle('Contacta con Nosotros'),
+          _buildSectionTitle('Contacta con Nosotros', context),
           const SizedBox(height: 16),
           _buildContactOption(
+            context: context,
             icon: HugeIcons.strokeRoundedMail01,
             title: 'Enviar un Correo',
             subtitle: 'Recibe respuesta en aproximadamente 24 horas',
@@ -69,7 +70,7 @@ class SupportScreen extends StatelessWidget {
             },
           ),
           const SizedBox(height: 32),
-          _buildSectionTitle('Preguntas Frecuentes'),
+          _buildSectionTitle('Preguntas Frecuentes', context),
           const SizedBox(height: 16),
           ...faqs.map(
             (faq) =>
@@ -80,19 +81,19 @@ class SupportScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, BuildContext context) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w700,
-        color: AppColors.textColor,
+        color: AppColors.textColor(context),
         letterSpacing: -0.3,
       ),
     );
   }
 
-  Widget _buildSupportHeader() {
+  Widget _buildSupportHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -100,13 +101,13 @@ class SupportScreen extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.primaryColor.withAlpha(20),
-            AppColors.primaryColor.withAlpha(30),
+            AppColors.primaryColor(context).withAlpha(20),
+            AppColors.primaryColor(context).withAlpha(30),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.primaryColor.withAlpha(30),
+          color: AppColors.primaryColor(context).withAlpha(30),
           width: 1,
         ),
       ),
@@ -117,12 +118,12 @@ class SupportScreen extends StatelessWidget {
             height: 60,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.primaryColor.withAlpha(30),
+              color: AppColors.primaryColor(context).withAlpha(30),
             ),
-            child: const Icon(
+            child: Icon(
               HugeIcons.strokeRoundedCustomerService01,
               size: 30,
-              color: AppColors.primaryColor,
+              color: AppColors.primaryColor(context),
             ),
           ),
           const SizedBox(width: 20),
@@ -130,12 +131,12 @@ class SupportScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   '¿Necesitas ayuda?',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textColor,
+                    color: AppColors.textColor(context),
                     letterSpacing: -0.3,
                   ),
                 ),
@@ -144,7 +145,7 @@ class SupportScreen extends StatelessWidget {
                   'Estamos aquí para asistirte con cualquier duda o problema que tengas.',
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textLightColor,
+                    color: AppColors.textLightColor(context),
                     height: 1.4,
                   ),
                 ),
@@ -157,6 +158,7 @@ class SupportScreen extends StatelessWidget {
   }
 
   Widget _buildContactOption({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required String subtitle,
@@ -198,10 +200,10 @@ class SupportScreen extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textColor,
+                          color: AppColors.textColor(context),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -209,7 +211,7 @@ class SupportScreen extends StatelessWidget {
                         subtitle,
                         style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textLightColor,
+                          color: AppColors.textLightColor(context),
                         ),
                       ),
                     ],
@@ -219,7 +221,7 @@ class SupportScreen extends StatelessWidget {
                 Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 16,
-                  color: AppColors.textLightColor,
+                  color: AppColors.textLightColor(context),
                 ),
               ],
             ),
@@ -253,16 +255,16 @@ class _FaqItemState extends State<FaqItem> {
       child: Theme(
         data: Theme.of(context).copyWith(
           dividerColor: Colors.transparent,
-          splashColor: AppColors.primaryColor.withAlpha(30),
-          highlightColor: AppColors.primaryColor.withAlpha(15),
+          splashColor: AppColors.primaryColor(context).withAlpha(30),
+          highlightColor: AppColors.primaryColor(context).withAlpha(15),
         ),
         child: ExpansionTile(
           title: Text(
             widget.question,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppColors.textColor,
+              color: AppColors.textColor(context),
             ),
           ),
           onExpansionChanged: (isExpanding) {
@@ -281,14 +283,14 @@ class _FaqItemState extends State<FaqItem> {
           },
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          iconColor: AppColors.primaryColor,
-          collapsedIconColor: AppColors.textLightColor,
+          iconColor: AppColors.primaryColor(context),
+          collapsedIconColor: AppColors.textLightColor(context),
           children: [
             Text(
               widget.answer,
               style: TextStyle(
                 fontSize: 13,
-                color: AppColors.textLightColor,
+                color: AppColors.textLightColor(context),
                 height: 1.5,
               ),
             ),

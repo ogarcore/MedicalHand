@@ -18,27 +18,27 @@ class LoginHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(50),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryColor.withAlpha(50),
+                  color: AppColors.primaryColor(context).withAlpha(50),
                   blurRadius: 15,
                   offset: const Offset(0, 5),
                 ),
               ],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.supervised_user_circle,
               size: 60,
-              color: AppColors.primaryColor,
+              color: AppColors.primaryColor(context),
             ),
           ),
         ),
         const SizedBox(height: 30),
-        const Text(
+        Text(
           '¡Bienvenido/a!',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
-            color: AppColors.textColor,
+            color: AppColors.textColor(context),
             letterSpacing: 0.5,
           ),
         ),

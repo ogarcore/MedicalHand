@@ -39,7 +39,7 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
     final activeProfile = context.watch<UserViewModel>().activeProfile;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: AppColors.backgroundColor(context),
       appBar: _buildAppBar(),
       body: activeProfile == null
           ? const _AppointmentsShimmer()
@@ -64,7 +64,7 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
   AppBar _buildAppBar() {
     return AppBar(
       automaticallyImplyLeading: false,
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: AppColors.backgroundColor(context),
       elevation: 0,
       surfaceTintColor: Colors.transparent,
       centerTitle: false,
@@ -73,12 +73,12 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 2),
-          const Text(
+          Text(
             'Mis Citas',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: AppColors.textColor,
+              color: AppColors.textColor(context),
             ),
           ),
           const SizedBox(height: 2),
@@ -87,7 +87,7 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.normal,
-              color: AppColors.textLightColor,
+              color: AppColors.textLightColor(context),
             ),
           ),
           const SizedBox(height: 4),
@@ -95,11 +95,11 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
       ),
       bottom: TabBar(
         controller: _tabController,
-        labelColor: AppColors.primaryColor,
+        labelColor: AppColors.primaryColor(context),
         unselectedLabelColor: Colors.grey[600],
         indicator: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          color: AppColors.primaryColor.withAlpha(70),
+          color: AppColors.primaryColor(context).withAlpha(70),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
         indicatorPadding: const EdgeInsets.symmetric(

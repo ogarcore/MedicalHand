@@ -29,7 +29,7 @@ class _ExternalAppoinmentScreenState extends State<ExternalAppoinmentScreen> {
   String? _selectedSpecialty;
 
   String? _selectedDepartment;
-HospitalModel? _selectedHospital; 
+  HospitalModel? _selectedHospital;
 
   int _currentStep = 0;
 
@@ -49,7 +49,7 @@ HospitalModel? _selectedHospital;
     'Jinotega',
     'Managua',
   ];
-    List<HospitalModel> _hospitalsList = []; 
+  List<HospitalModel> _hospitalsList = [];
 
   Future<void> _pickImage() async {
     // 1. Si ya está activo, no hagas nada.
@@ -135,7 +135,7 @@ HospitalModel? _selectedHospital;
               referralImage: _referralImage,
               specialty: _selectedSpecialty,
               departament: _selectedDepartment!,
-               hospitalId: _selectedHospital!.id,
+              hospitalId: _selectedHospital!.id,
               hospitalName: _selectedHospital!.name,
               reason: "Cita solicitada por referencia",
             ),
@@ -146,7 +146,7 @@ HospitalModel? _selectedHospital;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(errorMessage),
-          backgroundColor: AppColors.warningColor,
+          backgroundColor: AppColors.warningColor(context),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -178,7 +178,7 @@ HospitalModel? _selectedHospital;
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        backgroundColor: AppColors.backgroundColor,
+        backgroundColor: AppColors.backgroundColor(context),
         appBar: AppBar(
           title: const Text(
             'Referencia Externa',
@@ -197,8 +197,8 @@ HospitalModel? _selectedHospital;
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  AppColors.accentColor.withAlpha(243),
-                  AppColors.accentColor.withAlpha(217),
+                  AppColors.accentColor(context).withAlpha(243),
+                  AppColors.accentColor(context).withAlpha(217),
                 ],
               ),
             ),
@@ -225,10 +225,9 @@ HospitalModel? _selectedHospital;
                   // --- PASO 1: ADJUNTAR REFERENCIA Y ESPECIALIDAD ---
                   AppointmentStepLayout(
                     icon: HugeIcons.strokeRoundedDocumentValidation,
-                    iconColor: AppColors.accentColor,
+                    iconColor: AppColors.accentColor(context),
                     title: 'Adjunta tu Referencia',
-                    subtitle:
-                        'Selecciona una referencia digital',
+                    subtitle: 'Selecciona una referencia digital',
                     content: Column(
                       children: [
                         // Si no se ha elegido nada, muestra las dos opciones
@@ -256,7 +255,7 @@ HospitalModel? _selectedHospital;
                   // --- PASO 2: UBICACIÓN ---
                   AppointmentStepLayout(
                     icon: HugeIcons.strokeRoundedLocation04,
-                    iconColor: AppColors.accentColor,
+                    iconColor: AppColors.accentColor(context),
                     title: '¿En qué departamento te encuentras?',
                     subtitle:
                         'Selecciona tu ubicación para mostrarte los hospitales',
@@ -272,24 +271,26 @@ HospitalModel? _selectedHospital;
                   // --- PASO 3: HOSPITAL ---
                   AppointmentStepLayout(
                     icon: HugeIcons.strokeRoundedHospital01,
-                    iconColor: AppColors.accentColor,
+                    iconColor: AppColors.accentColor(context),
                     title: 'Confirma el centro médico',
                     subtitle:
                         'Verifica el hospital de destino que indica tu referencia',
                     content: AppStyledDropdown(
                       value: _selectedHospital?.name,
-                            // Mapeamos nuestra lista de objetos a una lista de Strings para mostrar
-                            items: _hospitalsList.map((hospital) => hospital.name).toList(),
+                      // Mapeamos nuestra lista de objetos a una lista de Strings para mostrar
+                      items: _hospitalsList
+                          .map((hospital) => hospital.name)
+                          .toList(),
                       hintText: 'Selecciona un hospital',
                       prefixIcon: HugeIcons.strokeRoundedHospital01,
                       onChanged: (selectedName) {
-                              setState(() {
-                                // ...buscamos en nuestra lista completa el objeto HospitalModel que coincide
-                                _selectedHospital = _hospitalsList.firstWhere(
-                                  (hospital) => hospital.name == selectedName
-                                );
-                              });
-                            },
+                        setState(() {
+                          // ...buscamos en nuestra lista completa el objeto HospitalModel que coincide
+                          _selectedHospital = _hospitalsList.firstWhere(
+                            (hospital) => hospital.name == selectedName,
+                          );
+                        });
+                      },
                     ),
                   ),
                 ],
@@ -301,15 +302,15 @@ HospitalModel? _selectedHospital;
           currentStep: _currentStep,
           onNextPressed: _nextStepOrSummary,
           onPreviousPressed: _previousStep,
-          primaryColor: AppColors.accentColor,
-          secondaryColor: AppColors.accentColor,
-          secondarySide: const BorderSide(
-            color: AppColors.accentColor,
+          primaryColor: AppColors.accentColor(context),
+          secondaryColor: AppColors.accentColor(context),
+          secondarySide: BorderSide(
+            color: AppColors.accentColor(context),
             width: 1,
           ),
-          secondaryForegroundColor: AppColors.accentColor,
-          secondaryIconColor: AppColors.accentColor,
-          secondaryShadowColor: AppColors.accentColor.withAlpha(35),
+          secondaryForegroundColor: AppColors.accentColor(context),
+          secondaryIconColor: AppColors.accentColor(context),
+          secondaryShadowColor: AppColors.accentColor(context).withAlpha(35),
         ),
       ),
     );
@@ -344,10 +345,10 @@ HospitalModel? _selectedHospital;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.successColor.withAlpha(15),
+        color: AppColors.successColor(context).withAlpha(15),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.successColor.withAlpha(60),
+          color: AppColors.successColor(context).withAlpha(60),
           width: 1.5,
         ),
       ),
@@ -358,7 +359,7 @@ HospitalModel? _selectedHospital;
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: AppColors.successColor.withAlpha(20),
+              color: AppColors.successColor(context).withAlpha(20),
               borderRadius: BorderRadius.circular(8),
             ),
             child: isImage
@@ -373,7 +374,7 @@ HospitalModel? _selectedHospital;
                   )
                 : Icon(
                     HugeIcons.strokeRoundedFolder01,
-                    color: AppColors.successColor,
+                    color: AppColors.successColor(context),
                     size: 24,
                   ),
           ),
@@ -384,9 +385,9 @@ HospitalModel? _selectedHospital;
               children: [
                 Text(
                   isImage ? "Foto cargada" : "Referencia digital",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textColor,
+                    color: AppColors.textColor(context),
                     fontSize: 14,
                   ),
                 ),
@@ -396,7 +397,7 @@ HospitalModel? _selectedHospital;
                       ? "Referencia adjuntada correctamente"
                       : "Seleccionada de tu bandeja",
                   style: TextStyle(
-                    color: AppColors.textLightColor,
+                    color: AppColors.textLightColor(context),
                     fontSize: 12,
                     height: 1.2,
                   ),
@@ -407,7 +408,7 @@ HospitalModel? _selectedHospital;
           IconButton(
             icon: Icon(
               Icons.close,
-              color: AppColors.textLightColor.withAlpha(150),
+              color: AppColors.textLightColor(context).withAlpha(150),
               size: 18,
             ),
             onPressed: _resetReferralChoice,
@@ -448,10 +449,14 @@ HospitalModel? _selectedHospital;
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: AppColors.accentColor.withAlpha(15),
+                color: AppColors.accentColor(context).withAlpha(15),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 20, color: AppColors.accentColor),
+              child: Icon(
+                icon,
+                size: 20,
+                color: AppColors.accentColor(context),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -460,10 +465,10 @@ HospitalModel? _selectedHospital;
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textColor,
+                      color: AppColors.textColor(context),
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -471,7 +476,7 @@ HospitalModel? _selectedHospital;
                     subtitle,
                     style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textLightColor,
+                      color: AppColors.textLightColor(context),
                       height: 1.2,
                     ),
                   ),
@@ -480,7 +485,7 @@ HospitalModel? _selectedHospital;
             ),
             Icon(
               Icons.chevron_right,
-              color: AppColors.textLightColor.withAlpha(120),
+              color: AppColors.textLightColor(context).withAlpha(120),
               size: 20,
             ),
           ],

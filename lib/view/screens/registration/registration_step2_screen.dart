@@ -97,19 +97,19 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                           IconButton(
                             onPressed:
                                 _onWillPop, // Llama a la misma función de salida
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.arrow_back,
-                              color: AppColors.textColor,
+                              color: AppColors.textColor(context),
                               size: 26.5,
                             ),
                           ),
                           const SizedBox(width: 8),
-                          const Text(
+                          Text(
                             "Datos Personales",
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textColor,
+                              color: AppColors.textColor(context),
                             ),
                           ),
                         ],
@@ -117,12 +117,12 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                       const SizedBox(height: 24),
                       const RegistrationProgressIndicator(currentStep: 2),
                       const SizedBox(height: 32),
-                      const Text(
+                      Text(
                         'Ahora, cuéntanos sobre ti',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textColor,
+                          color: AppColors.textColor(context),
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -185,9 +185,11 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                         onPressed: () {
                           if (authViewModel.selectedSex == null) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
+                              SnackBar(
                                 content: Text('Por favor, selecciona tu sexo.'),
-                                backgroundColor: AppColors.warningColor,
+                                backgroundColor: AppColors.warningColor(
+                                  context,
+                                ),
                               ),
                             );
                             return;

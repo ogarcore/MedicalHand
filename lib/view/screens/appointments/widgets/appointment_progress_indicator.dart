@@ -24,7 +24,8 @@ class AppointmentProgressIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color effectiveActiveColor = activeColor ?? AppColors.accentColor;
+    final Color effectiveActiveColor =
+        activeColor ?? AppColors.accentColor(context);
     final Color effectiveInactiveColor = inactiveColor ?? Colors.grey[300]!;
     final int totalSteps = stepTitles.length;
 
@@ -51,7 +52,7 @@ class AppointmentProgressIndicator extends StatelessWidget {
                 children: [
                   // Línea de fondo
                   Positioned(
-                    top: 22, 
+                    top: 22,
                     left: stepWidth / 2,
                     right: stepWidth / 2,
                     child: Container(
@@ -59,7 +60,6 @@ class AppointmentProgressIndicator extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: effectiveInactiveColor,
                         borderRadius: BorderRadius.circular(2),
-                        
                       ),
                     ),
                   ),
@@ -72,7 +72,10 @@ class AppointmentProgressIndicator extends StatelessWidget {
                       duration: const Duration(milliseconds: 400),
                       curve: Curves.easeInOutCubic,
                       height: 4,
-                      width: (stepWidth * currentStep).clamp(0.0, availableWidth - stepWidth),
+                      width: (stepWidth * currentStep).clamp(
+                        0.0,
+                        availableWidth - stepWidth,
+                      ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(2),
                         color: effectiveActiveColor,
@@ -82,7 +85,8 @@ class AppointmentProgressIndicator extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: List.generate(totalSteps, (index) {
-                      return ProgressStepWidget( // 2. Usamos el widget refactorizado
+                      return ProgressStepWidget(
+                        // 2. Usamos el widget refactorizado
                         stepNumber: index + 1,
                         title: stepTitles[index],
                         isActive: index <= currentStep,
@@ -108,7 +112,7 @@ class AppointmentProgressIndicator extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
-                mainAxisSize: MainAxisSize.min, 
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(

@@ -22,7 +22,7 @@ class _HomeAppBarState extends State<HomeAppBar> with HomeAppBarLogic {
     return AppBar(
       automaticallyImplyLeading: false,
       elevation: 0,
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: AppColors.backgroundColor(context),
       surfaceTintColor: Colors.transparent,
       title: ProfileButton(
         buttonKey: profileButtonKey, // Usa la variable del mixin

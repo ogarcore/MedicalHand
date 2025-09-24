@@ -66,8 +66,8 @@ class FamilyMemberProfileScreen extends StatelessWidget {
                             : 'Error al eliminar.',
                       ),
                       backgroundColor: success
-                          ? AppColors.successColor
-                          : AppColors.warningColor,
+                          ? AppColors.successColor(context)
+                          : AppColors.warningColor(context),
                     ),
                   );
                   if (success) {
@@ -96,7 +96,7 @@ class FamilyMemberProfileScreen extends StatelessWidget {
     final bool isTutorViewing = currentUser?.uid == activeProfile?.uid;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: AppColors.backgroundColor(context),
       appBar: AppBar(
         title: Text(
           'Perfil de ${member.firstName}',
@@ -106,7 +106,7 @@ class FamilyMemberProfileScreen extends StatelessWidget {
             letterSpacing: -0.5,
           ),
         ),
-        backgroundColor: AppColors.backgroundColor,
+        backgroundColor: AppColors.backgroundColor(context),
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
@@ -116,40 +116,47 @@ class FamilyMemberProfileScreen extends StatelessWidget {
         child: Column(
           children: [
             _buildSectionCard(
+              context: context,
               title: 'Información Personal',
               icon: HugeIcons.strokeRoundedUserCircle02,
               showEditButton: isTutorViewing,
               onEditPressed: () {},
               children: [
                 _buildInfoRow(
+                  context,
                   'Nombre Completo',
                   '${member.firstName} ${member.lastName}',
                 ),
                 _buildInfoRow(
+                  context,
                   'Fecha de Nacimiento',
                   _formatDateOfBirth(member),
                 ),
-                _buildInfoRow('Cédula', member.idNumber),
-                _buildInfoRow('Teléfono', member.phoneNumber),
-                _buildInfoRow('Dirección', member.address),
+                _buildInfoRow(context, 'Cédula', member.idNumber),
+                _buildInfoRow(context, 'Teléfono', member.phoneNumber),
+                _buildInfoRow(context, 'Dirección', member.address),
               ],
             ),
             const SizedBox(height: 16),
             _buildSectionCard(
+              context: context,
               title: 'Información Médica',
               icon: HugeIcons.strokeRoundedHealth,
               showEditButton: isTutorViewing,
               onEditPressed: () {},
               children: [
                 _buildInfoRow(
+                  context,
                   'Tipo de Sangre',
                   member.medicalInfo?['bloodType'] ?? 'No especificado',
                 ),
                 _buildInfoRow(
+                  context,
                   'Alergias',
                   member.medicalInfo?['knownAllergies'] ?? 'Ninguna reportada',
                 ),
                 _buildInfoRow(
+                  context,
                   'Padecimientos Crónicos',
                   _formatChronicDiseases(member),
                 ),
@@ -159,6 +166,7 @@ class FamilyMemberProfileScreen extends StatelessWidget {
             // Sección de Configuración de Cuenta (con el mismo diseño)
             if (isTutorViewing)
               _buildSectionCard(
+                context: context,
                 title: 'Configuración de Cuenta',
                 icon: HugeIcons.strokeRoundedSettings02,
                 showEditButton: false,
@@ -167,7 +175,7 @@ class FamilyMemberProfileScreen extends StatelessWidget {
                   _buildActionRow(
                     'Eliminar perfil familiar',
                     HugeIcons.strokeRoundedDelete02,
-                    AppColors.warningColor,
+                    AppColors.warningColor(context),
                     () => _showDeleteConfirmation(context, familyViewModel),
                   ),
                 ],
@@ -179,6 +187,7 @@ class FamilyMemberProfileScreen extends StatelessWidget {
   }
 
   Widget _buildSectionCard({
+    required BuildContext context,
     required String title,
     required IconData icon,
     required List<Widget> children,
@@ -210,18 +219,22 @@ class FamilyMemberProfileScreen extends StatelessWidget {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: AppColors.primaryColor.withOpacity(0.1),
+                      color: AppColors.primaryColor(context).withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(icon, color: AppColors.primaryColor, size: 18),
+                    child: Icon(
+                      icon,
+                      color: AppColors.primaryColor(context),
+                      size: 18,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textColor,
+                      color: AppColors.textColor(context),
                       letterSpacing: -0.3,
                     ),
                   ),
@@ -232,14 +245,14 @@ class FamilyMemberProfileScreen extends StatelessWidget {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withOpacity(0.08),
+                    color: AppColors.primaryColor(context).withOpacity(0.08),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
-                    icon: const Icon(
+                    icon: Icon(
                       HugeIcons.strokeRoundedEdit01,
                       size: 16,
-                      color: AppColors.primaryColor,
+                      color: AppColors.primaryColor(context),
                     ),
                     onPressed: onEditPressed,
                     padding: EdgeInsets.zero,
@@ -257,7 +270,7 @@ class FamilyMemberProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(BuildContext context, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
@@ -279,8 +292,8 @@ class FamilyMemberProfileScreen extends StatelessWidget {
             flex: 3,
             child: Text(
               value.isEmpty ? 'No especificado' : value,
-              style: const TextStyle(
-                color: AppColors.textColor,
+              style: TextStyle(
+                color: AppColors.textColor(context),
                 fontSize: 14.2,
                 fontWeight: FontWeight.w600,
               ),

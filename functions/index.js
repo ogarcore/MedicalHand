@@ -8,8 +8,7 @@ const {logger} = require("firebase-functions");
 // Inicializa Firebase Admin
 initializeApp();
 
-// Función Reutilizable para Enviar Notificaciones
-async function sendNotificationToTutor(patientId, notificationPayload, dataPayload = {}) {
+async function sendNotificationToTutor(patientId, notificationPayload, dataPayload = {}, notificationType) {
   const patientDoc = await getFirestore().collection("usuarios_movil").doc(patientId).get();
   if (!patientDoc.exists) {
     logger.error(`Error: No se encontró al paciente ${patientId}`);
@@ -25,7 +24,15 @@ async function sendNotificationToTutor(patientId, notificationPayload, dataPaylo
     return;
   }
 
-  const fcmToken = tutorDoc.data().fcmToken;
+  const tutorData = tutorDoc.data();
+  
+  const preferences = tutorData.notificationPreferences;
+  if (preferences && preferences[notificationType] === false) {
+    logger.info(`Notificación de tipo '${notificationType}' bloqueada para el tutor ${tutorId} según sus preferencias.`);
+    return;
+  }
+
+  const fcmToken = tutorData.fcmToken;
   if (!fcmToken) {
     logger.warn(`El tutor ${tutorId} no tiene un token FCM.`);
     return;
@@ -63,7 +70,7 @@ exports.notificarSolicitudRecibida = onDocumentCreated("citas/{citaId}", async (
 
   const data = {type: "solicitud_recibida"};
 
-  await sendNotificationToTutor(cita.uid, notification, data);
+  await sendNotificationToTutor(cita.uid, notification, data, "requests");
 });
 
 // Notificación: Cita Asignada o Reprogramada
@@ -94,7 +101,7 @@ exports.notificarCitaActualizada = onDocumentUpdated("citas/{citaId}", async (ev
 
     const data = {type: "cita_confirmada"};
 
-    await sendNotificationToTutor(datosDespues.uid, notification, data);
+    await sendNotificationToTutor(datosDespues.uid, notification, data, "changes");
   }
 });
 
@@ -108,7 +115,6 @@ exports.enviarRecordatorios = onSchedule({
   const db = getFirestore();
   const now = Timestamp.now();
 
-  // Lógica para recordatorios de 48 horas
   const a48HorasInicio = Timestamp.fromMillis(now.toMillis() + (48 * 60 - 15) * 60 * 1000); 
   const a48HorasFin = Timestamp.fromMillis(now.toMillis() + 48 * 60 * 60 * 1000); 
 
@@ -128,11 +134,10 @@ exports.enviarRecordatorios = onSchedule({
     };
     const data = {type: "recordatorio"};
     
-    await sendNotificationToTutor(cita.uid, notification, data);
+    await sendNotificationToTutor(cita.uid, notification, data, "reminders");
     return doc.ref.update({ reminder48hSent: true });
   });
 
-  // Lógica para recordatorios de 24 horas
   const a24HorasInicio = Timestamp.fromMillis(now.toMillis() + (24 * 60 - 15) * 60 * 1000); 
   const a24HorasFin = Timestamp.fromMillis(now.toMillis() + 24 * 60 * 60 * 1000); 
 
@@ -153,7 +158,7 @@ exports.enviarRecordatorios = onSchedule({
   
     const data = {type: "recordatorio"};
     
-    await sendNotificationToTutor(cita.uid, notification, data);
+    await sendNotificationToTutor(cita.uid, notification, data, "reminders");
     return doc.ref.update({ reminder24hSent: true });
   });
 

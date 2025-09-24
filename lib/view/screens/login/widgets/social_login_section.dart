@@ -40,21 +40,36 @@ class SocialLoginSection extends StatelessWidget {
             width: 280,
             child: isGoogleLoading
                 ? Container(
-                    padding: const EdgeInsets.symmetric(vertical: 14.5, horizontal: 12),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14.5,
+                      horizontal: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(
                           width: 20,
                           height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor)),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.primaryColor(context),
+                            ),
+                          ),
                         ),
                         SizedBox(width: 12),
-                        Text('Cargando...', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textColor)),
+                        Text(
+                          'Cargando...',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textColor(context),
+                          ),
+                        ),
                       ],
                     ),
                   )
@@ -63,19 +78,33 @@ class SocialLoginSection extends StatelessWidget {
                     icon: Container(
                       width: 24,
                       height: 24,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(4)),
-                      child: Image.asset('assets/images/google_icon.png', fit: BoxFit.cover),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Image.asset(
+                        'assets/images/google_icon.png',
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                    label: const Text(
+                    label: Text(
                       'Iniciar sesión con Google',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textColor),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textColor(context),
+                      ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14.5, horizontal: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14.5,
+                        horizontal: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                       side: BorderSide.none,
                       backgroundColor: Colors.grey.shade200,
-                      foregroundColor: AppColors.textColor,
+                      foregroundColor: AppColors.textColor(context),
                     ),
                   ),
           ),

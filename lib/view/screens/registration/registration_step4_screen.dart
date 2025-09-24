@@ -45,19 +45,19 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                       children: [
                         IconButton(
                           onPressed: () => Navigator.pop(context),
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.arrow_back,
-                            color: AppColors.textColor,
+                            color: AppColors.textColor(context),
                             size: 26.5,
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Text(
+                        Text(
                           "Datos de Contacto",
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textColor,
+                            color: AppColors.textColor(context),
                           ),
                         ),
                       ],
@@ -65,12 +65,12 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                     const SizedBox(height: 24),
                     const RegistrationProgressIndicator(currentStep: 4),
                     const SizedBox(height: 32),
-                    const Text(
+                    Text(
                       '¿Cómo podemos contactarte?',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textColor,
+                        color: AppColors.textColor(context),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -98,14 +98,14 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    const Row(
+                    Row(
                       children: [
                         Text(
                           'Contacto de Emergencia',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textColor,
+                            color: AppColors.textColor(context),
                           ),
                         ),
                         SizedBox(width: 8),
@@ -159,11 +159,13 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                           if (emergencyName.isNotEmpty &&
                               emergencyPhone.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
+                              SnackBar(
                                 content: Text(
                                   'Por favor, ingresa el teléfono del contacto de emergencia.',
                                 ),
-                                backgroundColor: AppColors.warningColor,
+                                backgroundColor: AppColors.warningColor(
+                                  context,
+                                ),
                               ),
                             );
                             return; // Detiene
@@ -173,11 +175,13 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                           if (emergencyPhone.isNotEmpty &&
                               emergencyName.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
+                              SnackBar(
                                 content: Text(
                                   'Por favor, ingresa el nombre del contacto de emergencia.',
                                 ),
-                                backgroundColor: AppColors.warningColor,
+                                backgroundColor: AppColors.warningColor(
+                                  context,
+                                ),
                               ),
                             );
                             return;

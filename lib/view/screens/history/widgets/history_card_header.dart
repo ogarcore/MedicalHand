@@ -33,10 +33,10 @@ class HistoryCardHeader extends StatelessWidget {
             Expanded(
               child: Text(
                 hospital,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textColor,
+                  color: AppColors.textColor(context),
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -46,20 +46,24 @@ class HistoryCardHeader extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: AppColors.accentColor.withAlpha(30),
+                color: AppColors.accentColor(context).withAlpha(30),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(HugeIcons.strokeRoundedCalendar01, size: 14, color: AppColors.accentColor),
+                  Icon(
+                    HugeIcons.strokeRoundedCalendar01,
+                    size: 14,
+                    color: AppColors.accentColor(context),
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     date,
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.accentColor,
+                      color: AppColors.accentColor(context),
                     ),
                   ),
                 ],
@@ -72,7 +76,7 @@ class HistoryCardHeader extends StatelessWidget {
           height: 3,
           width: 40,
           decoration: BoxDecoration(
-            color: AppColors.primaryColor.withAlpha(140),
+            color: AppColors.primaryColor(context).withAlpha(140),
             borderRadius: BorderRadius.circular(2),
           ),
         ),
@@ -88,8 +92,8 @@ class HistoryCardHeader extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppColors.primaryColor.withAlpha(140),
-                    AppColors.primaryColor.withAlpha(160),
+                    AppColors.primaryColor(context).withAlpha(140),
+                    AppColors.primaryColor(context).withAlpha(160),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(10),
@@ -115,13 +119,17 @@ class HistoryCardHeader extends StatelessWidget {
                         ? Row(
                             key: const ValueKey('details_message'),
                             children: [
-                              Icon(HugeIcons.strokeRoundedInformationCircle, size: 16, color: AppColors.textLightColor),
+                              Icon(
+                                HugeIcons.strokeRoundedInformationCircle,
+                                size: 16,
+                                color: AppColors.textLightColor(context),
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 'Viendo detalles completos...',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: AppColors.textLightColor,
+                                  color: AppColors.textLightColor(context),
                                   fontStyle: FontStyle.italic,
                                 ),
                               ),
@@ -133,12 +141,20 @@ class HistoryCardHeader extends StatelessWidget {
                             children: [
                               Row(
                                 children: [
-                                  const Icon(HugeIcons.strokeRoundedDoctor01, size: 16, color: AppColors.primaryColor),
+                                  Icon(
+                                    HugeIcons.strokeRoundedDoctor01,
+                                    size: 16,
+                                    color: AppColors.primaryColor(context),
+                                  ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       'Dr. $doctor',
-                                      style: TextStyle(fontSize: 14, color: Colors.grey[700], fontWeight: FontWeight.w500),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[700],
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -149,12 +165,20 @@ class HistoryCardHeader extends StatelessWidget {
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(HugeIcons.strokeRoundedHealth, size: 16, color: AppColors.primaryColor),
+                                  Icon(
+                                    HugeIcons.strokeRoundedHealth,
+                                    size: 16,
+                                    color: AppColors.primaryColor(context),
+                                  ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       diagnosis,
-                                      style: TextStyle(fontSize: 14, color: Colors.grey[700], fontWeight: FontWeight.w500),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[700],
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -171,16 +195,18 @@ class HistoryCardHeader extends StatelessWidget {
                     children: [
                       Text(
                         isExpanded ? 'OCULTAR' : 'VER DETALLES',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.primaryColor,
+                          color: AppColors.primaryColor(context),
                         ),
                       ),
                       const SizedBox(width: 6),
                       Icon(
-                        isExpanded ? HugeIcons.strokeRoundedArrowUp01 : HugeIcons.strokeRoundedArrowDown01,
-                        color: AppColors.primaryColor,
+                        isExpanded
+                            ? HugeIcons.strokeRoundedArrowUp01
+                            : HugeIcons.strokeRoundedArrowDown01,
+                        color: AppColors.primaryColor(context),
                         size: 16,
                       ),
                     ],

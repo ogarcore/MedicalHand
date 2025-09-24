@@ -1,31 +1,31 @@
 import 'package:flutter/material.dart';
+import 'custom_theme_colors.dart';
 
 class AppColors {
-  static const Color primaryColor = Color(
-    0xFF81C784,
-  ); // Verde Menta Suave (principal)
-  static const Color backgroundColor = Color(
-    0xFFF0F7F4,
-  ); // Gris con verde pálido
-  static const Color accentColor = Color(
-    0xFF26A69A,
-  ); // Verde Quirófano (detalles, botones)
-  static const Color secondaryColor = Color(
-    0xFF4CAF50,
-  ); // Verde Hospital clásico (apoyo)
-  static const Color warningColor = Color(
-    0xFFE76F51,
-  ); // Naranja coral (alertas)
-  static const Color successColor = Color(
-    0xFF2E7D32,
-  ); // Verde Jade (éxito, validaciones)
-  static const Color textColor = Color(
-    0xFF333333,
-  ); // Gris Grafito (texto principal)
-  static const Color textLightColor = Color(
-    0xFF757575,
-  ); // Gris Medio (texto secundario)
-  static const Color graceColor = Color(
-    0xFFFFB74D,
-  ); // Naranja cálido (gracia/bendición)
+  static CustomThemeColors _get(BuildContext context) =>
+      Theme.of(context).extension<CustomThemeColors>()!;
+
+  static Color primaryColor(BuildContext context) =>
+      _get(context).primaryColor!;
+
+  static Color backgroundColor(BuildContext context) =>
+      _get(context).backgroundColor!;
+
+  static Color accentColor(BuildContext context) => _get(context).accentColor!;
+
+  static Color secondaryColor(BuildContext context) =>
+      _get(context).secondaryColor!;
+
+  static Color warningColor(BuildContext context) =>
+      _get(context).warningColor!;
+
+  static Color successColor(BuildContext context) =>
+      _get(context).successColor!;
+
+  static Color textColor(BuildContext context) => _get(context).textColor!;
+
+  static Color textLightColor(BuildContext context) =>
+      _get(context).textLightColor!;
+
+  static Color graceColor(BuildContext context) => _get(context).graceColor!;
 }

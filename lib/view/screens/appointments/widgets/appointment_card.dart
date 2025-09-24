@@ -6,6 +6,7 @@ import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/app/core/utils/validators.dart';
 import 'package:p_hn25/view/widgets/custom_modal.dart';
 import 'package:p_hn25/data/models/cita_model.dart';
+import 'package:p_hn25/view/widgets/custom_text_field.dart';
 import 'package:p_hn25/view_model/appointment_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -41,7 +42,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
             ),
           ],
         ),
-        backgroundColor: AppColors.successColor.withAlpha(220),
+        backgroundColor: AppColors.successColor(context).withAlpha(220),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         margin: EdgeInsets.only(bottom: 10, left: 20, right: 20),
@@ -96,13 +97,11 @@ class _AppointmentCardState extends State<AppointmentCard> {
           icon: HugeIcons.strokeRoundedRepeat,
           content: Form(
             key: formKey,
-            child: TextFormField(
+            child: CustomTextField(
+              labelText: "Motivo de la reprogramación",
+              icon: HugeIcons.strokeRoundedAlertDiamond,
               controller: reasonController,
-              decoration: const InputDecoration(
-                labelText: 'Motivo de la reprogramación',
-                hintText: 'Explica brevemente por qué necesitas el cambio...',
-                border: OutlineInputBorder(),
-              ),
+              hintText: 'Explica brevemente por qué necesitas el cambio...',
               maxLines: 3,
               validator: AppValidators.validateRescheduleReason,
             ),
@@ -162,7 +161,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryColor.withAlpha(10),
+            color: AppColors.primaryColor(context).withAlpha(10),
             blurRadius: 10,
             offset: const Offset(0, 4),
             spreadRadius: 1,
@@ -183,10 +182,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
                     padding: const EdgeInsets.only(right: 32.0),
                     child: Text(
                       cita.specialty ?? 'Consulta General',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textColor,
+                        color: AppColors.textColor(context),
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -201,7 +200,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
               height: 3,
               width: 40,
               decoration: BoxDecoration(
-                color: AppColors.primaryColor.withAlpha(170),
+                color: AppColors.primaryColor(context).withAlpha(170),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -217,8 +216,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        AppColors.primaryColor.withAlpha(150),
-                        AppColors.primaryColor.withAlpha(170),
+                        AppColors.primaryColor(context).withAlpha(150),
+                        AppColors.primaryColor(context).withAlpha(170),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(10),
@@ -236,10 +235,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
                     children: [
                       Text(
                         cita.hospital,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textColor,
+                          color: AppColors.textColor(context),
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -247,10 +246,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
                       const SizedBox(height: 6),
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             HugeIcons.strokeRoundedCalendar01,
                             size: 14,
-                            color: AppColors.primaryColor,
+                            color: AppColors.primaryColor(context),
                           ),
                           const SizedBox(width: 6),
                           Expanded(
@@ -269,10 +268,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
                         const SizedBox(height: 6),
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               HugeIcons.strokeRoundedDoctor01,
                               size: 14,
-                              color: AppColors.primaryColor,
+                              color: AppColors.primaryColor(context),
                             ),
                             const SizedBox(width: 6),
                             Expanded(
@@ -293,10 +292,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
                       const SizedBox(height: 6),
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             HugeIcons.strokeRoundedHospitalBed01,
                             size: 14,
-                            color: AppColors.primaryColor,
+                            color: AppColors.primaryColor(context),
                           ),
                           const SizedBox(width: 6),
                           Expanded(
@@ -347,7 +346,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.accentColor.withAlpha(220),
+                        color: AppColors.accentColor(context).withAlpha(220),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -357,7 +356,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                       child: Icon(
                         HugeIcons.strokeRoundedArrowDownDouble,
                         size: 18,
-                        color: AppColors.accentColor.withAlpha(200),
+                        color: AppColors.accentColor(context).withAlpha(200),
                       ),
                     ),
                   ],
@@ -384,16 +383,18 @@ class _AppointmentCardState extends State<AppointmentCard> {
                         child: ElevatedButton(
                           onPressed: _rescheduleAppointment,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.accentColor.withAlpha(
-                              170,
-                            ),
+                            backgroundColor: AppColors.accentColor(
+                              context,
+                            ).withAlpha(170),
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 1),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             elevation: 1,
-                            shadowColor: AppColors.accentColor.withAlpha(100),
+                            shadowColor: AppColors.accentColor(
+                              context,
+                            ).withAlpha(100),
                           ),
                           child: const Text(
                             "Reprogramar",
@@ -410,12 +411,12 @@ class _AppointmentCardState extends State<AppointmentCard> {
                           onPressed: _cancelAppointment,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white.withAlpha(20),
-                            foregroundColor: AppColors.warningColor,
+                            foregroundColor: AppColors.warningColor(context),
                             padding: const EdgeInsets.symmetric(vertical: 1),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                              side: const BorderSide(
-                                color: AppColors.warningColor,
+                              side: BorderSide(
+                                color: AppColors.warningColor(context),
                                 width: 1.2,
                               ),
                             ),
@@ -451,28 +452,28 @@ class _AppointmentCardState extends State<AppointmentCard> {
 
     switch (status) {
       case 'confirmada':
-        backgroundColor = AppColors.secondaryColor.withAlpha(40);
-        textColor = AppColors.primaryColor;
+        backgroundColor = AppColors.secondaryColor(context).withAlpha(40);
+        textColor = AppColors.primaryColor(context);
         icon = HugeIcons.strokeRoundedTickDouble01;
         break;
       case 'pendiente':
-        backgroundColor = AppColors.graceColor.withAlpha(40);
-        textColor = AppColors.graceColor;
+        backgroundColor = AppColors.graceColor(context).withAlpha(40);
+        textColor = AppColors.graceColor(context);
         icon = HugeIcons.strokeRoundedClock01;
         break;
       case 'finalizada':
-        backgroundColor = AppColors.textLightColor.withAlpha(40);
-        textColor = AppColors.textLightColor;
+        backgroundColor = AppColors.textLightColor(context).withAlpha(40);
+        textColor = AppColors.textLightColor(context);
         icon = HugeIcons.strokeRoundedCheckmarkSquare03;
         break;
       case 'cancelada':
-        backgroundColor = AppColors.warningColor.withAlpha(40);
-        textColor = AppColors.warningColor;
+        backgroundColor = AppColors.warningColor(context).withAlpha(40);
+        textColor = AppColors.warningColor(context);
         icon = HugeIcons.strokeRoundedCancelCircleHalfDot;
         break;
       case 'pendiente_reprogramacion':
-        backgroundColor = AppColors.accentColor.withAlpha(40);
-        textColor = AppColors.accentColor;
+        backgroundColor = AppColors.accentColor(context).withAlpha(40);
+        textColor = AppColors.accentColor(context);
         icon = HugeIcons.strokeRoundedRepeat;
         break;
       default:

@@ -33,10 +33,10 @@ class DashboardHeader extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: '¡$greeting! ',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.textColor,
+                      color: AppColors.textColor(context),
                       height: 1.3,
                     ),
                   ),

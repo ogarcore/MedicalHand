@@ -47,19 +47,19 @@ class _RegistrationStep5ScreenState extends State<RegistrationStep5Screen> {
                             children: [
                               IconButton(
                                 onPressed: () => Navigator.pop(context),
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.arrow_back,
-                                  color: AppColors.textColor,
+                                  color: AppColors.textColor(context),
                                   size: 26.5,
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              const Text(
+                              Text(
                                 "Información Médica",
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
-                                  color: AppColors.textColor,
+                                  color: AppColors.textColor(context),
                                 ),
                               ),
                             ],
@@ -67,12 +67,12 @@ class _RegistrationStep5ScreenState extends State<RegistrationStep5Screen> {
                           const SizedBox(height: 24),
                           const RegistrationProgressIndicator(currentStep: 5),
                           const SizedBox(height: 32),
-                          const Text(
+                          Text(
                             'Por último, algunos datos básicos',
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textColor,
+                              color: AppColors.textColor(context),
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -106,18 +106,22 @@ class _RegistrationStep5ScreenState extends State<RegistrationStep5Screen> {
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryColor.withAlpha(60),
+                              color: AppColors.primaryColor(
+                                context,
+                              ).withAlpha(60),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: AppColors.primaryColor.withAlpha(80),
+                                color: AppColors.primaryColor(
+                                  context,
+                                ).withAlpha(80),
                                 width: 1,
                               ),
                             ),
                             child: Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.info_outline_rounded,
-                                  color: AppColors.primaryColor,
+                                  color: AppColors.primaryColor(context),
                                   size: 24,
                                 ),
                                 const SizedBox(width: 12),
@@ -126,7 +130,9 @@ class _RegistrationStep5ScreenState extends State<RegistrationStep5Screen> {
                                     'Si no tienes conocimientos de estos datos, puedes finalizar el registro y actualizarlos después en tu perfil.',
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: AppColors.textColor.withAlpha(200),
+                                      color: AppColors.textColor(
+                                        context,
+                                      ).withAlpha(200),
                                       height: 1.4,
                                     ),
                                   ),
@@ -176,7 +182,9 @@ class _RegistrationStep5ScreenState extends State<RegistrationStep5Screen> {
                                         authViewModel.errorMessage ??
                                             'Ocurrió un error.',
                                       ),
-                                      backgroundColor: AppColors.warningColor,
+                                      backgroundColor: AppColors.warningColor(
+                                        context,
+                                      ),
                                     ),
                                   );
                                 }

@@ -20,48 +20,51 @@ class EmptyFamilyView extends StatelessWidget {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: AppColors.primaryColor.withAlpha(25),
+                color: AppColors.primaryColor(context).withAlpha(25),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 HugeIcons.strokeRoundedUserGroup02,
                 size: 56,
-                color: AppColors.primaryColor,
+                color: AppColors.primaryColor(context),
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Administra los perfiles de tu familia',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textColor,
+                color: AppColors.textColor(context),
                 letterSpacing: -0.5,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
-            const Text(
+            Text(
               'Añade a tus familiares para gestionar sus perfiles médicos, historial clínico y citas de manera centralizada.',
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textLightColor,
+                color: AppColors.textLightColor(context),
                 height: 1.5,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 28),
             _buildFeatureRow(
+              context: context,
               icon: HugeIcons.strokeRoundedClinic,
               text: 'Historial médico compartido',
             ),
             const SizedBox(height: 10),
             _buildFeatureRow(
+              context: context,
               icon: HugeIcons.strokeRoundedCalendarLock02,
               text: 'Gestión de citas familiar',
             ),
             const SizedBox(height: 10),
             _buildFeatureRow(
+              context: context,
               icon: HugeIcons.strokeRoundedSquareLockPassword,
               text: 'Acceso seguro y controlado',
             ),
@@ -87,7 +90,7 @@ class EmptyFamilyView extends StatelessWidget {
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor,
+                    backgroundColor: AppColors.primaryColor(context),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       vertical: 16,
@@ -106,23 +109,27 @@ class EmptyFamilyView extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureRow({required IconData icon, required String text}) {
+  Widget _buildFeatureRow({
+    required BuildContext context,
+    required IconData icon,
+    required String text,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       decoration: BoxDecoration(
-        color: AppColors.primaryColor.withAlpha(15),
+        color: AppColors.primaryColor(context).withAlpha(15),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 18, color: AppColors.primaryColor),
+          Icon(icon, size: 18, color: AppColors.primaryColor(context)),
           const SizedBox(width: 10),
           Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: AppColors.textColor,
+              color: AppColors.textColor(context),
               fontWeight: FontWeight.w500,
             ),
           ),

@@ -30,12 +30,12 @@ class ChronicDiseasesList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Enfermedades Crónicas',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: AppColors.textColor,
+            color: AppColors.textColor(context),
           ),
         ),
         const SizedBox(height: 8),
@@ -63,16 +63,16 @@ class ChronicDiseasesList extends StatelessWidget {
                 return CheckboxListTile(
                   title: Text(
                     disease,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.textColor,
+                      color: AppColors.textColor(context),
                     ),
                   ),
                   value: selectedDiseases.contains(disease),
                   onChanged: (bool? selected) {
                     onDiseaseSelected(disease, selected);
                   },
-                  activeColor: AppColors.primaryColor,
+                  activeColor: AppColors.primaryColor(context),
                   checkColor: Colors.white,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                   dense: true,
@@ -85,9 +85,9 @@ class ChronicDiseasesList extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           '${selectedDiseases.length} seleccionadas',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: AppColors.primaryColor,
+            color: AppColors.primaryColor(context),
             fontWeight: FontWeight.w500,
           ),
         ),

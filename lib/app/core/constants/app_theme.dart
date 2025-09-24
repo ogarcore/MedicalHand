@@ -44,20 +44,22 @@ class AppThemes {
     ],
   );
 
-  // 3. TEMA CÁLIDO (Nueva paleta terracota)
-  static final ThemeData calidoTheme = ThemeData(
+  // 3. LAVANDA  (Nueva paleta terracota)
+  static final ThemeData lavandaTheme = ThemeData(
     brightness: Brightness.light,
     extensions: const <ThemeExtension<dynamic>>[
       CustomThemeColors(
-        primaryColor: Color(0xFFFFAB91),
-        backgroundColor: Color(0xFFFFF3E0),
-        accentColor: Color(0xFF8D6E63),
-        secondaryColor: Color(0xFFBCAAA4),
-        warningColor: Color(0xFFE57373),
-        successColor: Color(0xFFA5D6A7),
-        textColor: Color(0xFF333333),
-        textLightColor: Color(0xFF757575),
-        graceColor: Color(0xFFFFCC80),
+        primaryColor: Color(0xFF7E57C2), // Lavanda/Púrpura suave (principal)
+        backgroundColor: Color(0xFFF3F2F8), // Gris muy claro con tono lavanda
+        accentColor: Color(0xFF00897B), // Turquesa oscuro (detalles vibrantes)
+        secondaryColor: Color(0xFF90A4AE), // Gris azulado (apoyo neutro)
+        warningColor: Color(0xFFFF8A65), // Coral/Naranja suave (alertas)
+        successColor: Color(0xFF4DB6AC), // Turquesa claro (éxito)
+        textColor: Color(0xFF37474F), // Gris oscuro azulado (texto principal)
+        textLightColor: Color(
+          0xFF78909C,
+        ), // Gris azulado medio (texto secundario)
+        graceColor: Color(0xFFFFD54F), // Ámbar/Dorado (gracia)
       ),
     ],
   );
@@ -65,6 +67,6 @@ class AppThemes {
   static final List<AppTheme> themes = [
     AppTheme('Menta Fresca', mentaTheme),
     AppTheme('Azul Sereno', serenoTheme),
-    AppTheme('Coral Suave', calidoTheme),
+    AppTheme('Lavanda Suave', lavandaTheme),
   ];
 }

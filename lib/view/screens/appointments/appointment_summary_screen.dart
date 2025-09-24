@@ -115,7 +115,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
               ),
             ],
           ),
-          backgroundColor: AppColors.primaryColor,
+          backgroundColor: AppColors.primaryColor(context),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -147,7 +147,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
               ),
             ],
           ),
-          backgroundColor: AppColors.warningColor,
+          backgroundColor: AppColors.warningColor(context),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -165,14 +165,14 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: AppColors.backgroundColor(context),
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Resumen de Cita',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: AppColors.textColor,
+            color: AppColors.textColor(context),
           ),
         ),
         backgroundColor: Colors.white,
@@ -180,7 +180,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
         shadowColor: Colors.black.withAlpha(30),
         surfaceTintColor: Colors.transparent,
         centerTitle: false,
-        iconTheme: const IconThemeData(color: AppColors.textColor),
+        iconTheme: IconThemeData(color: AppColors.textColor(context)),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(12)),
         ),
@@ -200,36 +200,36 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
                       height: 60,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.primaryColor.withAlpha(20),
+                        color: AppColors.primaryColor(context).withAlpha(20),
                         border: Border.all(
-                          color: AppColors.primaryColor.withAlpha(40),
+                          color: AppColors.primaryColor(context).withAlpha(40),
                           width: 1.5,
                         ),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         HugeIcons.strokeRoundedTask01,
                         size: 26,
-                        color: AppColors.primaryColor,
+                        color: AppColors.primaryColor(context),
                       ),
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       '¡Revisa tu solicitud!',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textColor,
+                        color: AppColors.textColor(context),
                       ),
                     ),
                     const SizedBox(height: 6),
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20.0),
                       child: Text(
                         'Confirma que los datos de tu cita son correctos',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
-                          color: AppColors.textLightColor,
+                          color: AppColors.textLightColor(context),
                           height: 1.4,
                         ),
                       ),
@@ -324,12 +324,12 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: AppColors.primaryColor.withAlpha(15),
+            color: AppColors.primaryColor(context).withAlpha(15),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
+          child: Icon(
             HugeIcons.strokeRoundedImage01,
-            color: AppColors.primaryColor,
+            color: AppColors.primaryColor(context),
             size: 18,
           ),
         ),
@@ -338,10 +338,10 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Foto de Referencia Adjunta',
                 style: TextStyle(
-                  color: AppColors.textLightColor,
+                  color: AppColors.textLightColor(context),
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                 ),
@@ -400,10 +400,10 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: AppColors.primaryColor.withAlpha(15),
+            color: AppColors.primaryColor(context).withAlpha(15),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: AppColors.primaryColor, size: 18),
+          child: Icon(icon, color: AppColors.primaryColor(context), size: 18),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -412,8 +412,8 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
             children: [
               Text(
                 label,
-                style: const TextStyle(
-                  color: AppColors.textLightColor,
+                style: TextStyle(
+                  color: AppColors.textLightColor(context),
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                 ),
@@ -422,7 +422,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
               Text(
                 value,
                 style: TextStyle(
-                  color: AppColors.textColor,
+                  color: AppColors.textColor(context),
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                   height: isMultiline ? 1.3 : 1.2,

@@ -39,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primaryColor,
+      backgroundColor: AppColors.primaryColor(context).withAlpha(240),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -59,7 +59,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 values: [
                   ValueDelegate.color(const [
                     '**',
-                  ], value: AppColors.accentColor),
+                  ], value: AppColors.accentColor(context)),
                 ],
               ),
             ),

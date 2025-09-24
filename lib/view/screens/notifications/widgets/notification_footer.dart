@@ -53,13 +53,13 @@ class NotificationFooter extends StatelessWidget {
             child: ElevatedButton(
               onPressed: onClearAll,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor,
+                backgroundColor: AppColors.primaryColor(context),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 elevation: 2,
-                shadowColor: AppColors.primaryColor.withAlpha(102),
+                shadowColor: AppColors.primaryColor(context).withAlpha(102),
               ),
               child: const Text(
                 'Limpiar todo',

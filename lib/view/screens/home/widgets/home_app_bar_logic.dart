@@ -82,8 +82,8 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                 style: TextStyle(
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   color: isSelected
-                      ? AppColors.secondaryColor
-                      : AppColors.textColor,
+                      ? AppColors.secondaryColor(context)
+                      : AppColors.textColor(context),
                 ),
               ),
             ),
@@ -92,8 +92,8 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
               Container(
                 width: 8,
                 height: 8,
-                decoration: const BoxDecoration(
-                  color: AppColors.secondaryColor,
+                decoration: BoxDecoration(
+                  color: AppColors.secondaryColor(context),
                   shape: BoxShape.circle,
                 ),
               )
@@ -127,7 +127,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
           'profile',
           'Mi Perfil',
           HugeIcons.strokeRoundedUser,
-          AppColors.successColor,
+          AppColors.successColor(context),
         ),
       );
     }
@@ -136,7 +136,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
         'family',
         'Mis Familiares',
         HugeIcons.strokeRoundedUserGroup02,
-        AppColors.accentColor,
+        AppColors.accentColor(context),
       ),
     );
     menuItems.add(
@@ -144,7 +144,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
         'support',
         'Soporte',
         HugeIcons.strokeRoundedCustomerService01,
-        AppColors.textColor,
+        AppColors.textColor(context),
       ),
     );
     menuItems.add(const PopupMenuDivider());
@@ -153,7 +153,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
         'logout',
         'Cerrar Sesión',
         HugeIcons.strokeRoundedLogout03,
-        AppColors.warningColor,
+        AppColors.warningColor(context),
       ),
     );
 
@@ -252,16 +252,16 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                 showDialog(
                   context: context,
                   barrierDismissible: false,
-                  barrierColor: AppColors.backgroundColor,
+                  barrierColor: AppColors.backgroundColor(context),
                   builder: (BuildContext context) {
                     return Scaffold(
-                      backgroundColor: AppColors.backgroundColor,
+                      backgroundColor: AppColors.backgroundColor(context),
                       body: Center(
                         child: Container(
                           width: 280,
                           padding: const EdgeInsets.all(32),
                           decoration: BoxDecoration(
-                            color: AppColors.backgroundColor,
+                            color: AppColors.backgroundColor(context),
                             borderRadius: BorderRadius.circular(28),
                             boxShadow: [
                               BoxShadow(
@@ -282,13 +282,19 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: AppColors.primaryColor.withAlpha(60),
+                                    color: AppColors.primaryColor(
+                                      context,
+                                    ).withAlpha(60),
                                     width: 2,
                                   ),
                                   gradient: RadialGradient(
                                     colors: [
-                                      AppColors.primaryColor.withAlpha(30),
-                                      AppColors.primaryColor.withAlpha(10),
+                                      AppColors.primaryColor(
+                                        context,
+                                      ).withAlpha(30),
+                                      AppColors.primaryColor(
+                                        context,
+                                      ).withAlpha(10),
                                     ],
                                     center: Alignment.center,
                                     radius: 0.7,
@@ -301,7 +307,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                                     child: CircularProgressIndicator(
                                       strokeWidth: 3,
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                        AppColors.primaryColor,
+                                        AppColors.primaryColor(context),
                                       ),
                                     ),
                                   ),
@@ -309,12 +315,12 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                               ),
                               const SizedBox(height: 24),
                               // Texto principal
-                              const Text(
+                              Text(
                                 'Cerrando sesión',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.textColor,
+                                  color: AppColors.textColor(context),
                                   letterSpacing: 0.5,
                                 ),
                               ),
@@ -325,7 +331,9 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
-                                  color: AppColors.textColor.withAlpha(180),
+                                  color: AppColors.textColor(
+                                    context,
+                                  ).withAlpha(180),
                                   height: 1.4,
                                 ),
                                 textAlign: TextAlign.center,

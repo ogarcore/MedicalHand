@@ -38,16 +38,16 @@ class ProfileHeader extends StatelessWidget {
             height: 72,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.primaryColor.withAlpha(30),
+              color: AppColors.primaryColor(context).withAlpha(30),
               border: Border.all(
-                color: AppColors.primaryColor.withAlpha(100),
+                color: AppColors.primaryColor(context).withAlpha(100),
                 width: 1.5,
               ),
             ),
-            child: const Icon(
+            child: Icon(
               HugeIcons.strokeRoundedUser,
               size: 32,
-              color: AppColors.primaryColor,
+              color: AppColors.primaryColor(context),
             ),
           ),
           const SizedBox(width: 16),
@@ -57,10 +57,10 @@ class ProfileHeader extends StatelessWidget {
               children: [
                 Text(
                   _getShortName(user),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textColor,
+                    color: AppColors.textColor(context),
                     letterSpacing: -0.3,
                   ),
                 ),
@@ -82,16 +82,16 @@ class ProfileHeader extends StatelessWidget {
                     bottom: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withAlpha(30),
+                    color: AppColors.primaryColor(context).withAlpha(30),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
+                      Icon(
                         HugeIcons.strokeRoundedCalendar04,
                         size: 14,
-                        color: AppColors.primaryColor,
+                        color: AppColors.primaryColor(context),
                       ),
                       const SizedBox(width: 8),
                       Flexible(
@@ -100,9 +100,9 @@ class ProfileHeader extends StatelessWidget {
                           maxLines: 2,
                           softWrap: true,
                           overflow: TextOverflow.visible,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.textLightColor,
+                            color: AppColors.textLightColor(context),
                             fontWeight: FontWeight.w500,
                           ),
                         ),

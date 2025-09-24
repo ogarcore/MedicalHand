@@ -26,8 +26,8 @@ class SettingsRow extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(
-                color: AppColors.textColor,
+              style: TextStyle(
+                color: AppColors.textColor(context),
                 fontSize: 14.5,
                 fontWeight: FontWeight.w500,
               ),

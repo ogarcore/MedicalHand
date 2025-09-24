@@ -45,17 +45,18 @@ class LoginForm extends StatelessWidget {
             hintText: 'Ingresa tu contraseña',
             isPassword: true,
             icon: Icons.lock_outline,
-            validator: (value) => AppValidators.validateGenericEmpty(value, 'La contraseña'),
+            validator: (value) =>
+                AppValidators.validateGenericEmpty(value, 'La contraseña'),
           ),
           const SizedBox(height: 6),
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: onForgotPasswordPressed,
-              child: const Text(
+              child: Text(
                 '¿Olvidaste tu contraseña?',
                 style: TextStyle(
-                  color: AppColors.primaryColor,
+                  color: AppColors.primaryColor(context),
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),

@@ -40,7 +40,7 @@ class HistoryCard extends StatelessWidget {
       key: cardKey,
       color: Colors.white.withAlpha(220),
       elevation: 3,
-      shadowColor: AppColors.primaryColor.withAlpha(20),
+      shadowColor: AppColors.primaryColor(context).withAlpha(20),
       margin: const EdgeInsets.only(bottom: 16.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       clipBehavior: Clip.antiAlias,

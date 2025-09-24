@@ -110,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.backgroundColor,
+        backgroundColor: AppColors.backgroundColor(context),
         appBar: const HomeAppBar(),
         body: IndexedStack(index: _currentIndex, children: _pages),
         bottomNavigationBar: MainBottomNavBar(
@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryColor.withAlpha(60),
+                  color: AppColors.primaryColor(context).withAlpha(60),
                   blurRadius: 4,
                   spreadRadius: 1,
                   offset: const Offset(0, 4),
@@ -135,8 +135,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ],
               gradient: LinearGradient(
                 colors: [
-                  AppColors.primaryColor,
-                  AppColors.primaryColor.withAlpha(100),
+                  AppColors.primaryColor(context),
+                  AppColors.primaryColor(context).withAlpha(100),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,

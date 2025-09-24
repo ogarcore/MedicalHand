@@ -73,8 +73,8 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
           ],
         ),
         backgroundColor: success
-            ? AppColors.secondaryColor.withAlpha(220)
-            : AppColors.warningColor,
+            ? AppColors.secondaryColor(context).withAlpha(220)
+            : AppColors.warningColor(context),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         margin: EdgeInsets.only(bottom: 10, left: 20, right: 20),
@@ -95,7 +95,7 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        backgroundColor: AppColors.backgroundColor,
+        backgroundColor: AppColors.backgroundColor(context),
         appBar: AppBar(
           title: const Text(
             'Información Médica',
@@ -105,7 +105,9 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
               fontSize: 20,
             ),
           ),
-          backgroundColor: AppColors.accentColor, // Cambiado a accentColor
+          backgroundColor: AppColors.accentColor(
+            context,
+          ), // Cambiado a accentColor
           elevation: 0,
           iconTheme: const IconThemeData(color: Colors.white),
           centerTitle: true,
@@ -128,12 +130,12 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        AppColors.accentColor.withAlpha(
-                          30,
-                        ), // Cambiado a accentColor
-                        AppColors.accentColor.withAlpha(
-                          15,
-                        ), // Cambiado a accentColor
+                        AppColors.accentColor(
+                          context,
+                        ).withAlpha(30), // Cambiado a accentColor
+                        AppColors.accentColor(
+                          context,
+                        ).withAlpha(15), // Cambiado a accentColor
                       ],
                     ),
                     borderRadius: BorderRadius.circular(20),
@@ -150,17 +152,17 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.accentColor.withAlpha(
-                            40,
-                          ), // Cambiado a accentColor
+                          color: AppColors.accentColor(
+                            context,
+                          ).withAlpha(40), // Cambiado a accentColor
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           HugeIcons.strokeRoundedCovidInfo,
                           size: 40,
-                          color: AppColors.accentColor.withAlpha(
-                            220,
-                          ), // Cambiado a accentColor
+                          color: AppColors.accentColor(
+                            context,
+                          ).withAlpha(220), // Cambiado a accentColor
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -238,19 +240,21 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
                     borderRadius: BorderRadius.circular(14),
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.accentColor, // Cambiado a accentColor
-                        AppColors.accentColor.withAlpha(
-                          220,
+                        AppColors.accentColor(
+                          context,
                         ), // Cambiado a accentColor
+                        AppColors.accentColor(
+                          context,
+                        ).withAlpha(220), // Cambiado a accentColor
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.accentColor.withAlpha(
-                          120,
-                        ), // Cambiado a accentColor
+                        color: AppColors.accentColor(
+                          context,
+                        ).withAlpha(120), // Cambiado a accentColor
                         blurRadius: 15,
                         offset: const Offset(0, 5),
                       ),
@@ -260,7 +264,7 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
                     text: 'Guardar Cambios',
                     onPressed: _handleSave,
                     isLoading: _isLoading,
-                    backgroundColor: AppColors.accentColor,
+                    backgroundColor: AppColors.accentColor(context),
                   ),
                 ),
               ],

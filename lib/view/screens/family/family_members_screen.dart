@@ -32,7 +32,7 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
     final bool isTutorViewing = currentUser?.uid == activeProfile?.uid;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: AppColors.backgroundColor(context),
       appBar: AppBar(
         title: const Text(
           'Gestión de Familiares',
@@ -42,7 +42,7 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
             letterSpacing: -0.5,
           ),
         ),
-        backgroundColor: AppColors.backgroundColor,
+        backgroundColor: AppColors.backgroundColor(context),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         centerTitle: false,
@@ -65,7 +65,7 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
 
           final familyMembers = snapshot.data!;
           return Scaffold(
-            backgroundColor: AppColors.backgroundColor,
+            backgroundColor: AppColors.backgroundColor(context),
             body: ListView.builder(
               padding: const EdgeInsets.fromLTRB(
                 16,
@@ -98,7 +98,7 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
                       HugeIcons.strokeRoundedAddCircleHalfDot,
                       size: 20,
                     ),
-                    backgroundColor: AppColors.primaryColor,
+                    backgroundColor: AppColors.primaryColor(context),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),

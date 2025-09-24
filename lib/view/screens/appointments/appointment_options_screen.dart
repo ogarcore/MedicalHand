@@ -16,7 +16,7 @@ class AppointmentOptionsScreen extends StatelessWidget {
     final isSmallScreen = screenHeight < 700;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: AppColors.backgroundColor(context),
       body: Column(
         children: [
           // AppBar con gradiente elegante
@@ -26,8 +26,8 @@ class AppointmentOptionsScreen extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  AppColors.primaryColor.withAlpha(243),
-                  AppColors.primaryColor.withAlpha(217),
+                  AppColors.primaryColor(context).withAlpha(243),
+                  AppColors.primaryColor(context).withAlpha(217),
                 ],
               ),
               borderRadius: const BorderRadius.vertical(
@@ -35,7 +35,7 @@ class AppointmentOptionsScreen extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryColor.withAlpha(76),
+                  color: AppColors.primaryColor(context).withAlpha(76),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),
@@ -82,34 +82,36 @@ class AppointmentOptionsScreen extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withAlpha(25),
+                            color: AppColors.primaryColor(
+                              context,
+                            ).withAlpha(25),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             HugeIcons.strokeRoundedCalendar01,
-                            color: AppColors.primaryColor,
+                            color: AppColors.primaryColor(context),
                             size: isSmallScreen ? 24 : 28,
                           ),
                         ),
                         SizedBox(height: isSmallScreen ? 8 : 12),
-                        const Text(
+                        Text(
                           '¿Qué tipo de cita necesitas?',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textColor,
+                            color: AppColors.textColor(context),
                           ),
                         ),
                         SizedBox(height: isSmallScreen ? 4 : 6),
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.symmetric(horizontal: 8.0),
                           child: Text(
                             'Selecciona la opción según tu necesidad médica',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 13,
-                              color: AppColors.textLightColor,
+                              color: AppColors.textLightColor(context),
                               height: 1.3,
                             ),
                           ),
@@ -123,8 +125,9 @@ class AppointmentOptionsScreen extends StatelessWidget {
                   // Opciones de cita
                   // Botón 1: Consulta General (SecondaryButton)
                   _buildOptionCard(
+                    context: context,
                     icon: HugeIcons.strokeRoundedDoctor03,
-                    iconColor: AppColors.primaryColor,
+                    iconColor: AppColors.primaryColor(context),
                     title: 'Consulta General',
                     description:
                         'Solicita una cita para consulta externa o atención general',
@@ -156,7 +159,9 @@ class AppointmentOptionsScreen extends StatelessWidget {
                         child: Text(
                           'O',
                           style: TextStyle(
-                            color: AppColors.textLightColor.withAlpha(178),
+                            color: AppColors.textLightColor(
+                              context,
+                            ).withAlpha(178),
                             fontWeight: FontWeight.w500,
                             fontSize: 11,
                           ),
@@ -176,8 +181,9 @@ class AppointmentOptionsScreen extends StatelessWidget {
 
                   // Botón 2: Carril Rápido (PrimaryButton)
                   _buildOptionCard(
+                    context: context,
                     icon: HugeIcons.strokeRoundedHospital02,
-                    iconColor: AppColors.accentColor,
+                    iconColor: AppColors.accentColor(context),
                     title: 'Referencia Externa',
                     description: 'Para usuarios con referencia médica',
                     details: const [
@@ -209,7 +215,9 @@ class AppointmentOptionsScreen extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textLightColor.withAlpha(204),
+                          color: AppColors.textLightColor(
+                            context,
+                          ).withAlpha(204),
                           fontStyle: FontStyle.italic,
                         ),
                       ),
@@ -225,6 +233,7 @@ class AppointmentOptionsScreen extends StatelessWidget {
   }
 
   Widget _buildOptionCard({
+    required BuildContext context,
     required IconData icon,
     required Color iconColor,
     required String title,
@@ -250,7 +259,7 @@ class AppointmentOptionsScreen extends StatelessWidget {
         ],
         border: Border.all(
           color: isHighlighted
-              ? AppColors.accentColor.withAlpha(51)
+              ? AppColors.accentColor(context).withAlpha(51)
               : Colors.transparent,
           width: 1.5,
         ),
@@ -284,7 +293,7 @@ class AppointmentOptionsScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: isSmallScreen ? 16 : 17,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textColor,
+                    color: AppColors.textColor(context),
                   ),
                 ),
               ),
@@ -295,7 +304,7 @@ class AppointmentOptionsScreen extends StatelessWidget {
             description,
             style: TextStyle(
               fontSize: isSmallScreen ? 12 : 13,
-              color: AppColors.textLightColor,
+              color: AppColors.textLightColor(context),
               height: 1.3,
             ),
           ),
@@ -312,7 +321,7 @@ class AppointmentOptionsScreen extends StatelessWidget {
                       child: Icon(
                         Icons.circle,
                         size: 5,
-                        color: AppColors.accentColor,
+                        color: AppColors.accentColor(context),
                       ),
                     ),
                     Expanded(
@@ -320,7 +329,7 @@ class AppointmentOptionsScreen extends StatelessWidget {
                         detail,
                         style: TextStyle(
                           fontSize: isSmallScreen ? 11 : 12,
-                          color: AppColors.textLightColor,
+                          color: AppColors.textLightColor(context),
                           height: 1.3,
                         ),
                       ),
@@ -339,10 +348,10 @@ class AppointmentOptionsScreen extends StatelessWidget {
                 ? SecondaryButton(
                     text: buttonText,
                     onPressed: onPressed,
-                    foregroundColor: AppColors.accentColor,
-                    shadowColor: AppColors.accentColor.withAlpha(30),
-                    side: const BorderSide(
-                      color: AppColors.accentColor,
+                    foregroundColor: AppColors.accentColor(context),
+                    shadowColor: AppColors.accentColor(context).withAlpha(30),
+                    side: BorderSide(
+                      color: AppColors.accentColor(context),
                       width: 1,
                     ),
                   )

@@ -7,6 +7,7 @@ import 'package:p_hn25/data/network/notification_service.dart';
 import 'package:p_hn25/view_model/appointment_view_model.dart';
 import 'package:p_hn25/view_model/family_view_model.dart';
 import 'package:p_hn25/view_model/notification_view_model.dart';
+import 'package:p_hn25/view_model/theme_provider.dart';
 import '../data/network/firebase_storage_service.dart';
 import '../data/network/firebase_auth_service.dart';
 import '../data/models/user_model.dart';
@@ -109,6 +110,10 @@ class AuthViewModel extends ChangeNotifier {
             context,
             listen: false,
           );
+          final themeProvider = Provider.of<ThemeProvider>(
+            context,
+            listen: false,
+          );
 
           final postLoginTasks = <Future>[
             userViewModel.fetchCurrentUser(),
@@ -116,6 +121,7 @@ class AuthViewModel extends ChangeNotifier {
               userViewModel: userViewModel,
               notificationViewModel: notificationViewModel,
             ),
+            themeProvider.loadUserTheme(),
           ];
 
           await Future.wait(postLoginTasks);
@@ -199,6 +205,7 @@ class AuthViewModel extends ChangeNotifier {
       context,
       listen: false,
     );
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('last_active_user_id');
 
@@ -208,11 +215,12 @@ class AuthViewModel extends ChangeNotifier {
         await _firestore.collection('usuarios_movil').doc(user.uid).update({
           'fcmToken': FieldValue.delete(),
         });
-        print('Token FCM borrado para el usuario: ${user.uid}');
       } catch (e) {
         print('Error al borrar el token FCM: $e');
       }
     }
+
+    themeProvider.resetToDefault();
 
     _notificationService.dispose();
     userViewModel.clearUser();
@@ -443,6 +451,10 @@ class AuthViewModel extends ChangeNotifier {
           context,
           listen: false,
         );
+        final themeProvider = Provider.of<ThemeProvider>(
+          context,
+          listen: false,
+        );
         final postLoginTasks = <Future>[
           userViewModel.fetchCurrentUser(),
           SharedPreferences.getInstance().then(
@@ -452,6 +464,7 @@ class AuthViewModel extends ChangeNotifier {
             userViewModel: userViewModel,
             notificationViewModel: notificationViewModel,
           ),
+          themeProvider.loadUserTheme(),
         ];
 
         await Future.wait(postLoginTasks);

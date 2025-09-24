@@ -67,8 +67,8 @@ class _EditPersonalInfoScreenState extends State<EditPersonalInfoScreen> {
           ],
         ),
         backgroundColor: success
-            ? AppColors.secondaryColor.withAlpha(220)
-            : AppColors.warningColor,
+            ? AppColors.secondaryColor(context).withAlpha(220)
+            : AppColors.warningColor(context),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         margin: EdgeInsets.only(bottom: 10, left: 20, right: 20),
@@ -90,7 +90,7 @@ class _EditPersonalInfoScreenState extends State<EditPersonalInfoScreen> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        backgroundColor: AppColors.backgroundColor,
+        backgroundColor: AppColors.backgroundColor(context),
         appBar: AppBar(
           title: const Text(
             'Información Personal',
@@ -100,7 +100,7 @@ class _EditPersonalInfoScreenState extends State<EditPersonalInfoScreen> {
               fontSize: 20,
             ),
           ),
-          backgroundColor: AppColors.accentColor,
+          backgroundColor: AppColors.accentColor(context),
           elevation: 0,
           iconTheme: const IconThemeData(color: Colors.white),
           centerTitle: true,
@@ -123,8 +123,8 @@ class _EditPersonalInfoScreenState extends State<EditPersonalInfoScreen> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        AppColors.accentColor.withAlpha(30),
-                        AppColors.accentColor.withAlpha(15),
+                        AppColors.accentColor(context).withAlpha(30),
+                        AppColors.accentColor(context).withAlpha(15),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(20),
@@ -141,13 +141,13 @@ class _EditPersonalInfoScreenState extends State<EditPersonalInfoScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.accentColor.withAlpha(40),
+                          color: AppColors.accentColor(context).withAlpha(40),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.person_outline_rounded,
                           size: 40,
-                          color: AppColors.accentColor.withAlpha(220),
+                          color: AppColors.accentColor(context).withAlpha(220),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -223,15 +223,15 @@ class _EditPersonalInfoScreenState extends State<EditPersonalInfoScreen> {
                     borderRadius: BorderRadius.circular(14),
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.accentColor,
-                        AppColors.accentColor.withAlpha(220),
+                        AppColors.accentColor(context),
+                        AppColors.accentColor(context).withAlpha(220),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.accentColor.withAlpha(120),
+                        color: AppColors.accentColor(context).withAlpha(120),
                         blurRadius: 15,
                         offset: const Offset(0, 5),
                       ),
@@ -241,7 +241,7 @@ class _EditPersonalInfoScreenState extends State<EditPersonalInfoScreen> {
                     text: 'Guardar Cambios',
                     onPressed: _handleSave,
                     isLoading: _isLoading,
-                    backgroundColor: AppColors.accentColor,
+                    backgroundColor: AppColors.accentColor(context),
                   ),
                 ),
               ],

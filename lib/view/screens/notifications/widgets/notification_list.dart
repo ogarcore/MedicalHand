@@ -17,27 +17,30 @@ class NotificationList extends StatelessWidget {
     required this.notifications,
   });
 
-  Map<String, dynamic> _getNotificationStyle(String type) {
+  Map<String, dynamic> _getNotificationStyle(
+    BuildContext context,
+    String type,
+  ) {
     switch (type) {
       case 'cita_confirmada':
         return {
           'icon': HugeIcons.strokeRoundedCheckmarkCircle02,
-          'color': AppColors.successColor,
+          'color': AppColors.successColor(context),
         };
       case 'solicitud_recibida':
         return {
           'icon': HugeIcons.strokeRoundedSent,
-          'color': AppColors.accentColor,
+          'color': AppColors.accentColor(context),
         };
       case 'recordatorio':
         return {
           'icon': HugeIcons.strokeRoundedAlarmClock,
-          'color': AppColors.warningColor,
+          'color': AppColors.warningColor(context),
         };
       default:
         return {
           'icon': HugeIcons.strokeRoundedNotification01,
-          'color': AppColors.primaryColor,
+          'color': AppColors.primaryColor(context),
         };
     }
   }
@@ -49,14 +52,14 @@ class NotificationList extends StatelessWidget {
     }
 
     if (notifications.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               HugeIcons.strokeRoundedNotificationOff03,
               size: 48,
-              color: AppColors.textLightColor,
+              color: AppColors.textLightColor(context),
             ),
             SizedBox(height: 16),
             Text(
@@ -64,13 +67,13 @@ class NotificationList extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textColor,
+                color: AppColors.textColor(context),
               ),
             ),
             SizedBox(height: 4),
             Text(
               'No tienes notificaciones nuevas.',
-              style: TextStyle(color: AppColors.textLightColor),
+              style: TextStyle(color: AppColors.textLightColor(context)),
             ),
           ],
         ),
@@ -83,7 +86,7 @@ class NotificationList extends StatelessWidget {
       itemCount: notifications.length,
       itemBuilder: (context, index) {
         final notification = notifications[index];
-        final style = _getNotificationStyle(notification.type);
+        final style = _getNotificationStyle(context, notification.type);
         return NotificationTile(
           notification: notification,
           icon: style['icon'] as IconData,

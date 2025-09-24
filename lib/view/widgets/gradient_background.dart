@@ -17,8 +17,8 @@ class GradientBackground extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                AppColors.primaryColor.withAlpha(30),
-                AppColors.backgroundColor,
+                AppColors.primaryColor(context).withAlpha(30),
+                AppColors.backgroundColor(context),
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -33,11 +33,11 @@ class GradientBackground extends StatelessWidget {
             width: size.width * 0.8,
             height: size.width * 0.8,
             decoration: BoxDecoration(
-              color: AppColors.primaryColor.withAlpha(15),
+              color: AppColors.primaryColor(context).withAlpha(15),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryColor.withAlpha(50),
+                  color: AppColors.primaryColor(context).withAlpha(50),
                   blurRadius: 40,
                   spreadRadius: 20,
                 ),
@@ -53,11 +53,11 @@ class GradientBackground extends StatelessWidget {
             width: size.width * 0.65,
             height: size.width * 0.65,
             decoration: BoxDecoration(
-              color: AppColors.primaryColor.withAlpha(10),
+              color: AppColors.primaryColor(context).withAlpha(10),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryColor.withAlpha(80),
+                  color: AppColors.primaryColor(context).withAlpha(80),
                   blurRadius: 50,
                   spreadRadius: 30,
                 ),

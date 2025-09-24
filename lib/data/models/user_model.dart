@@ -17,6 +17,7 @@ class UserModel {
   final String? managedBy;
   final Map<String, dynamic>? verification;
   final Timestamp? createdAt;
+  final Map<String, bool>? notificationPreferences;
 
   UserModel({
     required this.uid,
@@ -34,10 +35,23 @@ class UserModel {
     this.managedBy,
     this.verification,
     this.createdAt,
+    this.notificationPreferences,
   });
 
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+
+    Map<String, bool> prefs = {
+      'reminders': true,
+      'changes': true,
+      'news': true,
+    };
+    if (data['notificationPreferences'] != null) {
+      prefs['reminders'] = data['notificationPreferences']['reminders'] ?? true;
+      prefs['changes'] = data['notificationPreferences']['changes'] ?? true;
+      prefs['news'] = data['notificationPreferences']['news'] ?? true;
+    }
+
     return UserModel(
       uid: doc.id,
       email: data['email'] ?? '',
@@ -56,6 +70,7 @@ class UserModel {
       managedBy: data['managedBy'],
       verification: data['verification'],
       createdAt: data['createdAt'],
+      notificationPreferences: prefs,
     );
   }
 
@@ -80,6 +95,9 @@ class UserModel {
       'isTutor': isTutor,
       'managedBy': managedBy,
       'verification': verification,
+      'notificationPreferences':
+          notificationPreferences ??
+          {'reminders': true, 'changes': true, 'news': true, 'requests': true},
     };
   }
 }

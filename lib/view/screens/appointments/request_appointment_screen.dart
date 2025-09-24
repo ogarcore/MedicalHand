@@ -117,7 +117,7 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(errorMessage),
-          backgroundColor: AppColors.warningColor,
+          backgroundColor: AppColors.warningColor(context),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -209,7 +209,7 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
       child: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Scaffold(
-          backgroundColor: AppColors.backgroundColor,
+          backgroundColor: AppColors.backgroundColor(context),
           appBar: AppBar(
             title: const Text(
               'Solicitar Cita Médica',
@@ -228,8 +228,8 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    AppColors.primaryColor.withAlpha(243),
-                    AppColors.primaryColor.withAlpha(217),
+                    AppColors.primaryColor(context).withAlpha(243),
+                    AppColors.primaryColor(context).withAlpha(217),
                   ],
                 ),
               ),
@@ -247,7 +247,7 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
                     children: [
                       AppointmentProgressIndicator(
                         currentStep: _currentStep,
-                        activeColor: AppColors.primaryColor,
+                        activeColor: AppColors.primaryColor(context),
                       ),
                       Expanded(
                         child: PageView(
@@ -260,15 +260,18 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
                             AppointmentStepLayout(
                               icon: HugeIcons.strokeRoundedLocation04,
                               title: '¿En qué departamento te encuentras?',
-                              subtitle: 'Selecciona tu ubicación para mostrarte los hospital de tu zona',
-                              iconColor: AppColors.primaryColor,
+                              subtitle:
+                                  'Selecciona tu ubicación para mostrarte los hospital de tu zona',
+                              iconColor: AppColors.primaryColor(context),
                               content: AppStyledDropdown(
                                 value: _selectedDepartament,
                                 items: _departmentsList,
                                 hintText: 'Selecciona tú departamento',
                                 prefixIcon: HugeIcons.strokeRoundedLocation04,
-                                iconColor: AppColors.accentColor,
-                                iconBackgroundColor: AppColors.accentColor.withAlpha(30),
+                                iconColor: AppColors.accentColor(context),
+                                iconBackgroundColor: AppColors.accentColor(
+                                  context,
+                                ).withAlpha(30),
                                 onChanged: (value) {
                                   if (value != null) {
                                     setState(() {
@@ -282,22 +285,27 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
                             AppointmentStepLayout(
                               icon: HugeIcons.strokeRoundedHospital01,
                               title: 'Elige tu centro médico',
-                              subtitle: 'Elige el centro médico donde deseas agendar tu cita',
+                              subtitle:
+                                  'Elige el centro médico donde deseas agendar tu cita',
                               content: _buildHospitalsDropdown(),
                             ),
                             AppointmentStepLayout(
                               icon: HugeIcons.strokeRoundedNote,
                               title: 'Cuéntanos sobre tu consulta',
-                              subtitle: 'Describe brevemente el motivo de tu visita médica',
+                              subtitle:
+                                  'Describe brevemente el motivo de tu visita médica',
                               content: CustomTextField(
                                 controller: _reasonController,
                                 focusNode: _reasonFocusNode,
                                 labelText: 'Motivo de la consulta',
-                                hintText: 'Ej: Dolor de cabeza, chequeo general, molestias...',
+                                hintText:
+                                    'Ej: Dolor de cabeza, chequeo general, molestias...',
                                 icon: HugeIcons.strokeRoundedNote,
                                 maxLines: 5,
-                                iconColor: AppColors.accentColor,
-                                focusedBorderColor: AppColors.accentColor,
+                                iconColor: AppColors.accentColor(context),
+                                focusedBorderColor: AppColors.accentColor(
+                                  context,
+                                ),
                               ),
                             ),
                           ],

@@ -19,14 +19,18 @@ class RegistrationLink extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const RegistrationStep1Screen()),
+              MaterialPageRoute(
+                builder: (context) => const RegistrationStep1Screen(),
+              ),
             );
           },
-          style: TextButton.styleFrom(foregroundColor: AppColors.primaryColor),
-          child: const Text(
+          style: TextButton.styleFrom(
+            foregroundColor: AppColors.primaryColor(context),
+          ),
+          child: Text(
             'Regístrate',
             style: TextStyle(
-              color: AppColors.primaryColor,
+              color: AppColors.primaryColor(context),
               fontWeight: FontWeight.bold,
               fontSize: 15,
             ),

@@ -43,7 +43,7 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppColors.backgroundColor,
+        color: AppColors.backgroundColor(context),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -66,10 +66,14 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: AppColors.primaryColor.withOpacity(0.1),
+                    color: AppColors.primaryColor(context).withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, color: AppColors.primaryColor, size: 20),
+                  child: Icon(
+                    icon,
+                    color: AppColors.primaryColor(context),
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -78,10 +82,10 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                     children: [
                       Text(
                         text,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textColor,
+                          color: AppColors.textColor(context),
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -102,7 +106,7 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                       ? Icons.check_circle_rounded
                       : Icons.chevron_right_rounded,
                   color: isSelected
-                      ? AppColors.successColor
+                      ? AppColors.successColor(context)
                       : Colors.grey.shade400,
                   size: 24,
                 ),
@@ -135,21 +139,21 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                           children: [
                             IconButton(
                               onPressed: () => Navigator.pop(context),
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.arrow_back,
-                                color: AppColors.textColor,
+                                color: AppColors.textColor(context),
                                 size: 26.5,
                               ),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
                             ),
                             const SizedBox(width: 8),
-                            const Text(
+                            Text(
                               "Verificación de Identidad",
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textColor,
+                                color: AppColors.textColor(context),
                               ),
                             ),
                           ],
@@ -160,20 +164,20 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                           totalSteps: 5,
                         ),
                         const SizedBox(height: 32),
-                        const Text(
+                        Text(
                           'Protección de tu información',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textColor,
+                            color: AppColors.textColor(context),
                           ),
                         ),
                         const SizedBox(height: 8),
                         RichText(
                           text: TextSpan(
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
-                              color: AppColors.textLightColor,
+                              color: AppColors.textLightColor(context),
                               height: 1.4,
                               fontFamily: 'Poppins',
                             ), // Reemplaza con tu fuente
@@ -186,7 +190,7 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                                 text: 'verificamos tu identidad',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.textColor,
+                                  color: AppColors.textColor(context),
                                 ),
                               ),
                               const TextSpan(
@@ -209,12 +213,12 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                           validator: AppValidators.validateCedula,
                         ),
                         const SizedBox(height: 20),
-                        const Text(
+                        Text(
                           'Documentación requerida',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textColor,
+                            color: AppColors.textColor(context),
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -251,11 +255,13 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                               if (authViewModel.idFrontImage == null ||
                                   authViewModel.idBackImage == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
+                                  SnackBar(
                                     content: Text(
                                       'Por favor, sube las imágenes requeridas.',
                                     ),
-                                    backgroundColor: AppColors.warningColor,
+                                    backgroundColor: AppColors.warningColor(
+                                      context,
+                                    ),
                                   ),
                                 );
                                 return;

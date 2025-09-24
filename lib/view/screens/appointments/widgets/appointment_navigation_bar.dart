@@ -66,20 +66,23 @@ class AppointmentNavigationBar extends StatelessWidget {
                   onPressed: onPreviousPressed,
                   height: 45,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  side: secondarySide ??
-                      const BorderSide(
-                        color: AppColors.primaryColor,
+                  side:
+                      secondarySide ??
+                      BorderSide(
+                        color: AppColors.primaryColor(context),
                         width: 1,
                       ),
                   foregroundColor:
-                      secondaryForegroundColor ?? AppColors.primaryColor,
+                      secondaryForegroundColor ??
+                      AppColors.primaryColor(context),
                   shadowColor: secondaryShadowColor,
                   icon: Icon(
                     HugeIcons.strokeRoundedArrowLeft01,
                     size: 18,
-                    color: secondaryIconColor ??
+                    color:
+                        secondaryIconColor ??
                         secondaryColor ??
-                        AppColors.primaryColor,
+                        AppColors.primaryColor(context),
                   ),
                 ),
               ),
@@ -92,7 +95,9 @@ class AppointmentNavigationBar extends StatelessWidget {
                 onPressed: onNextPressed,
                 height: 45,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                backgroundColor: primaryColor ?? AppColors.primaryColor.withAlpha(230),
+                backgroundColor:
+                    primaryColor ??
+                    AppColors.primaryColor(context).withAlpha(230),
                 icon: currentStep < 2
                     ? Icon(
                         HugeIcons.strokeRoundedArrowRight01,

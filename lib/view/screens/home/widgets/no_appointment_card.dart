@@ -16,14 +16,14 @@ class NoAppointmentCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.primaryColor.withAlpha(70),
-            AppColors.secondaryColor.withAlpha(30),
+            AppColors.primaryColor(context).withAlpha(50),
+            AppColors.secondaryColor(context).withAlpha(50),
           ],
         ),
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(12),
+            color: Colors.black.withAlpha(6),
             blurRadius: 12,
             offset: const Offset(0, 3),
           ),
@@ -35,23 +35,23 @@ class NoAppointmentCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppColors.primaryColor.withAlpha(50),
+              color: AppColors.primaryColor(context).withAlpha(40),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               HugeIcons.strokeRoundedCalendarMinus02,
               size: 32,
-              color: AppColors.secondaryColor,
+              color: AppColors.secondaryColor(context),
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'No tienes citas programadas',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppColors.textColor,
+              color: AppColors.textColor(context),
               letterSpacing: -0.3,
             ),
           ),
@@ -70,8 +70,8 @@ class NoAppointmentCard extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.primaryColor,
-                  AppColors.primaryColor.withAlpha(230),
+                  AppColors.primaryColor(context),
+                  AppColors.primaryColor(context).withAlpha(230),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -79,7 +79,7 @@ class NoAppointmentCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryColor.withAlpha(30),
+                  color: AppColors.primaryColor(context).withAlpha(30),
                   blurRadius: 6,
                   offset: const Offset(0, 3),
                 ),

@@ -61,19 +61,19 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                         children: [
                           IconButton(
                             onPressed: _clearFieldsAndNavigateBack,
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.arrow_back,
-                              color: AppColors.textColor,
+                              color: AppColors.textColor(context),
                               size: 26.5,
                             ),
                           ),
                           const SizedBox(width: 8),
-                          const Text(
+                          Text(
                             "Crear cuenta",
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textColor,
+                              color: AppColors.textColor(context),
                             ),
                           ),
                         ],
@@ -81,12 +81,12 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                       const SizedBox(height: 24),
                       const RegistrationProgressIndicator(currentStep: 1),
                       const SizedBox(height: 32),
-                      const Text(
+                      Text(
                         'Primero, tus datos de acceso',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textColor,
+                          color: AppColors.textColor(context),
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -180,17 +180,21 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                                               strokeWidth: 2,
                                               valueColor:
                                                   AlwaysStoppedAnimation<Color>(
-                                                    AppColors.primaryColor,
+                                                    AppColors.primaryColor(
+                                                      context,
+                                                    ),
                                                   ),
                                             ),
                                           ),
                                           const SizedBox(width: 12),
-                                          const Text(
+                                          Text(
                                             'Cargando...',
                                             style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.w600,
-                                              color: AppColors.textColor,
+                                              color: AppColors.textColor(
+                                                context,
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -224,7 +228,9 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                                                     'Ocurrió un error.',
                                               ),
                                               backgroundColor:
-                                                  AppColors.warningColor,
+                                                  AppColors.warningColor(
+                                                    context,
+                                                  ),
                                             ),
                                           );
                                           return;
@@ -232,9 +238,10 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                                         if (result == 'EXIST') {
                                           scaffoldMessenger.showSnackBar(
                                             SnackBar(
-                                              backgroundColor: AppColors
-                                                  .accentColor
-                                                  .withAlpha(200),
+                                              backgroundColor:
+                                                  AppColors.accentColor(
+                                                    context,
+                                                  ).withAlpha(200),
                                               content: const Text(
                                                 'Esta cuenta ya está registrada. Por favor, inicia sesión.',
                                               ),
@@ -263,12 +270,12 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                                           fit: BoxFit.cover,
                                         ),
                                       ),
-                                      label: const Text(
+                                      label: Text(
                                         'Registrarse con Google',
                                         style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600,
-                                          color: AppColors.textColor,
+                                          color: AppColors.textColor(context),
                                         ),
                                       ),
                                       style: OutlinedButton.styleFrom(
@@ -283,7 +290,9 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                                         ),
                                         side: BorderSide.none,
                                         backgroundColor: Colors.grey.shade200,
-                                        foregroundColor: AppColors.textColor,
+                                        foregroundColor: AppColors.textColor(
+                                          context,
+                                        ),
                                       ),
                                     ),
                             ),
@@ -326,7 +335,9 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                                         viewModel.errorMessage ??
                                             'Error desconocido.',
                                       ),
-                                      backgroundColor: AppColors.warningColor,
+                                      backgroundColor: AppColors.warningColor(
+                                        context,
+                                      ),
                                     ),
                                   );
                                 } else {

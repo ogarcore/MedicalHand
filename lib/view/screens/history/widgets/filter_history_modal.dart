@@ -63,13 +63,16 @@ class _FilterHistoryModalState extends State<FilterHistoryModal> {
             const SizedBox(height: 16),
             Row(
               children: [
-                const Icon(Icons.filter_list_rounded, 
-                    color: AppColors.primaryColor, size: 24),
+                Icon(
+                  Icons.filter_list_rounded,
+                  color: AppColors.primaryColor(context),
+                  size: 24,
+                ),
                 const SizedBox(width: 12),
                 const Text(
                   'Filtrar Historial',
                   style: TextStyle(
-                    fontSize: 20, 
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
@@ -130,8 +133,10 @@ class _FilterHistoryModalState extends State<FilterHistoryModal> {
                         vertical: 14,
                       ),
                     ),
-                    icon: const Icon(Icons.arrow_drop_down_rounded,
-                        color: AppColors.primaryColor),
+                    icon: Icon(
+                      Icons.arrow_drop_down_rounded,
+                      color: AppColors.primaryColor(context),
+                    ),
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ],
@@ -165,10 +170,7 @@ class _FilterHistoryModalState extends State<FilterHistoryModal> {
                         SizedBox(height: 4),
                         Text(
                           'Mostrar únicamente consultas con documentos adjuntos',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey,
-                          ),
+                          style: TextStyle(fontSize: 13, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -182,8 +184,10 @@ class _FilterHistoryModalState extends State<FilterHistoryModal> {
                           withResults = newValue;
                         });
                       },
-                      activeThumbColor: AppColors.primaryColor,
-                      activeTrackColor: AppColors.primaryColor.withAlpha(35),
+                      activeThumbColor: AppColors.primaryColor(context),
+                      activeTrackColor: AppColors.primaryColor(
+                        context,
+                      ).withAlpha(35),
                     ),
                   ),
                 ],
@@ -201,8 +205,8 @@ class _FilterHistoryModalState extends State<FilterHistoryModal> {
                       widget.onResetFilters();
                     },
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primaryColor,
-                      side: BorderSide(color: AppColors.primaryColor),
+                      foregroundColor: AppColors.primaryColor(context),
+                      side: BorderSide(color: AppColors.primaryColor(context)),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -222,7 +226,7 @@ class _FilterHistoryModalState extends State<FilterHistoryModal> {
                       widget.onApplyFilters(selectedSpecialty, withResults);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryColor,
+                      backgroundColor: AppColors.primaryColor(context),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(

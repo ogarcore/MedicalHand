@@ -136,8 +136,8 @@ class AppValidators {
     if (value == null || value.trim().isEmpty) {
       return 'El motivo es obligatorio.';
     }
-    if (value.trim().length < 20) {
-      return 'El motivo debe tener al menos 20 caracteres.';
+    if (value.trim().length < 10) {
+      return 'El motivo debe tener al menos 10 caracteres.';
     }
     return null;
   }

@@ -93,10 +93,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
       minLines: widget.isPassword ? 1 : 1,
       maxLines: widget.isPassword ? 1 : widget.maxLines,
       onChanged: widget.onChanged,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w500,
-        color: AppColors.textColor,
+        color: AppColors.textColor(context),
       ),
       decoration: InputDecoration(
         labelText: widget.labelText,
@@ -109,14 +109,14 @@ class _CustomTextFieldState extends State<CustomTextField> {
         hintStyle: TextStyle(color: Colors.grey[500], fontSize: 16),
         prefixIcon: Icon(
           widget.icon,
-          color: widget.iconColor ?? AppColors.primaryColor,
+          color: widget.iconColor ?? AppColors.primaryColor(context),
           size: 22,
         ),
         suffixIcon: widget.isPassword
             ? IconButton(
                 icon: Icon(
                   _isObscured ? Icons.visibility_off : Icons.visibility,
-                  color: widget.iconColor ?? AppColors.primaryColor,
+                  color: widget.iconColor ?? AppColors.primaryColor(context),
                 ),
                 onPressed: () {
                   setState(() {
@@ -136,7 +136,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(
-            color: widget.focusedBorderColor ?? AppColors.primaryColor,
+            color: widget.focusedBorderColor ?? AppColors.primaryColor(context),
             width: 1.8,
           ),
         ),

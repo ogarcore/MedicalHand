@@ -27,9 +27,7 @@ class CustomModal extends StatelessWidget {
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(20),
       child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: maxWidth ?? 500,
-        ),
+        constraints: BoxConstraints(maxWidth: maxWidth ?? 500),
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -56,8 +54,8 @@ class CustomModal extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        AppColors.primaryColor.withAlpha(230),
-                        AppColors.accentColor.withAlpha(220),
+                        AppColors.primaryColor(context).withAlpha(230),
+                        AppColors.accentColor(context).withAlpha(220),
                       ],
                     ),
                   ),
@@ -71,11 +69,7 @@ class CustomModal extends StatelessWidget {
                             shape: BoxShape.circle,
                             color: Colors.white.withAlpha(30),
                           ),
-                          child: Icon(
-                            icon,
-                            color: Colors.white,
-                            size: 24,
-                          ),
+                          child: Icon(icon, color: Colors.white, size: 24),
                         ),
                       if (icon != null) const SizedBox(width: 18),
                       Expanded(
@@ -108,13 +102,10 @@ class CustomModal extends StatelessWidget {
                     ],
                   ),
                 ),
-                
+
                 // Contenido
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: content,
-                ),
-                
+                Padding(padding: const EdgeInsets.all(20), child: content),
+
                 // Acciones (si existen)
                 if (actions != null && actions!.isNotEmpty)
                   Container(
@@ -123,9 +114,7 @@ class CustomModal extends StatelessWidget {
                       alignment: WrapAlignment.end,
                       spacing: 12,
                       runSpacing: 12,
-                      children: actions!
-                          .map((action) => action)
-                          .toList(),
+                      children: actions!.map((action) => action).toList(),
                     ),
                   ),
               ],
@@ -159,17 +148,17 @@ class ModalButton extends StatelessWidget {
     Color borderColor;
 
     if (isWarning) {
-      backgroundColor = AppColors.warningColor;
+      backgroundColor = AppColors.warningColor(context);
       textColor = Colors.white;
-      borderColor = AppColors.warningColor;
+      borderColor = AppColors.warningColor(context);
     } else if (isPrimary) {
-      backgroundColor = AppColors.accentColor;
+      backgroundColor = AppColors.accentColor(context);
       textColor = Colors.white;
-      borderColor = AppColors.accentColor;
+      borderColor = AppColors.accentColor(context);
     } else {
       backgroundColor = Colors.transparent;
-      textColor = AppColors.textColor;
-      borderColor = AppColors.textLightColor.withAlpha(80);
+      textColor = AppColors.textColor(context);
+      borderColor = AppColors.textLightColor(context).withAlpha(80);
     }
 
     return ElevatedButton(

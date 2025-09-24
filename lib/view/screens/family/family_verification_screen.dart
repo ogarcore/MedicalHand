@@ -39,10 +39,14 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: isSelected ? AppColors.primaryColor.withAlpha(20) : Colors.white,
+        color: isSelected
+            ? AppColors.primaryColor(context).withAlpha(20)
+            : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isSelected ? AppColors.primaryColor : Colors.grey.shade300,
+          color: isSelected
+              ? AppColors.primaryColor(context)
+              : Colors.grey.shade300,
           width: isSelected ? 1.5 : 1,
         ),
         boxShadow: [
@@ -69,13 +73,15 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: isSelected
-                        ? AppColors.primaryColor
-                        : AppColors.primaryColor.withAlpha(20),
+                        ? AppColors.primaryColor(context)
+                        : AppColors.primaryColor(context).withAlpha(20),
                   ),
                   child: Icon(
                     icon,
                     size: 20,
-                    color: isSelected ? Colors.white : AppColors.primaryColor,
+                    color: isSelected
+                        ? Colors.white
+                        : AppColors.primaryColor(context),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -86,8 +92,8 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: isSelected
-                          ? AppColors.primaryColor
-                          : AppColors.textColor,
+                          ? AppColors.primaryColor(context)
+                          : AppColors.textColor(context),
                     ),
                   ),
                 ),
@@ -96,7 +102,7 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
                       ? Icons.check_circle_rounded
                       : Icons.chevron_right_rounded,
                   color: isSelected
-                      ? AppColors.successColor
+                      ? AppColors.successColor(context)
                       : Colors.grey.shade400,
                   size: 22,
                 ),
@@ -113,7 +119,7 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
     final familyViewModel = context.watch<FamilyViewModel>();
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: AppColors.backgroundColor(context),
       appBar: AppBar(
         title: const Text(
           'Verificación de Identidad',
@@ -123,7 +129,7 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
             letterSpacing: -0.5,
           ),
         ),
-        backgroundColor: AppColors.backgroundColor,
+        backgroundColor: AppColors.backgroundColor(context),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         centerTitle: false,
@@ -139,10 +145,10 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withAlpha(15),
+                  color: AppColors.primaryColor(context).withAlpha(15),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: AppColors.primaryColor.withAlpha(40),
+                    color: AppColors.primaryColor(context).withAlpha(40),
                     width: 1,
                   ),
                 ),
@@ -153,12 +159,12 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
                       height: 50,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.primaryColor.withAlpha(30),
+                        color: AppColors.primaryColor(context).withAlpha(30),
                       ),
                       child: Icon(
                         HugeIcons.strokeRoundedShield01,
                         size: 24,
-                        color: AppColors.primaryColor,
+                        color: AppColors.primaryColor(context),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -170,10 +176,10 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
                             widget.isMinor
                                 ? 'Identificación del Menor'
                                 : 'Identificaione del Familiar',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.textColor,
+                              color: AppColors.textColor(context),
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -183,7 +189,7 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
                                 : 'Verifica la identidad de tu familiar',
                             style: TextStyle(
                               fontSize: 13,
-                              color: AppColors.textLightColor,
+                              color: AppColors.textLightColor(context),
                             ),
                           ),
                         ],
@@ -219,7 +225,7 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textColor,
+                  color: AppColors.textColor(context),
                 ),
               ),
               const SizedBox(height: 8),
@@ -227,7 +233,10 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
                 widget.isMinor
                     ? 'Toma una foto de la partida de nacimiento'
                     : 'Toma fotos de ambos lados de la cédula',
-                style: TextStyle(fontSize: 13, color: AppColors.textLightColor),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textLightColor(context),
+                ),
               ),
               const SizedBox(height: 16),
 
@@ -265,13 +274,13 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
                   borderRadius: BorderRadius.circular(16),
                   gradient: LinearGradient(
                     colors: [
-                      AppColors.primaryColor,
-                      AppColors.primaryColor.withAlpha(220),
+                      AppColors.primaryColor(context),
+                      AppColors.primaryColor(context).withAlpha(220),
                     ],
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primaryColor.withAlpha(100),
+                      color: AppColors.primaryColor(context).withAlpha(100),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
@@ -289,7 +298,7 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
                             content: Text(
                               'Por favor, sube la foto del documento.',
                             ),
-                            backgroundColor: AppColors.warningColor,
+                            backgroundColor: AppColors.warningColor(context),
                           ),
                         );
                         return;

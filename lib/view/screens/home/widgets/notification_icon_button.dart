@@ -37,7 +37,7 @@ class NotificationIconButton extends StatelessWidget {
                 onPressed: onPressed,
                 icon: Icon(
                   HugeIcons.strokeRoundedNotification03,
-                  color: AppColors.textColor.withAlpha(204),
+                  color: AppColors.textColor(context).withAlpha(204),
                   size: 25,
                 ),
               ),
@@ -52,7 +52,7 @@ class NotificationIconButton extends StatelessWidget {
                   width: 10,
                   height: 10,
                   decoration: BoxDecoration(
-                    color: AppColors.warningColor,
+                    color: AppColors.warningColor(context),
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 1.5),
                   ),

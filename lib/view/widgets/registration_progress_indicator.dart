@@ -19,7 +19,7 @@ class RegistrationProgressIndicator extends StatelessWidget {
         Text(
           'Paso $currentStep de $totalSteps',
           style: TextStyle(
-            color: AppColors.textColor.withAlpha(150),
+            color: AppColors.textColor(context).withAlpha(150),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -30,8 +30,8 @@ class RegistrationProgressIndicator extends StatelessWidget {
           child: LinearProgressIndicator(
             value: currentStep / totalSteps,
             backgroundColor: Colors.grey[300],
-            valueColor: const AlwaysStoppedAnimation<Color>(
-              AppColors.primaryColor,
+            valueColor: AlwaysStoppedAnimation<Color>(
+              AppColors.primaryColor(context),
             ),
             minHeight: 8,
           ),

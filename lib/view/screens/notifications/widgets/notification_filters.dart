@@ -33,8 +33,8 @@ class NotificationFilters extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppColors.primaryColor.withAlpha(229),
-                    AppColors.primaryColor.withAlpha(178),
+                    AppColors.primaryColor(context).withAlpha(229),
+                    AppColors.primaryColor(context).withAlpha(178),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -82,7 +82,7 @@ class NotificationFilters extends StatelessWidget {
                         curve: Curves.fastOutSlowIn,
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? AppColors.primaryColor
+                              ? AppColors.primaryColor(context)
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(11),
                           gradient: isSelected
@@ -90,8 +90,10 @@ class NotificationFilters extends StatelessWidget {
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
                                   colors: [
-                                    AppColors.primaryColor,
-                                    AppColors.primaryColor.withAlpha(210),
+                                    AppColors.primaryColor(context),
+                                    AppColors.primaryColor(
+                                      context,
+                                    ).withAlpha(210),
                                   ],
                                 )
                               : null,
@@ -103,8 +105,12 @@ class NotificationFilters extends StatelessWidget {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(11),
                           onTap: () => onFilterSelected(index),
-                          splashColor: AppColors.primaryColor.withAlpha(30),
-                          highlightColor: AppColors.primaryColor.withAlpha(40),
+                          splashColor: AppColors.primaryColor(
+                            context,
+                          ).withAlpha(30),
+                          highlightColor: AppColors.primaryColor(
+                            context,
+                          ).withAlpha(40),
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(11),

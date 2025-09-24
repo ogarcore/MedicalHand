@@ -30,24 +30,28 @@ class HistoryCardDetails extends StatelessWidget {
           const Divider(height: 1, color: Colors.grey),
           const SizedBox(height: 16),
           _buildDetailRow(
+            context,
             HugeIcons.strokeRoundedStethoscope,
             'Especialidad',
             specialty,
           ),
           const SizedBox(height: 16),
           _buildDetailRow(
+            context,
             HugeIcons.strokeRoundedDoctor01,
             'Médico tratante',
             doctor,
           ),
           const SizedBox(height: 16),
           _buildDetailRow(
+            context,
             HugeIcons.strokeRoundedHealth,
             'Diagnóstico',
             diagnosis,
           ),
           const SizedBox(height: 16),
           _buildDetailRow(
+            context,
             HugeIcons.strokeRoundedGivePill,
             'Tratamiento indicado',
             prescription,
@@ -60,7 +64,12 @@ class HistoryCardDetails extends StatelessWidget {
   }
 
   // --- MÉTODOS DE TU CÓDIGO ORIGINAL ---
-  Widget _buildDetailRow(IconData icon, String label, String value) {
+  Widget _buildDetailRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -68,10 +77,10 @@ class HistoryCardDetails extends StatelessWidget {
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: AppColors.primaryColor.withAlpha(35),
+            color: AppColors.primaryColor(context).withAlpha(35),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: AppColors.primaryColor, size: 20),
+          child: Icon(icon, color: AppColors.primaryColor(context), size: 20),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -89,10 +98,10 @@ class HistoryCardDetails extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textColor,
+                  color: AppColors.textColor(context),
                 ),
               ),
             ],
@@ -117,12 +126,12 @@ class HistoryCardDetails extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AppColors.primaryColor.withAlpha(35),
+                color: AppColors.primaryColor(context).withAlpha(35),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
+              child: Icon(
                 HugeIcons.strokeRoundedMicroscope,
-                color: AppColors.primaryColor,
+                color: AppColors.primaryColor(context),
                 size: 20,
               ),
             ),
@@ -150,9 +159,9 @@ class HistoryCardDetails extends StatelessWidget {
                     ),
                     child: Text(
                       labResults,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.textColor,
+                        color: AppColors.textColor(context),
                         height: 1.4,
                       ),
                     ),
@@ -188,7 +197,7 @@ class HistoryCardDetails extends StatelessWidget {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryColor,
+          backgroundColor: AppColors.primaryColor(context),
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
           shape: RoundedRectangleBorder(
@@ -213,18 +222,18 @@ class HistoryCardDetails extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 HugeIcons.strokeRoundedDownload01,
                 size: 40,
-                color: AppColors.primaryColor,
+                color: AppColors.primaryColor(context),
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Descargar Resultados',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textColor,
+                  color: AppColors.textColor(context),
                 ),
               ),
               const SizedBox(height: 8),
@@ -285,17 +294,17 @@ class HistoryCardDetails extends StatelessWidget {
         width: 50,
         height: 50,
         decoration: BoxDecoration(
-          color: AppColors.primaryColor.withAlpha(40),
+          color: AppColors.primaryColor(context).withAlpha(40),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(icon, color: AppColors.primaryColor, size: 24),
+        child: Icon(icon, color: AppColors.primaryColor(context), size: 24),
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          color: AppColors.textColor,
+          color: AppColors.textColor(context),
         ),
       ),
       subtitle: Text(
@@ -305,12 +314,12 @@ class HistoryCardDetails extends StatelessWidget {
       trailing: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: AppColors.primaryColor.withAlpha(40),
+          color: AppColors.primaryColor(context).withAlpha(40),
           shape: BoxShape.circle,
         ),
-        child: const Icon(
+        child: Icon(
           HugeIcons.strokeRoundedDownload01,
-          color: AppColors.primaryColor,
+          color: AppColors.primaryColor(context),
           size: 20,
         ),
       ),
@@ -319,7 +328,7 @@ class HistoryCardDetails extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Descargando $title...'),
-            backgroundColor: AppColors.primaryColor,
+            backgroundColor: AppColors.primaryColor(context),
             duration: const Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(

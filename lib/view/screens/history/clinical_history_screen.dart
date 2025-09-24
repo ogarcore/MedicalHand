@@ -119,12 +119,12 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: AppColors.backgroundColor(context),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             automaticallyImplyLeading: false,
-            backgroundColor: AppColors.backgroundColor,
+            backgroundColor: AppColors.backgroundColor(context),
             surfaceTintColor: Colors.transparent,
             pinned: true,
             floating: true,
@@ -135,12 +135,12 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   'Mi Historial Clínico',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textColor,
+                    color: AppColors.textColor(context),
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -149,7 +149,7 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.normal,
-                    color: AppColors.textLightColor,
+                    color: AppColors.textLightColor(context),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -168,7 +168,7 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.primaryColor,
+                          color: AppColors.primaryColor(context),
                         ),
                       ),
                     ),
@@ -176,7 +176,7 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
                   IconButton(
                     icon: Icon(
                       HugeIcons.strokeRoundedFilter,
-                      color: AppColors.primaryColor,
+                      color: AppColors.primaryColor(context),
                       size: 26,
                     ),
                     onPressed: _showFilterDialog,

@@ -37,7 +37,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: AppColors.backgroundColor(context),
       appBar: AppBar(
         title: const Text(
           'Mi Perfil',
@@ -47,19 +47,19 @@ class ProfileScreen extends StatelessWidget {
             letterSpacing: -0.5,
           ),
         ),
-        backgroundColor: AppColors.backgroundColor,
+        backgroundColor: AppColors.backgroundColor(context),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         centerTitle: false,
-        iconTheme: const IconThemeData(color: AppColors.textColor),
+        iconTheme: IconThemeData(color: AppColors.textColor(context)),
       ),
       body: Consumer<UserViewModel>(
         builder: (context, userViewModel, child) {
           if (userViewModel.isLoading && userViewModel.currentUser == null) {
-            return const Center(
+            return Center(
               child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  AppColors.primaryColor,
+                  AppColors.primaryColor(context),
                 ),
               ),
             );

@@ -77,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   messenger.showSnackBar(
                     SnackBar(
                       content: Text(error),
-                      backgroundColor: AppColors.warningColor,
+                      backgroundColor: AppColors.warningColor(context),
                     ),
                   );
                 }
@@ -112,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
         messenger.showSnackBar(
           SnackBar(
             content: Text(authViewModel.errorMessage ?? 'Error'),
-            backgroundColor: AppColors.warningColor,
+            backgroundColor: AppColors.warningColor(context),
           ),
         );
       }
@@ -138,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(authViewModel.errorMessage!),
-          backgroundColor: AppColors.warningColor,
+          backgroundColor: AppColors.warningColor(context),
         ),
       );
     }

@@ -18,8 +18,8 @@ class FamilyMemberCard extends StatelessWidget {
     return HugeIcons.strokeRoundedUser;
   }
 
-  Color get _getIconColor {
-    return AppColors.primaryColor;
+  Color _getIconColor(BuildContext context) {
+    return AppColors.primaryColor(context);
   }
 
   @override
@@ -59,8 +59,8 @@ class FamilyMemberCard extends StatelessWidget {
               );
             },
             borderRadius: BorderRadius.circular(16),
-            splashColor: AppColors.primaryColor.withAlpha(40),
-            highlightColor: AppColors.primaryColor.withAlpha(20),
+            splashColor: AppColors.primaryColor(context).withAlpha(40),
+            highlightColor: AppColors.primaryColor(context).withAlpha(20),
             child: Padding(
               padding: const EdgeInsets.all(18.0),
               child: Row(
@@ -71,19 +71,23 @@ class FamilyMemberCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          _getIconColor.withAlpha(40),
-                          _getIconColor.withAlpha(60),
+                          _getIconColor(context).withAlpha(40),
+                          _getIconColor(context).withAlpha(60),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: _getIconColor.withAlpha(100),
+                        color: _getIconColor(context).withAlpha(100),
                         width: 2,
                       ),
                     ),
-                    child: Icon(_getIcon, size: 24, color: _getIconColor),
+                    child: Icon(
+                      _getIcon,
+                      size: 24,
+                      color: _getIconColor(context),
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -92,10 +96,10 @@ class FamilyMemberCard extends StatelessWidget {
                       children: [
                         Text(
                           '${member.firstName} ${member.lastName}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textColor,
+                            color: AppColors.textColor(context),
                             letterSpacing: -0.3,
                           ),
                           maxLines: 1,
@@ -110,15 +114,15 @@ class FamilyMemberCard extends StatelessWidget {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                _getIconColor.withAlpha(30),
-                                _getIconColor.withAlpha(50),
+                                _getIconColor(context).withAlpha(30),
+                                _getIconColor(context).withAlpha(50),
                               ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: _getIconColor.withAlpha(80),
+                              color: _getIconColor(context).withAlpha(80),
                               width: 1,
                             ),
                           ),
@@ -127,7 +131,7 @@ class FamilyMemberCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: _getIconColor,
+                              color: _getIconColor(context),
                             ),
                           ),
                         ),

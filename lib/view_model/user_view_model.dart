@@ -103,6 +103,24 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateNotificationPreference(String key, bool value) async {
+    if (currentUser == null) return;
+
+    // Actualiza el modelo local para que la UI reaccione inmediatamente
+    currentUser!.notificationPreferences?[key] = value;
+    notifyListeners();
+
+    try {
+      final userRef = _firestore
+          .collection('usuarios_movil')
+          .doc(currentUser!.uid);
+      await userRef.update({'notificationPreferences.$key': value});
+    } catch (e) {
+      currentUser!.notificationPreferences?[key] = !value;
+      notifyListeners();
+    }
+  }
+
   void clearUser() {
     _currentUser = null;
     _activeProfile = null;

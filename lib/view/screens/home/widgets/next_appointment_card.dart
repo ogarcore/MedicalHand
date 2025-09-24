@@ -42,8 +42,8 @@ class NextAppointmentCard extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.primaryColor,
-                  AppColors.primaryColor.withAlpha(204),
+                  AppColors.primaryColor(context),
+                  AppColors.primaryColor(context).withAlpha(204),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -81,24 +81,28 @@ class NextAppointmentCard extends StatelessWidget {
               children: [
                 // Los datos ahora son dinámicos
                 _buildInfoRow(
+                  context,
                   HugeIcons.strokeRoundedMicroscope,
                   'Especialidad',
                   appointment.specialty ?? 'Consulta General',
                 ),
                 const SizedBox(height: 12),
                 _buildInfoRow(
+                  context,
                   HugeIcons.strokeRoundedHospital01,
                   'Hospital',
                   appointment.hospital,
                 ),
                 const SizedBox(height: 12),
                 _buildInfoRow(
+                  context,
                   HugeIcons.strokeRoundedHospitalBed01,
                   'Consultorio',
                   appointment.clinicOffice ?? 'Por Asignar',
                 ),
                 const SizedBox(height: 12),
                 _buildInfoRow(
+                  context,
                   HugeIcons.strokeRoundedDateTime,
                   'Fecha y Hora',
                   _formatFullDate(),
@@ -112,7 +116,12 @@ class NextAppointmentCard extends StatelessWidget {
   }
 
   // Fila de información
-  Widget _buildInfoRow(IconData icon, String label, String value) {
+  Widget _buildInfoRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -120,10 +129,10 @@ class NextAppointmentCard extends StatelessWidget {
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: AppColors.primaryColor.withAlpha(20),
+            color: AppColors.primaryColor(context).withAlpha(20),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: AppColors.primaryColor, size: 16),
+          child: Icon(icon, color: AppColors.primaryColor(context), size: 16),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -141,10 +150,10 @@ class NextAppointmentCard extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textColor,
+                  color: AppColors.textColor(context),
                 ),
               ),
             ],

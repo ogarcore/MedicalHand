@@ -33,10 +33,10 @@ class EmptyStateWidget extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textColor,
+                color: AppColors.textColor(context),
               ),
             ),
             const SizedBox(height: 12),
@@ -56,14 +56,17 @@ class EmptyStateWidget extends StatelessWidget {
                 icon: const Icon(HugeIcons.strokeRoundedAdd01, size: 20),
                 label: Text(buttonText!),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryColor,
+                  backgroundColor: AppColors.primaryColor(context),
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-              )
+              ),
             ],
           ],
         ),

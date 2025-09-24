@@ -28,9 +28,9 @@ class AppStyledDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveIconColor = iconColor ?? AppColors.primaryColor;
+    final effectiveIconColor = iconColor ?? AppColors.primaryColor(context);
     final effectiveIconBg =
-        iconBackgroundColor ?? AppColors.primaryColor.withAlpha(25);
+        iconBackgroundColor ?? AppColors.primaryColor(context).withAlpha(25);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,7 +49,7 @@ class AppStyledDropdown extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primaryColor.withAlpha(25),
+                color: AppColors.primaryColor(context).withAlpha(25),
                 blurRadius: 15,
                 spreadRadius: 2,
                 offset: const Offset(0, 4),
@@ -70,18 +70,19 @@ class AppStyledDropdown extends StatelessWidget {
                       constraints: const BoxConstraints(minWidth: 100),
                       child: Text(
                         v,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.textColor,
+                          color: AppColors.textColor(context),
                         ),
                         overflow: TextOverflow.ellipsis,
-                        maxLines: 2, // Permite hasta 2 líneas para textos largos
+                        maxLines:
+                            2, // Permite hasta 2 líneas para textos largos
                       ),
                     ),
                   );
                 }).toList(),
-                
+
                 selectedItemBuilder: (BuildContext context) {
                   return items.map<Widget>((String item) {
                     return Container(
@@ -89,13 +90,14 @@ class AppStyledDropdown extends StatelessWidget {
                       constraints: const BoxConstraints(minWidth: 100),
                       child: Text(
                         item,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.textColor,
+                          color: AppColors.textColor(context),
                         ),
                         overflow: TextOverflow.ellipsis,
-                        maxLines: 1, // Para el campo seleccionado, solo una línea con puntos suspensivos
+                        maxLines:
+                            1, // Para el campo seleccionado, solo una línea con puntos suspensivos
                       ),
                     );
                   }).toList();
@@ -134,14 +136,14 @@ class AppStyledDropdown extends StatelessWidget {
                         ),
                       )
                     : const SizedBox.shrink(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textColor,
+                  color: AppColors.textColor(context),
                 ),
                 borderRadius: BorderRadius.circular(16),
                 isExpanded: true,
-                menuMaxHeight: 300, 
+                menuMaxHeight: 300,
                 elevation: 8,
               ),
             ),

@@ -36,8 +36,8 @@ class VerificationScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              AppColors.primaryColor.withAlpha(25),
-                              AppColors.primaryColor.withAlpha(10),
+                              AppColors.primaryColor(context).withAlpha(25),
+                              AppColors.primaryColor(context).withAlpha(10),
                             ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
@@ -47,7 +47,7 @@ class VerificationScreen extends StatelessWidget {
                         child: Icon(
                           Icons.mark_email_read_outlined,
                           size: size.width * 0.18,
-                          color: AppColors.primaryColor,
+                          color: AppColors.primaryColor(context),
                         ),
                       ),
 
@@ -60,7 +60,7 @@ class VerificationScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textColor,
+                          color: AppColors.textColor(context),
                           letterSpacing: -0.8,
                         ),
                       ),
@@ -77,7 +77,7 @@ class VerificationScreen extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,
-                            color: AppColors.textColor.withAlpha(180),
+                            color: AppColors.textColor(context).withAlpha(180),
                             height: 1.5,
                             fontWeight: FontWeight.w400,
                           ),
@@ -91,10 +91,12 @@ class VerificationScreen extends StatelessWidget {
                         width: double.infinity,
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryColor.withAlpha(5),
+                          color: AppColors.primaryColor(context).withAlpha(5),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: AppColors.primaryColor.withAlpha(25),
+                            color: AppColors.primaryColor(
+                              context,
+                            ).withAlpha(25),
                             width: 1,
                           ),
                         ),
@@ -106,7 +108,7 @@ class VerificationScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.primaryColor,
+                                color: AppColors.primaryColor(context),
                                 letterSpacing: 0.3,
                               ),
                             ),
@@ -116,7 +118,9 @@ class VerificationScreen extends StatelessWidget {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 14,
-                                color: AppColors.textColor.withAlpha(128),
+                                color: AppColors.textColor(
+                                  context,
+                                ).withAlpha(128),
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
@@ -131,11 +135,13 @@ class VerificationScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           _buildStepIndicator(
+                            context: context,
                             icon: Icons.inbox_outlined,
                             text: 'Bandeja de entrada',
                           ),
                           SizedBox(width: 24),
                           _buildStepIndicator(
+                            context: context,
                             icon: Icons.folder_outlined,
                             text: 'Carpeta spam',
                           ),
@@ -156,7 +162,7 @@ class VerificationScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primaryColor.withAlpha(76),
+                      color: AppColors.primaryColor(context).withAlpha(76),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
                     ),
@@ -173,7 +179,7 @@ class VerificationScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor,
+                    backgroundColor: AppColors.primaryColor(context),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
@@ -198,24 +204,28 @@ class VerificationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStepIndicator({required IconData icon, required String text}) {
+  Widget _buildStepIndicator({
+    required BuildContext context,
+    required IconData icon,
+    required String text,
+  }) {
     return Column(
       children: [
         Container(
           width: 50,
           height: 50,
           decoration: BoxDecoration(
-            color: AppColors.primaryColor.withAlpha(25),
+            color: AppColors.primaryColor(context).withAlpha(25),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: AppColors.primaryColor, size: 22),
+          child: Icon(icon, color: AppColors.primaryColor(context), size: 22),
         ),
         SizedBox(height: 8),
         Text(
           text,
           style: TextStyle(
             fontSize: 12,
-            color: AppColors.textColor.withAlpha(153),
+            color: AppColors.textColor(context).withAlpha(153),
             fontWeight: FontWeight.w500,
           ),
         ),
