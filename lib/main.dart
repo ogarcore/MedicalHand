@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:p_hn25/view_model/appointment_view_model.dart';
 import 'package:p_hn25/view_model/auth_view_model.dart';
 import 'package:p_hn25/view_model/family_view_model.dart';
+import 'package:p_hn25/view_model/history_view_model.dart';
 import 'package:p_hn25/view_model/notification_view_model.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
@@ -14,9 +15,12 @@ import 'view_model/splash_view_model.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:p_hn25/view_model/theme_provider.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await initializeDateFormatting('es_ES', null);
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -51,6 +55,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UserViewModel()),
         ChangeNotifierProvider(create: (_) => FamilyViewModel()),
         ChangeNotifierProvider(create: (_) => NotificationViewModel()),
+        ChangeNotifierProvider(create: (_) => HistoryViewModel()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {

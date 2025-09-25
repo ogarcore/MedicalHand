@@ -155,62 +155,69 @@ class _AppointmentCardState extends State<AppointmentCard> {
     final cita = widget.appointment;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16.0),
+      margin: const EdgeInsets.only(bottom: 12.0),
       decoration: BoxDecoration(
         color: Colors.white.withAlpha(220),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
             color: AppColors.primaryColor(context).withAlpha(10),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
             spreadRadius: 1,
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(14.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header compacto
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 32.0),
-                    child: Text(
-                      cita.specialty ?? 'Consulta General',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textColor(context),
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                  child: Text(
+                    cita.specialty ?? 'Consulta Externa',
+                    style: TextStyle(
+                      fontSize: 16.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textColor(context),
+                      height: 1.2,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                const SizedBox(width: 8),
                 _buildStatusChip(cita.status),
               ],
             ),
-            const SizedBox(height: 12),
+
+            const SizedBox(height: 10),
+
+            // Línea divisoria más delgada
             Container(
-              height: 3,
-              width: 40,
+              height: 2,
+              width: 32,
               decoration: BoxDecoration(
                 color: AppColors.primaryColor(context).withAlpha(170),
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(1),
               ),
             ),
-            const SizedBox(height: 12),
+
+            const SizedBox(height: 10),
+
+            // Contenido compacto
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Icono más compacto
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 36,
+                  height: 36,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
@@ -220,101 +227,65 @@ class _AppointmentCardState extends State<AppointmentCard> {
                         AppColors.primaryColor(context).withAlpha(170),
                       ],
                     ),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(9),
                   ),
                   child: const Icon(
                     HugeIcons.strokeRoundedHospital01,
                     color: Colors.white,
-                    size: 20,
+                    size: 18,
                   ),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
+
+                // Información compacta
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Hospital
                       Text(
                         cita.hospital,
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textColor(context),
+                          height: 1.2,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Icon(
-                            HugeIcons.strokeRoundedCalendar01,
-                            size: 14,
-                            color: AppColors.primaryColor(context),
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              _formatDate(),
-                              style: TextStyle(
-                                fontSize: 13.5,
-                                color: Colors.grey[700],
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
+
+                      const SizedBox(height: 8),
+
+                      // Fecha
+                      _buildInfoRow(
+                        HugeIcons.strokeRoundedCalendar01,
+                        _formatDate(),
                       ),
+
+                      // Doctor (solo para citas pasadas)
                       if (!widget.isUpcoming) ...[
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            Icon(
-                              HugeIcons.strokeRoundedDoctor01,
-                              size: 14,
-                              color: AppColors.primaryColor(context),
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                cita.assignedDoctor ?? 'Por Asignar',
-                                style: TextStyle(
-                                  fontSize: 13.5,
-                                  color: Colors.grey[700],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
+                        const SizedBox(height: 4),
+                        _buildInfoRow(
+                          HugeIcons.strokeRoundedDoctor01,
+                          cita.assignedDoctor ?? 'Por Asignar',
+                          maxLines: 1,
                         ),
                       ],
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Icon(
-                            HugeIcons.strokeRoundedHospitalBed01,
-                            size: 14,
-                            color: AppColors.primaryColor(context),
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              cita.clinicOffice ?? 'Por Asignar',
-                              style: TextStyle(
-                                fontSize: 13.5,
-                                color: Colors.grey[700],
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
+
+                      // Consultorio
+                      const SizedBox(height: 4),
+                      _buildInfoRow(
+                        HugeIcons.strokeRoundedHospitalBed01,
+                        cita.clinicOffice ?? 'Por Asignar',
                       ),
                     ],
                   ),
                 ),
               ],
             ),
+
+            // Sección de opciones (si aplica)
             if (showOptions) _buildOptionsSection(),
           ],
         ),
@@ -322,21 +293,43 @@ class _AppointmentCardState extends State<AppointmentCard> {
     );
   }
 
+  Widget _buildInfoRow(IconData icon, String text, {int maxLines = 2}) {
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: AppColors.primaryColor(context)),
+        const SizedBox(width: 5),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 13.5,
+              color: Colors.grey[700],
+              fontWeight: FontWeight.w500,
+              height: 1.3,
+            ),
+            maxLines: maxLines,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildOptionsSection() {
     return Column(
       children: [
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         Align(
           alignment: Alignment.centerRight,
           child: Material(
             color: Colors.transparent,
             child: InkWell(
               onTap: () => setState(() => _isExpanded = !_isExpanded),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  vertical: 8.0,
-                  horizontal: 12,
+                  vertical: 6.0,
+                  horizontal: 10,
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -344,18 +337,18 @@ class _AppointmentCardState extends State<AppointmentCard> {
                     Text(
                       "Opciones",
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: AppColors.accentColor(context).withAlpha(220),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 6),
                     AnimatedRotation(
                       duration: const Duration(milliseconds: 300),
                       turns: _isExpanded ? 0.5 : 0,
                       child: Icon(
                         HugeIcons.strokeRoundedArrowDownDouble,
-                        size: 18,
+                        size: 16,
                         color: AppColors.accentColor(context).withAlpha(200),
                       ),
                     ),
@@ -373,9 +366,9 @@ class _AppointmentCardState extends State<AppointmentCard> {
               if (_isExpanded)
                 Padding(
                   padding: const EdgeInsets.only(
-                    top: 12.0,
-                    right: 15,
-                    left: 15,
+                    top: 10.0,
+                    right: 12,
+                    left: 12,
                   ),
                   child: Row(
                     children: [
@@ -387,9 +380,9 @@ class _AppointmentCardState extends State<AppointmentCard> {
                               context,
                             ).withAlpha(170),
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 1),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                             elevation: 1,
                             shadowColor: AppColors.accentColor(
@@ -400,21 +393,21 @@ class _AppointmentCardState extends State<AppointmentCard> {
                             "Reprogramar",
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
-                              fontSize: 13.5,
+                              fontSize: 12.5,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 20),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: _cancelAppointment,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white.withAlpha(20),
                             foregroundColor: AppColors.warningColor(context),
-                            padding: const EdgeInsets.symmetric(vertical: 1),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(10),
                               side: BorderSide(
                                 color: AppColors.warningColor(context),
                                 width: 1.2,
@@ -423,10 +416,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
                             elevation: 0,
                           ),
                           child: const Text(
-                            "Cancelar cita",
+                            "Cancelar",
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
-                              fontSize: 13.5,
+                              fontSize: 12.5,
                             ),
                           ),
                         ),
@@ -483,22 +476,22 @@ class _AppointmentCardState extends State<AppointmentCard> {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: textColor),
-          const SizedBox(width: 4),
+          Icon(icon, size: 12, color: textColor),
+          const SizedBox(width: 3),
           Text(
             displayStatus,
             style: TextStyle(
               color: textColor,
               fontWeight: FontWeight.w600,
-              fontSize: 11,
+              fontSize: 10,
             ),
           ),
         ],

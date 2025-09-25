@@ -8,21 +8,21 @@ class EmptyHistoryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Tu código de _buildEmptyState va aquí, sin cambios.
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Padding(padding: const EdgeInsets.only(top: 120.0)),
           Container(
-            width: 120,
-            height: 120,
+            width: 100,
+            height: 100,
             decoration: BoxDecoration(
               color: AppColors.primaryColor(context).withAlpha(25),
               shape: BoxShape.circle,
             ),
             child: Icon(
               HugeIcons.strokeRoundedFolderFavourite,
-              size: 60,
+              size: 50,
               color: AppColors.primaryColor(context),
             ),
           ),
@@ -42,21 +42,6 @@ class EmptyHistoryView extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 32),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryColor(context),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text(
-              'Solicitar historial',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-          ),
         ],
       ),
     );
