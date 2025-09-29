@@ -89,74 +89,70 @@ class AuthViewModel extends ChangeNotifier {
     setErrorMessage(null);
 
     try {
+      // 1. Autenticación con Google (este es el único paso que debe esperar el usuario)
       final User? user = await _authService.signInWithGoogle();
 
       if (user == null) {
         setLoading(false);
+        return null; // El usuario canceló
+      }
+
+      // 2. Verificamos si el usuario ya tiene un documento en Firestore.
+      //    Esto es más rápido que tu consulta anterior.
+      final bool userExists = await _authService.doesUserExist(user.uid);
+
+      if (!userExists) {
+        // Este es un caso raro: el usuario se autenticó pero no está en la base de datos.
+        // Lo mejor es desloguearlo y pedirle que se registre.
+        setErrorMessage(
+          'Este correo no se encuentra registrado. Por favor, crea una cuenta.',
+        );
+        await _authService.signOut();
+        setLoading(false);
         return null;
       }
 
-      final provider = await _authService.getAuthProviderFromFirestore(
-        user.email!,
-      );
+      // 3. ¡Éxito! Guardamos el ID de usuario y navegamos INMEDIATAMENTE.
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('last_active_user_id', user.uid);
 
-      switch (provider) {
-        case 'google.com':
-          final userViewModel = Provider.of<UserViewModel>(
-            context,
-            listen: false,
-          );
-          final notificationViewModel = Provider.of<NotificationViewModel>(
-            context,
-            listen: false,
-          );
-          final themeProvider = Provider.of<ThemeProvider>(
-            context,
-            listen: false,
-          );
-
-          final postLoginTasks = <Future>[
-            userViewModel.fetchCurrentUser(),
-            _notificationService.initNotifications(
-              userViewModel: userViewModel,
-              notificationViewModel: notificationViewModel,
-            ),
-            themeProvider.loadUserTheme(),
-          ];
-
-          await Future.wait(postLoginTasks);
-
-          final currentUser = userViewModel.currentUser;
-          if (currentUser != null) {
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setString('last_active_user_id', currentUser.uid);
-          }
-
-          setLoading(false);
-          return 'HOME';
-
-        case 'password':
-          setErrorMessage(
-            'Ese correo ya está registrado con contraseña. Por favor, inicia sesión con tu contraseña.',
-          );
-          await _authService.signOut();
-          setLoading(false);
-          return null;
-
-        default:
-          setErrorMessage(
-            'Este correo no se encuentra registrado. Por favor, crea una cuenta.',
-          );
-          await _authService.signOut();
-          setLoading(false);
-          return null;
-      }
+      setLoading(false);
+      return 'HOME'; // Navegamos sin esperar a cargar el resto de los datos
     } on FirebaseAuthException {
       setErrorMessage(
         'Ocurrió un error al intentar iniciar sesión con Google.',
       );
       setLoading(false);
       return null;
+    }
+  }
+
+  /// NUEVO MÉTODO: Tareas que se ejecutan en segundo plano DESPUÉS de navegar
+  Future<void> performPostLoginTasks(BuildContext context) async {
+    // Usamos 'try-catch' para manejar errores sin bloquear la UI
+    try {
+      final userViewModel = Provider.of<UserViewModel>(context, listen: false);
+      final notificationViewModel = Provider.of<NotificationViewModel>(
+        context,
+        listen: false,
+      );
+      final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+
+      // Creamos la lista de tareas que se ejecutarán en paralelo
+      final postLoginTasks = <Future>[
+        userViewModel.fetchCurrentUser(),
+        _notificationService.initNotifications(
+          userViewModel: userViewModel,
+          notificationViewModel: notificationViewModel,
+        ),
+        themeProvider.loadUserTheme(),
+      ];
+
+      // Esperamos a que todas las tareas terminen
+      await Future.wait(postLoginTasks);
+    } catch (e) {
+      print("Error ejecutando tareas post-login: $e");
+      // Opcional: Mostrar un SnackBar o mensaje de error no intrusivo
     }
   }
 
@@ -443,35 +439,15 @@ class AuthViewModel extends ChangeNotifier {
       }
 
       if (user != null) {
-        final userViewModel = Provider.of<UserViewModel>(
-          context,
-          listen: false,
-        );
-        final notificationViewModel = Provider.of<NotificationViewModel>(
-          context,
-          listen: false,
-        );
-        final themeProvider = Provider.of<ThemeProvider>(
-          context,
-          listen: false,
-        );
-        final postLoginTasks = <Future>[
-          userViewModel.fetchCurrentUser(),
-          SharedPreferences.getInstance().then(
-            (prefs) => prefs.setString('last_active_user_id', user.uid),
-          ),
-          _notificationService.initNotifications(
-            userViewModel: userViewModel,
-            notificationViewModel: notificationViewModel,
-          ),
-          themeProvider.loadUserTheme(),
-        ];
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('last_active_user_id', user.uid);
 
-        await Future.wait(postLoginTasks);
+        setLoading(false);
+        return true;
       }
 
       setLoading(false);
-      return user != null;
+      return false;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
         setErrorMessage('La contraseña es incorrecta.');

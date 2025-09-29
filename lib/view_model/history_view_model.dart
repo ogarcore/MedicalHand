@@ -74,6 +74,7 @@ class HistoryViewModel extends ChangeNotifier {
 
       return allConsultations;
     } on FirebaseException catch (e) {
+      print(e);
       throw Exception("No se pudo cargar el historial. Inténtalo de nuevo.");
     } catch (e) {
       throw Exception("Ocurrió un error inesperado.");

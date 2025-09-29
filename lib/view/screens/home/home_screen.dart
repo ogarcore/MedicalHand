@@ -6,6 +6,7 @@ import 'package:p_hn25/view/screens/appointments/appointments_list_screen.dart';
 import 'package:p_hn25/view/screens/history/clinical_history_screen.dart';
 import 'package:p_hn25/view/screens/home/widgets/home_app_bar.dart';
 import 'package:p_hn25/view/screens/home/widgets/main_bottom_nav_bar.dart';
+import 'package:p_hn25/view_model/auth_view_model.dart';
 import 'package:p_hn25/view_model/notification_view_model.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
@@ -31,8 +32,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadUserNotifications();
+      Provider.of<AuthViewModel>(
+        context,
+        listen: false,
+      ).performPostLoginTasks(context);
     });
   }
 
@@ -46,7 +51,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      print("App reanudada. Recargando notificaciones...");
       _loadUserNotifications();
     }
   }
@@ -75,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       context: context,
       builder: (context) => CustomModal(
         icon: HugeIcons.strokeRoundedLogout01,
-        title: 'Salir de Medical Hand',
+        title: 'Salir de MedicalHand',
         content: const Text(
           '¿Estás seguro de que quieres cerrar la aplicación?',
           textAlign: TextAlign.center,

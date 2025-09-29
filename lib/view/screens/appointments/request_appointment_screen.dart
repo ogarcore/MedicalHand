@@ -1,4 +1,3 @@
-// lib/view/screens/appointments/request_appointment_screen.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -11,7 +10,7 @@ import 'appointment_summary_screen.dart';
 import 'widgets/appointment_progress_indicator.dart';
 import 'widgets/appointment_step_layout.dart';
 import 'widgets/appointment_navigation_bar.dart';
-import 'package:p_hn25/view/widgets/custom_modal.dart'; // Importa tu modal personalizado
+import 'package:p_hn25/view/widgets/custom_modal.dart';
 
 class RequestAppointmentScreen extends StatefulWidget {
   const RequestAppointmentScreen({super.key});
@@ -136,7 +135,6 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
     }
   }
 
-  // --- 1. NUEVO MÉTODO PARA MOSTRAR EL DIÁLOGO DE CONFIRMACIÓN ---
   Future<bool> _showExitConfirmationDialog() async {
     final result = await showDialog<bool>(
       context: context,
@@ -166,13 +164,11 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
     return result ?? false;
   }
 
-  // --- 2. NUEVO MÉTODO QUE CONTROLA LA LÓGICA DE "ATRÁS" ---
   Future<bool> _onWillPop() async {
     if (_currentStep > 0) {
       _previousStep();
-      return false; // Previene que la pantalla se cierre
+      return false;
     } else {
-      // Muestra el diálogo y espera la respuesta del usuario
       return await _showExitConfirmationDialog();
     }
   }
@@ -203,7 +199,6 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // --- 3. ENVOLVEMOS EL SCAFFOLD EN UN WillPopScope ---
     return WillPopScope(
       onWillPop: _onWillPop,
       child: GestureDetector(
