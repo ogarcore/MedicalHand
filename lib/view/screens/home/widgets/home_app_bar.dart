@@ -12,7 +12,7 @@ class HomeAppBar extends StatefulWidget implements PreferredSizeWidget {
   State<HomeAppBar> createState() => _HomeAppBarState();
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight+10);
 }
 
 // CAMBIO: La clase ahora hereda de State y "mezcla" la lógica con 'with'.

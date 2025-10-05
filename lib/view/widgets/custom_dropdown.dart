@@ -61,7 +61,7 @@ class AppStyledDropdown extends StatelessWidget {
             child: DropdownButtonHideUnderline(
               child: DropdownButtonFormField<String>(
                 validator: validator,
-                value: value,
+                initialValue: value,
                 onChanged: onChanged,
                 items: items.map<DropdownMenuItem<String>>((String v) {
                   return DropdownMenuItem<String>(

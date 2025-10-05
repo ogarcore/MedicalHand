@@ -18,7 +18,7 @@ class MainBottomNavBar extends StatelessWidget {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: AppColors.textColor(context).withAlpha(10),
+            color: AppColors.textColor(context).withAlpha(20),
             blurRadius: 10,
             spreadRadius: 0,
             offset: const Offset(0, -2),

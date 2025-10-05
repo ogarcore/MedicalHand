@@ -57,9 +57,8 @@ class _SplashScreenState extends State<SplashScreen> {
               height: 120,
               delegates: LottieDelegates(
                 values: [
-                  ValueDelegate.color(const [
-                    '**',
-                  ], value: AppColors.accentColor(context)),
+                  ValueDelegate.color(const ['**'], 
+                  value: Colors.white),
                 ],
               ),
             ),

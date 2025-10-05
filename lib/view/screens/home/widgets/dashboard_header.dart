@@ -34,7 +34,7 @@ class DashboardHeader extends StatelessWidget {
                   TextSpan(
                     text: '¡$greeting! ',
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: 24,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textColor(context),
                       height: 1.3,

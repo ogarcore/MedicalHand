@@ -1,5 +1,6 @@
 // lib/view_model/splash_view_model.dart
 import 'dart:async'; // Necesario para manejo de errores de red
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:p_hn25/view_model/notification_view_model.dart';
@@ -19,7 +20,17 @@ class SplashViewModel extends ChangeNotifier {
     required NotificationViewModel notificationViewModel,
   }) async {
     if (!context.mounted) return;
+    final connectivityResult = await (Connectivity().checkConnectivity());
 
+    if (connectivityResult.contains(ConnectivityResult.none)) {
+      if (context.mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const NoInternetScreen()),
+        );
+      }
+      return; 
+    }
     final currentUser = _auth.currentUser;
 
     if (currentUser != null) {
@@ -48,7 +59,7 @@ class SplashViewModel extends ChangeNotifier {
         }
       }
     } else {
-      await Future.delayed(const Duration(milliseconds: 1500));
+      await Future.delayed(const Duration(milliseconds: 1300));
       if (context.mounted) {
         Navigator.pushReplacement(
           context,

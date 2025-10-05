@@ -27,17 +27,21 @@ class AppointmentCard extends StatefulWidget {
 class _AppointmentCardState extends State<AppointmentCard> {
   bool _isExpanded = false;
 
+  // --- NINGÚN CAMBIO EN LA LÓGICA ---
+  // Todas las funciones de aquí abajo permanecen intactas.
+
   void _showConfirmationSnackBar(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 message,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -45,9 +49,9 @@ class _AppointmentCardState extends State<AppointmentCard> {
         backgroundColor: AppColors.successColor(context).withAlpha(220),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        margin: EdgeInsets.only(bottom: 10, left: 20, right: 20),
-        duration: Duration(seconds: 3),
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        margin: const EdgeInsets.only(bottom: 10, left: 20, right: 20),
+        duration: const Duration(seconds: 3),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
   }
@@ -154,127 +158,173 @@ class _AppointmentCardState extends State<AppointmentCard> {
         widget.isUpcoming && widget.appointment.status == 'confirmada';
     final cita = widget.appointment;
 
+    // --- NUEVO: Lógica para el color dinámico del Header ---
+    List<Color> headerGradientColors;
+
+    switch (cita.status) {
+      case 'confirmada':
+        final primaryColor = AppColors.primaryColor(context);
+        headerGradientColors = [
+          primaryColor,
+          Color.lerp(primaryColor, Colors.blue.shade700, 0.3)!,
+        ];
+        break;
+      case 'cancelada':
+        final warningColor = AppColors.warningColor(context);
+        headerGradientColors = [
+          warningColor.withAlpha(220),
+          Color.lerp(warningColor, Colors.black, 0.1)!,
+        ];
+        break;
+      case 'pendiente':
+        final graceColor = AppColors.graceColor(context);
+        headerGradientColors = [
+          graceColor.withAlpha(210),
+          Color.lerp(graceColor.withAlpha(170), Colors.brown, 0.3)!,
+        ];
+        break;
+      case 'finalizada':
+        headerGradientColors = [
+          Colors.grey.shade700,
+          Colors.grey.shade900,
+        ];
+        break;
+      case 'pendiente_reprogramacion':
+        final accentColor = AppColors.accentColor(context);
+        headerGradientColors = [
+          accentColor,
+          Color.lerp(accentColor, Colors.indigo.shade900, 0.3)!,
+        ];
+        break;
+      default:
+        headerGradientColors = [
+          Colors.grey.shade800,
+          Colors.black,
+        ];
+    }
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 12.0),
+      margin: const EdgeInsets.only(bottom: 16.0),
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(220),
-        borderRadius: BorderRadius.circular(14),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryColor(context).withAlpha(10),
+            color: Colors.black.withAlpha(20),
+            blurRadius: 32,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.black.withAlpha(10),
             blurRadius: 8,
             offset: const Offset(0, 2),
-            spreadRadius: 1,
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(14.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header compacto
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        children: [
+          // Header con el nuevo color dinámico
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: headerGradientColors, // <-- Color dinámico aplicado aquí
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              ),
+            ),
+            child: Row(
               children: [
-                Expanded(
-                  child: Text(
-                    cita.specialty ?? 'Consulta Externa',
-                    style: TextStyle(
-                      fontSize: 16.5,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textColor(context),
-                      height: 1.2,
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withAlpha(40),
+                        Colors.white.withAlpha(20),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.white.withAlpha(60),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Icon(
+                    HugeIcons.strokeRoundedHospital01,
+                    color: Colors.white.withAlpha(220),
+                    size: 16.5,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        cita.specialty ?? 'Consulta Externa',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white.withAlpha(240),
+                          letterSpacing: 0.3,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 8),
                 _buildStatusChip(cita.status),
               ],
             ),
+          ),
 
-            const SizedBox(height: 10),
-
-            // Línea divisoria más delgada
-            Container(
-              height: 2,
-              width: 32,
-              decoration: BoxDecoration(
-                color: AppColors.primaryColor(context).withAlpha(170),
-                borderRadius: BorderRadius.circular(1),
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            // Contenido compacto
-            Row(
+          // Contenido de la Cita (sin cambios)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Icono más compacto
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.primaryColor(context).withAlpha(150),
-                        AppColors.primaryColor(context).withAlpha(170),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(9),
-                  ),
-                  child: const Icon(
-                    HugeIcons.strokeRoundedHospital01,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                ),
-                const SizedBox(width: 12),
-
-                // Información compacta
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Hospital
                       Text(
                         cita.hospital,
                         style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
                           color: AppColors.textColor(context),
+                          letterSpacing: -0.2,
                           height: 1.2,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-
-                      const SizedBox(height: 8),
-
-                      // Fecha
+                      const SizedBox(height: 10),
                       _buildInfoRow(
                         HugeIcons.strokeRoundedCalendar01,
                         _formatDate(),
                       ),
-
-                      // Doctor (solo para citas pasadas)
                       if (!widget.isUpcoming) ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 6),
                         _buildInfoRow(
                           HugeIcons.strokeRoundedDoctor01,
                           cita.assignedDoctor ?? 'Por Asignar',
                           maxLines: 1,
                         ),
                       ],
-
-                      // Consultorio
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
                       _buildInfoRow(
                         HugeIcons.strokeRoundedHospitalBed01,
                         cita.clinicOffice ?? 'Por Asignar',
@@ -284,11 +334,28 @@ class _AppointmentCardState extends State<AppointmentCard> {
                 ),
               ],
             ),
+          ),
 
-            // Sección de opciones (si aplica)
-            if (showOptions) _buildOptionsSection(),
-          ],
-        ),
+          // Sección de Opciones (sin cambios)
+          if (showOptions) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Container(
+                height: 1,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.grey.shade100,
+                      Colors.grey.shade300,
+                      Colors.grey.shade100,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            _buildOptionsSection(),
+          ]
+        ],
       ),
     );
   }
@@ -297,15 +364,15 @@ class _AppointmentCardState extends State<AppointmentCard> {
     return Row(
       children: [
         Icon(icon, size: 14, color: AppColors.primaryColor(context)),
-        const SizedBox(width: 5),
+        const SizedBox(width: 8),
         Expanded(
           child: Text(
             text,
             style: TextStyle(
-              fontSize: 13.5,
-              color: Colors.grey[700],
+              fontSize: 13,
+              color: AppColors.textLightColor(context),
+              height: 1.4,
               fontWeight: FontWeight.w500,
-              height: 1.3,
             ),
             maxLines: maxLines,
             overflow: TextOverflow.ellipsis,
@@ -316,180 +383,171 @@ class _AppointmentCardState extends State<AppointmentCard> {
   }
 
   Widget _buildOptionsSection() {
-    return Column(
-      children: [
-        const SizedBox(height: 10),
-        Align(
-          alignment: Alignment.centerRight,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => setState(() => _isExpanded = !_isExpanded),
-              borderRadius: BorderRadius.circular(10),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 6.0,
-                  horizontal: 10,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "Opciones",
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.accentColor(context).withAlpha(220),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    AnimatedRotation(
-                      duration: const Duration(milliseconds: 300),
-                      turns: _isExpanded ? 0.5 : 0,
-                      child: Icon(
-                        HugeIcons.strokeRoundedArrowDownDouble,
-                        size: 16,
-                        color: AppColors.accentColor(context).withAlpha(200),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-        AnimatedSize(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          child: Column(
-            children: [
-              if (_isExpanded)
-                Padding(
-                  padding: const EdgeInsets.only(
-                    top: 10.0,
-                    right: 12,
-                    left: 12,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
+      child: Column(
+        children: [
+          Align(
+            alignment: Alignment.center,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => setState(() => _isExpanded = !_isExpanded),
+                borderRadius: BorderRadius.circular(12),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8.0,
+                    horizontal: 12,
                   ),
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _rescheduleAppointment,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.accentColor(
-                              context,
-                            ).withAlpha(170),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            elevation: 1,
-                            shadowColor: AppColors.accentColor(
-                              context,
-                            ).withAlpha(100),
-                          ),
-                          child: const Text(
-                            "Reprogramar",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12.5,
-                            ),
-                          ),
+                      Text(
+                        "Opciones de la cita",
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.accentColor(context).withAlpha(220),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _cancelAppointment,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white.withAlpha(20),
-                            foregroundColor: AppColors.warningColor(context),
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              side: BorderSide(
-                                color: AppColors.warningColor(context),
-                                width: 1.2,
-                              ),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: const Text(
-                            "Cancelar",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12.5,
-                            ),
-                          ),
+                      const SizedBox(width: 6),
+                      AnimatedRotation(
+                        duration: const Duration(milliseconds: 300),
+                        turns: _isExpanded ? 0.5 : 0,
+                        child: Icon(
+                          HugeIcons.strokeRoundedArrowDownDouble,
+                          size: 16,
+                          color: AppColors.accentColor(context).withAlpha(200),
                         ),
                       ),
                     ],
                   ),
                 ),
-            ],
+              ),
+            ),
           ),
-        ),
-      ],
+          AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: Column(
+              children: [
+                if (_isExpanded)
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(top: 8.0, bottom: 8, left: 4, right: 4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _rescheduleAppointment,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.accentColor(context)
+                                  .withAlpha(200),
+                              foregroundColor: Colors.white,
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 1,
+                              shadowColor: AppColors.accentColor(context)
+                                  .withAlpha(100),
+                            ),
+                            child: const Text(
+                              "Reprogramar",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _cancelAppointment,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white.withAlpha(20),
+                              foregroundColor: AppColors.warningColor(context),
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: BorderSide(
+                                  color: AppColors.warningColor(context),
+                                  width: 1.5,
+                                ),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: const Text(
+                              "Cancelar",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
+  // --- WIDGET AUXILIAR MODIFICADO ---
   Widget _buildStatusChip(String status) {
-    Color backgroundColor;
-    Color textColor;
+    // --- NUEVO: Variables de color constantes para el chip ---
+    const Color chipTextColor = Colors.white;
+    final Color chipBackgroundColor = Colors.white.withAlpha(40);
     IconData? icon;
 
     final displayStatus = status.isNotEmpty
         ? status[0].toUpperCase() + status.substring(1).replaceAll('_', ' ')
         : '';
 
+    // El switch ahora solo define el ícono
     switch (status) {
       case 'confirmada':
-        backgroundColor = AppColors.secondaryColor(context).withAlpha(40);
-        textColor = AppColors.primaryColor(context);
         icon = HugeIcons.strokeRoundedTickDouble01;
         break;
       case 'pendiente':
-        backgroundColor = AppColors.graceColor(context).withAlpha(40);
-        textColor = AppColors.graceColor(context);
         icon = HugeIcons.strokeRoundedClock01;
         break;
       case 'finalizada':
-        backgroundColor = AppColors.textLightColor(context).withAlpha(40);
-        textColor = AppColors.textLightColor(context);
         icon = HugeIcons.strokeRoundedCheckmarkSquare03;
         break;
       case 'cancelada':
-        backgroundColor = AppColors.warningColor(context).withAlpha(40);
-        textColor = AppColors.warningColor(context);
         icon = HugeIcons.strokeRoundedCancelCircleHalfDot;
         break;
       case 'pendiente_reprogramacion':
-        backgroundColor = AppColors.accentColor(context).withAlpha(40);
-        textColor = AppColors.accentColor(context);
         icon = HugeIcons.strokeRoundedRepeat;
         break;
       default:
-        backgroundColor = Colors.grey.withAlpha(50);
-        textColor = Colors.grey.shade800;
         icon = HugeIcons.strokeRoundedHelpSquare;
     }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: chipBackgroundColor, // <-- Color de fondo constante
         borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.white.withAlpha(80), width: 0.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: textColor),
-          const SizedBox(width: 3),
+          Icon(icon, size: 12, color: chipTextColor), // <-- Color de ícono constante
+          const SizedBox(width: 4),
           Text(
             displayStatus,
-            style: TextStyle(
-              color: textColor,
+            style: const TextStyle(
+              color: chipTextColor, // <-- Color de texto constante
               fontWeight: FontWeight.w600,
               fontSize: 10,
             ),

@@ -140,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               gradient: LinearGradient(
                 colors: [
                   AppColors.primaryColor(context),
-                  AppColors.primaryColor(context).withAlpha(100),
+                  AppColors.primaryColor(context).withAlpha(150),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,

@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:p_hn25/data/models/cita_model.dart';
 import 'package:p_hn25/data/models/user_model.dart';
+import 'package:p_hn25/view/screens/home/widgets/ai_chat_card.dart';
 import 'package:p_hn25/view/screens/home/widgets/dashboard_action_buttons.dart';
 import 'package:p_hn25/view/screens/home/widgets/dashboard_header.dart';
+import 'package:p_hn25/view/screens/home/widgets/health_tips_section.dart';
 import 'package:p_hn25/view/screens/home/widgets/next_appointment_card.dart';
 import 'package:p_hn25/view/screens/home/widgets/no_appointment_card.dart';
 import 'package:p_hn25/view_model/appointment_view_model.dart';
@@ -41,12 +43,12 @@ class _DashboardViewState extends State<DashboardView> {
     final activeProfile = userViewModel.activeProfile;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 19.0, vertical: 14.0),
+      padding: const EdgeInsets.only(top: 4, right: 19, bottom: 24, left: 19),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const DashboardHeader(),
-          const SizedBox(height: 24),
+          const SizedBox(height: 10),
           if (activeProfile == null)
             const _DashboardLoadingShimmer()
           else
@@ -79,13 +81,63 @@ class _DashboardViewState extends State<DashboardView> {
           final bool canCheckIn = _isAppointmentToday(appointment);
           return Column(
             children: [
-              NextAppointmentCard(appointment: appointment),
-              const SizedBox(height: 26),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 12),
+                  NextAppointmentCard(appointment: appointment),
+                ],
+              ),
+              const SizedBox(height: 22),
               DashboardActionButtons(canCheckIn: canCheckIn),
+              const SizedBox(height: 22),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  height: 1,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.grey.shade200,
+                        Colors.grey.withAlpha(120),
+                        Colors.grey.shade200,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              AiChatCard(),
+              const SizedBox(height: 15),
+              HealthTipsSection(),
             ],
           );
         } else {
-          return const NoAppointmentCard();
+          return Column(
+            children: [
+              const NoAppointmentCard(),
+              const SizedBox(height: 22),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  height: 1,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.grey.shade200,
+                        Colors.grey.withAlpha(120),
+                        Colors.grey.shade200,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              AiChatCard(),
+              const SizedBox(height: 15),
+              HealthTipsSection(),
+            ],
+          );
         }
       },
     );
