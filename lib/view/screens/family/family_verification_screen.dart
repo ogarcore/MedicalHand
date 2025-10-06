@@ -1,4 +1,3 @@
-// lib/view/screens/family/family_verification_screen.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
@@ -6,6 +5,7 @@ import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/app/core/utils/input_formatters.dart';
 import 'package:p_hn25/app/core/utils/validators.dart';
 import 'package:p_hn25/data/network/image_picker_service.dart';
+import 'package:p_hn25/data/network/permission_service.dart';
 import 'package:p_hn25/view/widgets/custom_text_field.dart';
 import 'package:p_hn25/view/widgets/primary_button.dart';
 import 'package:p_hn25/view_model/family_view_model.dart';
@@ -23,8 +23,17 @@ class FamilyVerificationScreen extends StatefulWidget {
 class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
   final _formKey = GlobalKey<FormState>();
   final ImagePickerService _imagePickerService = ImagePickerService();
+  final PermissionService _permissionService = PermissionService(); // Instancia del servicio
 
+  // CAMBIO CLAVE 1: La función ahora es asíncrona y maneja el permiso.
   Future<void> _handleImagePick(Function(XFile?) setImageCallback) async {
+    // Primero, solicitamos el permiso de cámara de forma segura.
+    final hasPermission = await _permissionService.handleCameraPermission(context);
+
+    // Si no se otorgó el permiso, no continuamos.
+    if (!hasPermission || !mounted) return;
+
+    // Si el permiso fue otorgado, procedemos a abrir la cámara.
     final file = await _imagePickerService.pickAndCompressImage();
     if (file != null) {
       setImageCallback(file);
@@ -37,6 +46,7 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
     required VoidCallback onPressed,
     bool isSelected = false,
   }) {
+    // Este widget no necesita cambios internos.
     return Container(
       decoration: BoxDecoration(
         color: isSelected
@@ -141,7 +151,6 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Header Section
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -175,7 +184,7 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
                           Text(
                             widget.isMinor
                                 ? 'Identificación del Menor'
-                                : 'Identificaione del Familiar',
+                                : 'Identificación del Familiar',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
@@ -199,27 +208,24 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-
-              // Document Number Field
               CustomTextField(
                 controller: familyViewModel.idController,
-                labelText: widget.isMinor ? 'Partida de Nacimiento' : 'Cédula',
-                hintText: widget.isMinor
-                    ? 'N° de documento'
-                    : '001-123456-1234A',
+                labelText:
+                    widget.isMinor ? 'Partida de Nacimiento' : 'Cédula',
+                hintText:
+                    widget.isMinor ? 'N° de documento' : '001-123456-1234A',
                 keyboardType: TextInputType.visiblePassword,
                 icon: HugeIcons.strokeRoundedId,
-                inputFormatters: widget.isMinor ? [] : [CedulaInputFormatter()],
+                inputFormatters:
+                    widget.isMinor ? [] : [CedulaInputFormatter()],
                 validator: widget.isMinor
                     ? (val) => AppValidators.validateGenericEmpty(
-                        val,
-                        'El documento',
-                      )
+                          val,
+                          'El documento',
+                        )
                     : AppValidators.validateCedula,
               ),
               const SizedBox(height: 24),
-
-              // Photo Section Title
               Text(
                 'Documento de Identificación',
                 style: TextStyle(
@@ -239,8 +245,6 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Photo Buttons
               if (widget.isMinor)
                 _buildVerificationButton(
                   icon: HugeIcons.strokeRoundedCamera01,
@@ -267,8 +271,6 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
                 ),
               ],
               const SizedBox(height: 32),
-
-              // Submit Button
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
@@ -291,12 +293,12 @@ class _FamilyVerificationScreenState extends State<FamilyVerificationScreen> {
                   isLoading: familyViewModel.isLoading,
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      if (familyViewModel.idFrontImage == null &&
-                          familyViewModel.idBackImage == null) {
+                      if (familyViewModel.idFrontImage == null ||
+                          (!widget.isMinor && familyViewModel.idBackImage == null)) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              'Por favor, sube la foto del documento.',
+                              'Por favor, sube las fotos requeridas.',
                             ),
                             backgroundColor: AppColors.warningColor(context),
                           ),

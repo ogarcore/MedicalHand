@@ -9,7 +9,7 @@ import '../data/models/hospital_model.dart';
 class AppointmentViewModel extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Propiedades para gestionar el estado del dashboard (estas no se usan en la pantalla de citas)
+  CitaModel? initialDashboardAppointment;
   CitaModel? _nextAppointment;
   CitaModel? get nextAppointment => _nextAppointment;
   bool _isDashboardLoading = true;
@@ -49,6 +49,7 @@ class AppointmentViewModel extends ChangeNotifier {
         return HospitalModel(
           id: doc.data()['hospitalId'] as String,
           name: doc.data()['name'] as String,
+          location: doc.data()['location'] as GeoPoint,
         );
       }).toList();
       hospitals.sort((a, b) => a.name.compareTo(b.name));
@@ -99,6 +100,28 @@ class AppointmentViewModel extends ChangeNotifier {
           return citas;
         });
   }
+
+  Future<void> fetchInitialDashboardAppointment(String userId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('citas')
+          .where('userId', isEqualTo: userId)
+          .where('status', whereIn: ['confirmada', 'pendiente', 'pendiente_reprogramacion'])
+          .orderBy('assignedDate', descending: false)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        initialDashboardAppointment = CitaModel.fromFirestore(querySnapshot.docs.first);
+      } else {
+        initialDashboardAppointment = null;
+      }
+    } catch (e) {
+      print("Error al pre-cargar la cita del dashboard: $e");
+      initialDashboardAppointment = null;
+    }
+  }
+
 
   Future<bool> updateAppointmentStatus(
     String appointmentId,

@@ -53,8 +53,8 @@ class _SplashScreenState extends State<SplashScreen> {
             const SizedBox(height: 40),
             Lottie.asset(
               'assets/animation/loading.json',
-              width: 120,
-              height: 120,
+              width: 60,
+              height: 60,
               delegates: LottieDelegates(
                 values: [
                   ValueDelegate.color(const ['**'], 

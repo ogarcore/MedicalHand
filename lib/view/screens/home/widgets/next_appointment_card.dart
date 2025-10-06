@@ -1,15 +1,50 @@
-// lib/view/screens/home/widgets/next_appointment_card.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/data/models/cita_model.dart';
 import 'package:p_hn25/view/screens/home/widgets/appointment_details_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; 
 
 class NextAppointmentCard extends StatelessWidget {
   final CitaModel appointment;
 
   const NextAppointmentCard({super.key, required this.appointment});
+
+  // Nueva función para lanzar los mapas, ahora usando GeoPoint
+  Future<void> _launchMaps(BuildContext context, GeoPoint? hospitalLocation) async {
+    // 1. Validar que la ubicación no sea nula
+    if (hospitalLocation == null) {
+      _showErrorSnackBar(context, 'La ubicación del hospital no está disponible.');
+      return;
+    }
+
+    // 2. Extraer latitud y longitud del GeoPoint
+    final lat = hospitalLocation.latitude;
+    final lon = hospitalLocation.longitude;
+
+    // 3. Construir la URL universal de Google Maps
+    final url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lon');
+
+    // 4. Intentar abrir la URL en una aplicación externa
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      _showErrorSnackBar(context, 'No se pudo abrir la aplicación de mapas.');
+    }
+  }
+
+  // Widget auxiliar para mostrar mensajes de error
+  void _showErrorSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red.shade700,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
 
   String _formatTime() {
     if (appointment.assignedDate == null) return '--:--';
@@ -28,17 +63,10 @@ class NextAppointmentCard extends StatelessWidget {
 
   String _formatWeekday() {
     if (appointment.assignedDate == null) return '---';
-
     final now = DateTime.now();
     final assigned = appointment.assignedDate!;
-
-    // Comparamos solo fechas, sin horas
     final today = DateTime(now.year, now.month, now.day);
-    final appointmentDate = DateTime(
-      assigned.year,
-      assigned.month,
-      assigned.day,
-    );
+    final appointmentDate = DateTime(assigned.year, assigned.month, assigned.day);
 
     if (appointmentDate == today) {
       return 'Hoy';
@@ -69,7 +97,6 @@ class NextAppointmentCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Header compacto sin espacio innecesario
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             decoration: BoxDecoration(
@@ -88,16 +115,13 @@ class NextAppointmentCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                // Badge de fecha
-
-                // Información de día y hora
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         "Próxima cita",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -148,93 +172,78 @@ class NextAppointmentCard extends StatelessWidget {
                     ],
                   ),
                 ),
-
-                // Icono decorativo clickeable
-                GestureDetector(
-                  onTap: () {
-                    // Aquí puedes agregar la funcionalidad cuando se haga clic
-                  },
-                  child: Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withAlpha(25),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.white.withAlpha(60),
-                        width: 1.5,
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha(25),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withAlpha(60),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _formatDay(),
+                        style: const TextStyle(
+                          fontSize: 27,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          height: 1.0,
+                        ),
                       ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          _formatDay(),
-                          style: const TextStyle(
-                            fontSize: 27,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                            height: 1.0,
-                          ),
+                      Text(
+                        _formatMonth().toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white.withAlpha(220),
+                          letterSpacing: 0.8,
                         ),
-                        Text(
-                          _formatMonth().toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white.withAlpha(220),
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-
-          // Contenido principal (sin cambios)
           Padding(
             padding: const EdgeInsets.all(20),
-            child: Column(
+            child: Row(
               children: [
-                // Botones de acción elegantes
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildActionButton(
+                Expanded(
+                  child: _buildActionButton(
+                    context,
+                    'Ver Detalles',
+                    HugeIcons.strokeRoundedEye,
+                    primaryColor,
+                    hasBorder: true,
+                    onPressed: () {
+                      Navigator.push(
                         context,
-                        'Ver Detalles',
-                        HugeIcons.strokeRoundedEye,
-                        primaryColor,
-                        hasBorder: true,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AppointmentDetailsScreen(
-                                appointment: appointment,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildActionButton(
-                        context,
-                        'Cómo Llegar',
-                        HugeIcons.strokeRoundedMaps,
-                        primaryColor,
-                        isPrimary: true,
-                        onPressed: () {
-                          
-                        },
-                      ),
-                    ),
-                  ],
+                        MaterialPageRoute(
+                          builder: (context) => AppointmentDetailsScreen(
+                            appointment: appointment,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildActionButton(
+                    context,
+                    'Cómo Llegar',
+                    HugeIcons.strokeRoundedMaps,
+                    primaryColor,
+                    isPrimary: true,
+                    // CAMBIO CLAVE: Llamamos a la función _launchMaps con el campo GeoPoint.
+                    onPressed: () => _launchMaps(context, appointment.hospitalLocation),
+                  ),
                 ),
               ],
             ),

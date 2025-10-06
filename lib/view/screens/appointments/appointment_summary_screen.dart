@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -16,11 +17,13 @@ class AppointmentSummaryScreen extends StatefulWidget {
   final String hospitalId;
   final String hospitalName;
   final String reason;
+  final GeoPoint location;
 
   const AppointmentSummaryScreen({
     super.key,
     required this.departament,
     required this.hospitalId,
+    required this.location,
     required this.hospitalName,
     required this.reason,
     this.referralImage,
@@ -91,6 +94,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
       verificationUrls: verificationUrls,
       reminder24hSent: false,
       reminder48hSent: false,
+      hospitalLocation: widget.location
     );
 
     // Enviamos la solicitud a través del ViewModel

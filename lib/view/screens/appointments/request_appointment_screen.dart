@@ -107,6 +107,7 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
               departament: _selectedDepartament!,
               hospitalId: _selectedHospital!.id,
               hospitalName: _selectedHospital!.name,
+              location: _selectedHospital!.location,
               reason: _reasonController.text,
             ),
           ),

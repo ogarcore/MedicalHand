@@ -1,17 +1,42 @@
+//
+// =========================================================================
+// ARCHIVO: lib/view/screens/home/widgets/dashboard_action_buttons.dart (MODIFICADO)
+// CÓDIGO COMPLETO PARA COPIAR Y PEGAR
+// =========================================================================
+//
+
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
+import 'package:p_hn25/data/models/cita_model.dart'; // Importación añadida
 import 'package:p_hn25/view/screens/appointments/appointment_options_screen.dart';
 
 class DashboardActionButtons extends StatelessWidget {
-  final bool canCheckIn;
+  // CAMBIO CLAVE 1: Recibimos el objeto de la cita completo, que puede ser nulo.
+  final CitaModel? appointment;
 
-  const DashboardActionButtons({super.key, required this.canCheckIn});
+  const DashboardActionButtons({super.key, this.appointment});
+
+  // CAMBIO CLAVE 2: La lógica para determinar si la cita es hoy, ahora vive aquí.
+  // Usamos un getter para que el código sea más limpio.
+  bool get _isCheckInAvailable {
+    final appt = appointment; // Creamos una variable local para facilitar la comprobación de nulidad.
+    if (appt?.assignedDate == null) return false;
+
+    final now = DateTime.now();
+    final appointmentDate = appt!.assignedDate!;
+    return now.year == appointmentDate.year &&
+        now.month == appointmentDate.month &&
+        now.day == appointmentDate.day;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final warniniColor = AppColors.warningColor(context);
+    final warningColor = AppColors.warningColor(context);
     final accentColor = AppColors.accentColor(context);
+
+    // CAMBIO CLAVE 3: Usamos el nuevo getter para decidir si mostrar el botón.
+    final bool canCheckIn = _isCheckInAvailable;
 
     return Column(
       children: [
@@ -21,12 +46,13 @@ class DashboardActionButtons extends StatelessWidget {
             title: 'Confirmar asistencia',
             subtitle: 'Recibir turno',
             icon: HugeIcons.strokeRoundedTickDouble04,
-            primaryColor: warniniColor,
+            primaryColor: warningColor,
             onPressed: () {
-              // Lógica para el check-in
+              // Tu lógica para el check-in va aquí
             },
           ),
         if (canCheckIn) const SizedBox(height: 12),
+        // Este botón siempre es visible, así que no necesita cambios.
         _buildCompactGlamorousButton(
           context: context,
           title: 'Agendar cita',
@@ -44,6 +70,7 @@ class DashboardActionButtons extends StatelessWidget {
     );
   }
 
+  // El widget auxiliar para construir el botón no necesita ningún cambio.
   Widget _buildCompactGlamorousButton({
     required BuildContext context,
     required String title,
@@ -53,7 +80,7 @@ class DashboardActionButtons extends StatelessWidget {
     required VoidCallback onPressed,
   }) {
     return Container(
-      height: 68, // Más compacto
+      height: 68,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         gradient: LinearGradient(
@@ -96,7 +123,6 @@ class DashboardActionButtons extends StatelessWidget {
             ),
             child: Row(
               children: [
-                // Icono más compacto
                 Container(
                   width: 42,
                   height: 42,
@@ -115,8 +141,6 @@ class DashboardActionButtons extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 14),
-                
-                // Texto más compacto
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,8 +169,6 @@ class DashboardActionButtons extends StatelessWidget {
                     ],
                   ),
                 ),
-                
-                // Flecha más compacta
                 Container(
                   width: 28,
                   height: 28,
@@ -158,7 +180,7 @@ class DashboardActionButtons extends StatelessWidget {
                       width: 1.2,
                     ),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     HugeIcons.strokeRoundedArrowRight01,
                     color: Colors.white,
                     size: 14,

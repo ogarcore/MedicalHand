@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
+import 'package:p_hn25/view/screens/chat/chat_screen.dart';
 
 class AiChatCard extends StatelessWidget {
   const AiChatCard({super.key});
@@ -24,7 +25,7 @@ class AiChatCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: AppColors.primaryColor(context).withAlpha(100),
-            blurRadius: 20,
+            blurRadius: 10,
             offset: const Offset(0, 8),
           ),
         ],
@@ -85,7 +86,14 @@ class AiChatCard extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ChatScreen(),
+                          ),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: AppColors.primaryColor(context),

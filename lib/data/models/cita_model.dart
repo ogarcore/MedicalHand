@@ -1,4 +1,3 @@
-// lib/data/models/cita_model.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CitaModel {
@@ -24,6 +23,7 @@ class CitaModel {
   final List<Map<String, dynamic>>? rescheduleHistory;
   final bool? reminder24hSent;
   final bool? reminder48hSent;
+  final GeoPoint? hospitalLocation;
 
   CitaModel({
     this.id,
@@ -48,6 +48,7 @@ class CitaModel {
     this.rescheduleHistory,
     this.reminder24hSent,
     this.reminder48hSent,
+    this.hospitalLocation,
   });
 
   Map<String, dynamic> toMap() {
@@ -64,9 +65,8 @@ class CitaModel {
       'status': status,
       'requestType': requestType,
       'isActive': isActive,
-      'assignedDate': assignedDate != null
-          ? Timestamp.fromDate(assignedDate!)
-          : null,
+      'assignedDate':
+          assignedDate != null ? Timestamp.fromDate(assignedDate!) : null,
       'assignedDoctor': assignedDoctor,
       'clinicOffice': clinicOffice,
       'specialty': specialty,
@@ -75,6 +75,7 @@ class CitaModel {
       'rescheduleHistory': rescheduleHistory,
       'reminder24hSent': reminder24hSent,
       'reminder48hSent': reminder48hSent,
+      'hospitalLocation': hospitalLocation,
     };
   }
 
@@ -109,6 +110,9 @@ class CitaModel {
           : null,
       reminder24hSent: data['reminder24hSent'] ?? false,
       reminder48hSent: data['reminder48hSent'] ?? false,
+      hospitalLocation: data['hospitalLocation'] is GeoPoint
+          ? data['hospitalLocation'] as GeoPoint
+          : null,
     );
   }
 }

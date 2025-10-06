@@ -137,6 +137,7 @@ class _ExternalAppoinmentScreenState extends State<ExternalAppoinmentScreen> {
               departament: _selectedDepartment!,
               hospitalId: _selectedHospital!.id,
               hospitalName: _selectedHospital!.name,
+              location: _selectedHospital!.location,
               reason: "Cita solicitada por referencia",
             ),
           ),

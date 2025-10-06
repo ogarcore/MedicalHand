@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:p_hn25/data/network/image_picker_service.dart';
+import 'package:p_hn25/data/network/permission_service.dart';
 import 'package:p_hn25/view/screens/registration/registration_step4_screen.dart';
 import 'package:p_hn25/view/widgets/gradient_background.dart';
 import 'package:p_hn25/view/widgets/primary_button.dart';
@@ -25,8 +26,18 @@ class RegistrationStep3Screen extends StatefulWidget {
 class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
   final _formKey = GlobalKey<FormState>();
   final ImagePickerService _imagePickerService = ImagePickerService();
+  final PermissionService _permissionService = PermissionService(); // Instancia del servicio
 
-  Future<void> _handleImagePick(void Function(XFile?) setImageCallback) async {
+  // CAMBIO CLAVE 1: La función ahora es asíncrona y maneja el permiso.
+  Future<void> _handleImagePick(
+      void Function(XFile?) setImageCallback) async {
+    // Primero, solicitamos el permiso de cámara de forma segura.
+    final hasPermission = await _permissionService.handleCameraPermission(context);
+
+    // Si no se otorgó el permiso, no continuamos.
+    if (!hasPermission || !mounted) return;
+
+    // Si el permiso fue otorgado, procedemos a abrir la cámara.
     final file = await _imagePickerService.pickAndCompressImage();
     if (file != null) {
       setImageCallback(file);
@@ -40,6 +51,7 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
     required VoidCallback onPressed,
     bool isSelected = false,
   }) {
+    // Este widget no necesita cambios internos.
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -66,7 +78,7 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: AppColors.primaryColor(context).withOpacity(0.1),
+                    color: AppColors.primaryColor(context).withAlpha(26),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -180,11 +192,10 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                               color: AppColors.textLightColor(context),
                               height: 1.4,
                               fontFamily: 'Poppins',
-                            ), // Reemplaza con tu fuente
+                            ),
                             children: [
                               const TextSpan(
-                                text:
-                                    'Para garantizar la seguridad de tu expediente, ',
+                                text: 'Para garantizar la seguridad de tu expediente, ',
                               ),
                               TextSpan(
                                 text: 'verificamos tu identidad',
@@ -256,7 +267,7 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                                   authViewModel.idBackImage == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text(
+                                    content: const Text(
                                       'Por favor, sube las imágenes requeridas.',
                                     ),
                                     backgroundColor: AppColors.warningColor(

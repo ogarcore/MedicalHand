@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
-import 'package:p_hn25/view/screens/appointments/appointment_options_screen.dart';
 
 class NoAppointmentCard extends StatelessWidget {
   const NoAppointmentCard({super.key});
@@ -94,58 +93,7 @@ class NoAppointmentCard extends StatelessWidget {
           const SizedBox(height: 18),
           
           // Botón mejorado
-          Container(
-            width: double.infinity,
-            height: 48,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              gradient: LinearGradient(
-                colors: [
-                  primaryColor,
-                  Color.lerp(primaryColor.withAlpha(200), Colors.black, 0.2)!,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: primaryColor.withAlpha(60),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: ElevatedButton.icon(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const AppointmentOptionsScreen(),
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                backgroundColor: Colors.transparent,
-                shadowColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              icon: Icon(
-                HugeIcons.strokeRoundedAddCircle,
-                color: Colors.white.withAlpha(230),
-                size: 16,
-              ),
-              label: Text(
-                'Agendar Nueva Cita',
-                style: TextStyle(
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white.withAlpha(230),
-                  letterSpacing: 0.1,
-                ),
-              ),
-            ),
-          ),
+          
         ],
       ),
     );
