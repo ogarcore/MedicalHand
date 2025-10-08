@@ -18,7 +18,7 @@ class CitaModel {
   final String? assignedDoctor;
   final String? clinicOffice;
   final String? specialty;
-  final bool requiereExpediente;
+  final bool requiresFile;
   final Map<String, String>? verificationUrls;
   final List<Map<String, dynamic>>? rescheduleHistory;
   final bool? reminder24hSent;
@@ -43,7 +43,7 @@ class CitaModel {
     this.assignedDoctor,
     this.clinicOffice,
     this.specialty = 'Consulta Externa',
-    required this.requiereExpediente,
+    required this.requiresFile,
     this.verificationUrls,
     this.rescheduleHistory,
     this.reminder24hSent,
@@ -70,7 +70,7 @@ class CitaModel {
       'assignedDoctor': assignedDoctor,
       'clinicOffice': clinicOffice,
       'specialty': specialty,
-      'requiereExpediente': requiereExpediente,
+      'requiresFile': requiresFile,
       'verificationUrls': verificationUrls,
       'rescheduleHistory': rescheduleHistory,
       'reminder24hSent': reminder24hSent,
@@ -101,7 +101,7 @@ class CitaModel {
       assignedDoctor: data['assignedDoctor'],
       clinicOffice: data['clinicOffice'],
       specialty: data['specialty'] ?? 'Consulta Externa',
-      requiereExpediente: data['requiereExpediente'] ?? false,
+      requiresFile: data['requiereExpediente'] ?? false,
       verificationUrls: data['verificationUrls'] != null
           ? Map<String, String>.from(data['verificationUrls'])
           : null,

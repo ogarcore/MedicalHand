@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:p_hn25/app/core/utils/validators.dart';
 import 'package:p_hn25/data/network/notification_service.dart';
 import 'package:p_hn25/view_model/appointment_view_model.dart';
+import 'package:p_hn25/view_model/chat_view_model.dart';
 import 'package:p_hn25/view_model/family_view_model.dart';
 import 'package:p_hn25/view_model/notification_view_model.dart';
 import 'package:p_hn25/view_model/theme_provider.dart';
@@ -201,6 +202,10 @@ class AuthViewModel extends ChangeNotifier {
       context,
       listen: false,
     );
+    final chatViewModel = Provider.of<ChatViewModel>(
+      context,
+      listen: false,
+    );
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('last_active_user_id');
@@ -223,6 +228,7 @@ class AuthViewModel extends ChangeNotifier {
     appointmentViewModel.disposeListeners();
     familyViewModel.clearData();
     notificationViewModel.clearDataOnSignOut();
+    chatViewModel.clearChatOnSignOut();
     clearControllers();
 
     await _authService.signOut();

@@ -22,7 +22,6 @@ class ChatViewModel extends ChangeNotifier {
   Future<void> _loadChatHistory() async {
     if (_userId == null) return;
 
-    // Indicamos que estamos cargando el historial inicial.
     _isLoading = true;
     notifyListeners();
 
@@ -30,54 +29,61 @@ class ChatViewModel extends ChangeNotifier {
         .collection('chats')
         .doc(_userId)
         .collection('messages')
-        // CAMBIO CLAVE 1: Ordenar por 'descending' para tener los más nuevos primero.
         .orderBy('timestamp', descending: true)
         .limit(30)
         .get();
-
     _messages = snapshot.docs.map((doc) => Message.fromFirestore(doc)).toList();
 
-    // La carga inicial ha terminado.
     _isLoading = false;
     notifyListeners();
   }
 
+  // --- MÉTODO sendMessage COMPLETAMENTE REESTRUCTURADO ---
   Future<void> sendMessage(String text) async {
     if (text.trim().isEmpty || _userId == null || _isLoading) return;
 
+    // PASO A (INSTANTÁNEO): Mostrar el mensaje del usuario.
     final userMessage = Message(
       text: text,
       role: 'user',
       timestamp: Timestamp.now(),
     );
-
-    // CAMBIO CLAVE 2: Insertar el nuevo mensaje al principio de la lista (índice 0).
+    // Se inserta al principio de la lista (porque la UI está invertida).
     _messages.insert(0, userMessage);
-    await _saveMessageToFirestore(userMessage);
+    // Notificamos a la UI INMEDIATAMENTE para que la burbuja del usuario aparezca.
+    notifyListeners();
+    // Guardamos en la base de datos en segundo plano, sin esperar (await).
+    _saveMessageToFirestore(userMessage);
 
-    // Renombramos la variable para mayor claridad.
+    // PASO B (INSTANTÁNEO): Mostrar el indicador de "escribiendo...".
     _isLoading = true;
+    // Notificamos de nuevo para que el 'ListView' muestre el TypingIndicator.
     notifyListeners();
 
-    final history = _messages.length > 1
-        ? _messages.sublist(1).reversed.toList() // Excluimos el mensaje actual y revertimos para el contexto correcto
-        : <Message>[];
+    // Preparamos el historial para la IA. Excluimos el mensaje que acabamos de enviar
+    // y lo revertimos para que la conversación tenga el orden cronológico correcto.
+    final history = _messages.sublist(1).reversed.toList();
 
+    // PASO C (EN ESPERA): Esperamos la respuesta de la IA.
     final responseText = await _geminiService.generateContent(history, text);
 
+    // PASO D (FINAL): Mostrar la respuesta de la IA.
     final modelMessage = Message(
       text: responseText,
       role: 'model',
       timestamp: Timestamp.now(),
     );
-
-    // CAMBIO CLAVE 3: Insertar la respuesta de la IA también al principio.
+    // Añadimos la respuesta de la IA al principio de la lista.
     _messages.insert(0, modelMessage);
 
+    // Indicamos que la carga ha terminado.
     _isLoading = false;
+    // La notificación final reconstruirá la UI, quitando el TypingIndicator
+    // y mostrando la burbuja de la IA en su lugar.
     notifyListeners();
 
-    await _saveMessageToFirestore(modelMessage);
+    // Guardamos la respuesta de la IA en segundo plano.
+    _saveMessageToFirestore(modelMessage);
   }
 
   Future<void> _saveMessageToFirestore(Message message) async {
@@ -87,5 +93,12 @@ class ChatViewModel extends ChangeNotifier {
         .doc(_userId)
         .collection('messages')
         .add(message.toFirestore());
+  }
+
+  void clearChatOnSignOut() {
+    _messages = [];
+    _userId = null;
+    _isLoading = false;
+    notifyListeners();
   }
 }

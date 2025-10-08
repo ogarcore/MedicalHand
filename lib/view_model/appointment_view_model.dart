@@ -39,6 +39,31 @@ class AppointmentViewModel extends ChangeNotifier {
     ];
   }
 
+  Future<void> checkForMissedAppointments(String userId) async {
+    final now = DateTime.now();
+    try {
+      final query = await _firestore
+          .collection('citas')
+          .where('uid', isEqualTo: userId)
+          .where('status', isEqualTo: 'confirmada')
+          .where('assignedDate', isLessThan: Timestamp.fromDate(now))
+          .get();
+
+      if (query.docs.isEmpty) return;
+
+      final batch = _firestore.batch();
+      for (final doc in query.docs) {
+        batch.update(doc.reference, {'status': 'no_asistio'});
+      }
+      await batch.commit();
+      print('${query.docs.length} cita(s) marcada(s) como "No Asistió".');
+    } catch (e) {
+      print('Error al verificar citas perdidas: $e');
+    }
+  }
+
+  
+
   Future<List<HospitalModel>> getHospitals(String department) async {
     try {
       final snapshot = await _firestore
@@ -101,11 +126,11 @@ class AppointmentViewModel extends ChangeNotifier {
         });
   }
 
-  Future<void> fetchInitialDashboardAppointment(String userId) async {
+ Future<void> fetchInitialDashboardAppointment(String userId) async {
     try {
       final querySnapshot = await _firestore
           .collection('citas')
-          .where('userId', isEqualTo: userId)
+          .where('uid', isEqualTo: userId) // Corregido de 'userId' a 'uid'
           .where('status', whereIn: ['confirmada', 'pendiente', 'pendiente_reprogramacion'])
           .orderBy('assignedDate', descending: false)
           .limit(1)
@@ -121,6 +146,7 @@ class AppointmentViewModel extends ChangeNotifier {
       initialDashboardAppointment = null;
     }
   }
+  
 
 
   Future<bool> updateAppointmentStatus(
@@ -141,15 +167,16 @@ class AppointmentViewModel extends ChangeNotifier {
     return _firestore
         .collection('citas')
         .where('uid', isEqualTo: userId)
-        .where('status', whereIn: ['finalizada', 'cancelada', 'reprogramada'])
+        .where('status', whereIn: ['finalizada', 'cancelada', 'reprogramada', 'no_asistio'])
         .orderBy('requestTimestamp', descending: true)
         .snapshots()
         .map((snapshot) {
-          return snapshot.docs
-              .map((doc) => CitaModel.fromFirestore(doc))
-              .toList();
-        });
+      return snapshot.docs
+          .map((doc) => CitaModel.fromFirestore(doc))
+          .toList();
+    });
   }
+
 
   Future<bool> requestReschedule({
     required String appointmentId,
@@ -182,18 +209,14 @@ class AppointmentViewModel extends ChangeNotifier {
   }
 
   Stream<CitaModel?> getDashboardAppointmentStream(String userId) {
-    if (_listeningForUserId != userId) {
-      _appointmentSubscription?.cancel();
-      _listeningForUserId = userId;
-    }
-    final now = DateTime.now();
     final query = _firestore
         .collection('citas')
         .where('uid', isEqualTo: userId)
         .where('status', isEqualTo: 'confirmada')
-        .where('assignedDate', isGreaterThanOrEqualTo: Timestamp.fromDate(now))
+        // El filtro 'isGreaterThanOrEqualTo' se ha eliminado.
         .orderBy('assignedDate')
         .limit(1);
+
     return query.snapshots().map((snapshot) {
       if (snapshot.docs.isEmpty) {
         return null;
@@ -231,7 +254,6 @@ class AppointmentViewModel extends ChangeNotifier {
         notifyListeners();
       },
       onError: (error) {
-        print("Error al escuchar la próxima cita: $error");
         _isDashboardLoading = false;
         _nextAppointment = null;
         notifyListeners();

@@ -26,6 +26,17 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     initializeDateFormatting('es_ES', null);
+
+    // Esta función se mantiene para la consistencia de datos (Enfoque Híbrido).
+    // Se ejecuta una vez para actualizar el estado en Firestore.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userViewModel = context.read<UserViewModel>();
+      final appointmentViewModel = context.read<AppointmentViewModel>();
+      final activeProfile = userViewModel.activeProfile;
+      if (activeProfile != null) {
+        appointmentViewModel.checkForMissedAppointments(activeProfile.uid);
+      }
+    });
   }
 
   @override
@@ -102,33 +113,25 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
           color: AppColors.primaryColor(context).withAlpha(70),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
-        indicatorPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 6,
-        ),
+        indicatorPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        unselectedLabelStyle: const TextStyle(
-          fontWeight: FontWeight.normal,
-          fontSize: 15,
-        ),
+        unselectedLabelStyle:
+            const TextStyle(fontWeight: FontWeight.normal, fontSize: 15),
         overlayColor: WidgetStateProperty.all(Colors.transparent),
         splashFactory: NoSplash.splashFactory,
         tabs: [
           Tab(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
               child: const Text('Próximas'),
             ),
           ),
           Tab(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
               child: const Text('Pasadas'),
             ),
           ),
@@ -159,10 +162,7 @@ class _AppointmentTabPageState extends State<_AppointmentTabPage>
   @override
   void initState() {
     super.initState();
-    final appointmentViewModel = Provider.of<AppointmentViewModel>(
-      context,
-      listen: false,
-    );
+    final appointmentViewModel = context.read<AppointmentViewModel>();
     _appointmentsStream = widget.isUpcoming
         ? appointmentViewModel.getUpcomingAppointments(widget.profileId)
         : appointmentViewModel.getPastAppointments(widget.profileId);
@@ -221,10 +221,21 @@ class _AppointmentTabPageState extends State<_AppointmentTabPage>
       itemCount: appointments.length,
       itemBuilder: (context, index) {
         final cita = appointments[index];
+        bool displayAsUpcoming = isUpcoming;
+
+        final now = DateTime.now();
+        if (isUpcoming &&
+            cita.status == 'confirmada' &&
+            cita.assignedDate != null &&
+            cita.assignedDate!.isBefore(now)) {
+          displayAsUpcoming = false;
+        }
+
         return AppointmentCard(
           key: ValueKey(cita.id),
           appointment: cita,
-          isUpcoming: isUpcoming,
+          // Usamos nuestra nueva variable para decidir el estilo de la tarjeta.
+          isUpcoming: displayAsUpcoming,
         );
       },
     );

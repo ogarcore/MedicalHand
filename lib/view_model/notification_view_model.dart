@@ -21,15 +21,19 @@ class NotificationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> markAllAsRead(String userId) async {
-    await NotificationStorageService.markAllAsRead(userId);
-    await loadNotifications(userId);
+Future<void> markAllAsRead(String userId) async {
+  for (var notification in _notifications) {
+    notification.isRead = true;
   }
+  notifyListeners(); 
+  await NotificationStorageService.markAllAsRead(userId);
+}
 
   Future<void> clearAll(String userId) async {
-    await NotificationStorageService.clearNotifications(userId);
-    await loadNotifications(userId);
-  }
+  _notifications = [];
+  notifyListeners();
+  await NotificationStorageService.clearNotifications(userId);
+}
 
   void clearDataOnSignOut() {
     _notifications = [];

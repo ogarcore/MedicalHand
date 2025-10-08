@@ -48,20 +48,22 @@ class _ChatScreenState extends State<ChatScreen> {
       _focusNode.unfocus();
       viewModel.sendMessage(_textController.text.trim());
       _textController.clear();
-      // CAMBIO CLAVE 4: Animamos al principio de la lista (que ahora es el final visible).
+      // El scroll se activa inmediatamente para mostrar el nuevo mensaje.
       _scrollToLatestMessage();
     }
   }
 
-  // La función ahora se desplaza a la posición 0.0, que es el final en una lista invertida.
   void _scrollToLatestMessage() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        0.0,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    }
+    // Un pequeño retraso asegura que el ListView tenga tiempo de añadir el nuevo item.
+    Future.delayed(const Duration(milliseconds: 50), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          0.0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   void _showInfoDialog() {
@@ -128,36 +130,42 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               child: Consumer<ChatViewModel>(
                 builder: (context, viewModel, child) {
-                  // CAMBIO CLAVE 5: Se elimina la llamada a `_scrollToBottom` de aquí.
-
-                  // Mostramos el estado inicial mientras se carga el historial.
                   if (viewModel.isLoading && viewModel.messages.isEmpty) {
                     return _buildInitialState();
                   }
 
-                  // Mostramos un mensaje si no hay historial.
                   if (!viewModel.isLoading && viewModel.messages.isEmpty) {
                     return _buildEmptyState();
                   }
 
+                  // --- INICIO DE LA CORRECCIÓN CLAVE ---
                   return ListView.builder(
                     controller: _scrollController,
-                    // CAMBIO CLAVE 6: La propiedad 'reverse' invierte la lista visualmente.
                     reverse: true,
                     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    // El itemCount es la cantidad de mensajes + 1 si estamos esperando respuesta.
                     itemCount: viewModel.messages.length + (viewModel.isLoading ? 1 : 0),
                     itemBuilder: (context, index) {
-                      // El indicador de "escribiendo" ahora va al principio de la lista.
+                      // Si estamos esperando respuesta y es el primer item de la lista (la más nueva),
+                      // mostramos el indicador de "escribiendo...".
                       if (viewModel.isLoading && index == 0) {
                         return const TypingIndicator();
                       }
                       
-                      // Ajustamos el índice para acceder a los mensajes.
+                      // Para el resto de los items, calculamos el índice correcto en la lista de mensajes.
+                      // Si estamos cargando, restamos 1 al índice porque el TypingIndicator ocupa la posición 0.
                       final messageIndex = viewModel.isLoading ? index - 1 : index;
+
+                      // Esta comprobación de seguridad previene el error 'RangeError'.
+                      if (messageIndex < 0 || messageIndex >= viewModel.messages.length) {
+                        return const SizedBox.shrink(); // No dibuja nada si el índice es inválido.
+                      }
+
                       final message = viewModel.messages[messageIndex];
                       return ChatBubble(message: message);
                     },
                   );
+                  // --- FIN DE LA CORRECCIÓN CLAVE ---
                 },
               ),
             ),
@@ -172,14 +180,12 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  // Un widget para el estado inicial de carga.
   Widget _buildInitialState() {
     return const Center(child: CircularProgressIndicator());
   }
-  
-  // Un widget para cuando no hay mensajes.
+
   Widget _buildEmptyState() {
-     return Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -195,28 +201,17 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              HugeIcons.strokeRoundedRobot01,
-              color: Colors.white,
-              size: 32,
-            ),
+            child: const Icon(HugeIcons.strokeRoundedRobot01, color: Colors.white, size: 32),
           ),
           const SizedBox(height: 20),
           Text(
             'Tu asistente de salud',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textColor(context),
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textColor(context)),
           ),
           const SizedBox(height: 8),
           Text(
             'Haz tu primera consulta de bienestar',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textLightColor(context),
-            ),
+            style: TextStyle(fontSize: 14, color: AppColors.textLightColor(context)),
           ),
         ],
       ),

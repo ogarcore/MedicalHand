@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 
 class NotificationFilters extends StatelessWidget {
-  final int unreadCount;
   final List<String> filters;
   final int selectedIndex;
   final ValueChanged<int> onFilterSelected;
 
   const NotificationFilters({
     super.key,
-    required this.unreadCount,
     required this.filters,
     required this.selectedIndex,
     required this.onFilterSelected,
@@ -17,6 +15,10 @@ class NotificationFilters extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = AppColors.primaryColor(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final containerWidth = screenWidth - 40; // 20 margin on each side
+    
     return Column(
       children: [
         Padding(
@@ -28,123 +30,112 @@ class NotificationFilters extends StatelessWidget {
           ),
           child: Align(
             alignment: Alignment.centerRight,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.primaryColor(context).withAlpha(229),
-                    AppColors.primaryColor(context).withAlpha(178),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Text(
-                unreadCount == 0
-                    ? 'No hay nuevas notificaciones'
-                    : unreadCount == 1
-                    ? '1 nueva notificación'
-                    : '$unreadCount nuevas notificaciones',
-                style: const TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                  letterSpacing: 0.2,
-                ),
-              ),
-            ),
           ),
         ),
         Container(
-          height: 46,
+          height: 54,
           margin: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.grey[300]!, width: 0.8),
+            color: Theme.of(context).brightness == Brightness.dark 
+                ? Colors.grey[800]!.withAlpha(60)
+                : Colors.grey[50],
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey[700]!
+                  : Colors.grey[200]!,
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(8),
+                blurRadius: 12,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
-          child: Row(
-            children: List.generate(filters.length, (index) {
-              final isSelected = index == selectedIndex;
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 3.0,
-                    vertical: 3,
-                  ),
-                  child: Stack(
-                    children: [
-                      // Fondo con efecto de acento suave
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 350),
-                        curve: Curves.fastOutSlowIn,
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.primaryColor(context)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(11),
-                          gradient: isSelected
-                              ? LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    AppColors.primaryColor(context),
-                                    AppColors.primaryColor(
-                                      context,
-                                    ).withAlpha(210),
-                                  ],
-                                )
-                              : null,
-                        ),
+          child: Stack(
+            children: [
+              // Indicador de selección animado - CORREGIDO
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeInOutCubic,
+                left: (selectedIndex * (containerWidth / filters.length)) + 4,
+                top: 4,
+                bottom: 4,
+                child: Container(
+                  width: (containerWidth / filters.length) - 8,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        primaryColor,
+                        Color.lerp(primaryColor, Colors.blue.shade400, 0.3)!,
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: primaryColor.withAlpha(120),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
                       ),
-                      // Texto con efecto de elevación suave
-                      Material(
+                    ],
+                  ),
+                ),
+              ),
+              // Botones
+              Row(
+                children: List.generate(filters.length, (index) {
+                  final isSelected = index == selectedIndex;
+                  return Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4.0,
+                        vertical: 4,
+                      ),
+                      child: Material(
                         color: Colors.transparent,
                         child: InkWell(
-                          borderRadius: BorderRadius.circular(11),
+                          borderRadius: BorderRadius.circular(12),
                           onTap: () => onFilterSelected(index),
-                          splashColor: AppColors.primaryColor(
-                            context,
-                          ).withAlpha(30),
-                          highlightColor: AppColors.primaryColor(
-                            context,
-                          ).withAlpha(40),
+                          splashColor: primaryColor.withAlpha(50),
+                          highlightColor: primaryColor.withAlpha(25),
                           child: Container(
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(11),
-                              border: isSelected
-                                  ? Border.all(
-                                      color: Colors.white.withAlpha(200),
-                                      width: 0.8,
-                                    )
-                                  : null,
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: Center(
                               child: AnimatedDefaultTextStyle(
-                                duration: const Duration(milliseconds: 250),
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
                                 style: TextStyle(
                                   color: isSelected
                                       ? Colors.white
-                                      : Colors.grey[700],
+                                      : Theme.of(context).brightness == Brightness.dark
+                                          ? Colors.grey[300]
+                                          : Colors.grey[700],
                                   fontWeight: isSelected
                                       ? FontWeight.w700
-                                      : FontWeight.w500,
-                                  fontSize: 13.5,
-                                  letterSpacing: isSelected ? 0.2 : 0.0,
+                                      : FontWeight.w600,
+                                  fontSize: 14,
+                                  letterSpacing: isSelected ? 0.3 : 0.1,
                                 ),
-                                child: Text(filters[index]),
+                                child: Text(
+                                  filters[index],
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              );
-            }),
+                    ),
+                  );
+                }),
+              ),
+            ],
           ),
         ),
       ],

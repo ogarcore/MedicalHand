@@ -36,15 +36,13 @@ class NotificationIconButton extends StatelessWidget {
               child: IconButton(
                 onPressed: onPressed,
                 icon: Icon(
-                  HugeIcons.strokeRoundedNotification03,
+                  HugeIcons.strokeRoundedInbox,
                   color: AppColors.textColor(context).withAlpha(204),
                   size: 25,
                 ),
               ),
             ),
-            // El punto rojo ahora depende del estado en el ViewModel,
-            // que se actualiza en tiempo real.
-            if (viewModel.hasUnreadNotifications)
+            if (viewModel.hasUnreadNotifications || viewModel.unreadCount > 0)
               Positioned(
                 right: 10,
                 top: 10,

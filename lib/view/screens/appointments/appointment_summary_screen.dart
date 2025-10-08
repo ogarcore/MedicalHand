@@ -90,7 +90,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
       hospital: widget.hospitalName,
       reason: widget.reason,
       requestTimestamp: DateTime.now(),
-      requiereExpediente: !expedienteExists,
+      requiresFile: !expedienteExists,
       verificationUrls: verificationUrls,
       reminder24hSent: false,
       reminder48hSent: false,

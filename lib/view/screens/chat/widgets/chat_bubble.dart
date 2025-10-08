@@ -24,7 +24,7 @@ class ChatBubble extends StatelessWidget {
             Container(
               width: 32,
               height: 32,
-              margin: const EdgeInsets.only(right: 8, top: 4),
+              margin: const EdgeInsets.only(right: 8, top: 2),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -67,14 +67,14 @@ class ChatBubble extends StatelessWidget {
                         ],
                       ),
                 borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(20),
-                  topRight: const Radius.circular(20),
-                  bottomLeft: isUserMessage
+                  topLeft:  isUserMessage
                       ? const Radius.circular(20)
                       : const Radius.circular(4),
-                  bottomRight: isUserMessage
+                  topRight:isUserMessage
                       ? const Radius.circular(4)
                       : const Radius.circular(20),
+                  bottomLeft: const Radius.circular(20),
+                  bottomRight: const Radius.circular(20),
                 ),
                 boxShadow: [
                   if (!isUserMessage)
@@ -109,7 +109,7 @@ class ChatBubble extends StatelessWidget {
             Container(
               width: 32,
               height: 32,
-              margin: const EdgeInsets.only(left: 8, top: 4),
+              margin: const EdgeInsets.only(left: 8, top: 2),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [

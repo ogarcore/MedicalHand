@@ -1,26 +1,23 @@
 //
 // =========================================================================
-// ARCHIVO: lib/view/screens/home/widgets/dashboard_action_buttons.dart (MODIFICADO)
-// CÓDIGO COMPLETO PARA COPIAR Y PEGAR
+// ARCHIVO: lib/view/screens/home/widgets/dashboard_action_buttons.dart (MODIFICADO CON ANIMACIÓN SHAKE)
 // =========================================================================
 //
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
-import 'package:p_hn25/data/models/cita_model.dart'; // Importación añadida
+import 'package:p_hn25/data/models/cita_model.dart';
 import 'package:p_hn25/view/screens/appointments/appointment_options_screen.dart';
 
 class DashboardActionButtons extends StatelessWidget {
-  // CAMBIO CLAVE 1: Recibimos el objeto de la cita completo, que puede ser nulo.
   final CitaModel? appointment;
 
   const DashboardActionButtons({super.key, this.appointment});
 
-  // CAMBIO CLAVE 2: La lógica para determinar si la cita es hoy, ahora vive aquí.
-  // Usamos un getter para que el código sea más limpio.
   bool get _isCheckInAvailable {
-    final appt = appointment; // Creamos una variable local para facilitar la comprobación de nulidad.
+    final appt = appointment;
     if (appt?.assignedDate == null) return false;
 
     final now = DateTime.now();
@@ -35,24 +32,24 @@ class DashboardActionButtons extends StatelessWidget {
     final warningColor = AppColors.warningColor(context);
     final accentColor = AppColors.accentColor(context);
 
-    // CAMBIO CLAVE 3: Usamos el nuevo getter para decidir si mostrar el botón.
     final bool canCheckIn = _isCheckInAvailable;
 
     return Column(
       children: [
         if (canCheckIn)
-          _buildCompactGlamorousButton(
-            context: context,
-            title: 'Confirmar asistencia',
-            subtitle: 'Recibir turno',
-            icon: HugeIcons.strokeRoundedTickDouble04,
-            primaryColor: warningColor,
-            onPressed: () {
-              // Tu lógica para el check-in va aquí
-            },
+          _ShakeButton(
+            child: _buildCompactGlamorousButton(
+              context: context,
+              title: 'Confirmar asistencia',
+              subtitle: 'Recibir turno',
+              icon: HugeIcons.strokeRoundedTickDouble04,
+              primaryColor: warningColor,
+              onPressed: () {
+                // Tu lógica para el check-in va aquí
+              },
+            ),
           ),
         if (canCheckIn) const SizedBox(height: 12),
-        // Este botón siempre es visible, así que no necesita cambios.
         _buildCompactGlamorousButton(
           context: context,
           title: 'Agendar cita',
@@ -70,7 +67,6 @@ class DashboardActionButtons extends StatelessWidget {
     );
   }
 
-  // El widget auxiliar para construir el botón no necesita ningún cambio.
   Widget _buildCompactGlamorousButton({
     required BuildContext context,
     required String title,
@@ -191,6 +187,68 @@ class DashboardActionButtons extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+// ==========================================================================
+// NUEVO WIDGET: _ShakeButton
+// ==========================================================================
+
+class _ShakeButton extends StatefulWidget {
+  final Widget child;
+
+  const _ShakeButton({required this.child});
+
+  @override
+  State<_ShakeButton> createState() => _ShakeButtonState();
+}
+
+class _ShakeButtonState extends State<_ShakeButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _offsetAnimation;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+
+    _offsetAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0, end: -6), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -6, end: 6), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: 6, end: -6), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: -6, end: 0), weight: 1),
+    ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    _timer = Timer.periodic(const Duration(seconds: 10), (_) {
+      if (mounted) _controller.forward(from: 0);
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _offsetAnimation,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(_offsetAnimation.value, 0),
+          child: child,
+        );
+      },
+      child: widget.child,
     );
   }
 }

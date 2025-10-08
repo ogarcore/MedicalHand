@@ -1,4 +1,3 @@
-// lib/view/screens/appointments/widgets/appointment_card.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
@@ -27,8 +26,103 @@ class AppointmentCard extends StatefulWidget {
 class _AppointmentCardState extends State<AppointmentCard> {
   bool _isExpanded = false;
 
-  // --- NINGÚN CAMBIO EN LA LÓGICA ---
-  // Todas las funciones de aquí abajo permanecen intactas.
+  // --- INICIO DE LA MODIFICACIÓN ---
+  // Nueva función para mostrar el diálogo de detalles.
+  void _showDetailsDialog() {
+    final cita = widget.appointment;
+    showDialog(
+      context: context,
+      builder: (ctx) => CustomModal(
+        title: 'Detalles de la Cita',
+        icon: HugeIcons.strokeRoundedDocumentValidation,
+        content: SingleChildScrollView(
+          // Para asegurar que no haya overflow si el texto es largo
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDetailRow(
+                HugeIcons.strokeRoundedStethoscope,
+                'Especialidad',
+                cita.specialty ?? 'No especificada',
+              ),
+              _buildDetailRow(
+                HugeIcons.strokeRoundedCalendar01,
+                'Fecha y Hora',
+                _formatDate(),
+              ),
+              _buildDetailRow(
+                HugeIcons.strokeRoundedHospital01,
+                'Hospital',
+                cita.hospital,
+              ),
+              _buildDetailRow(
+                HugeIcons.strokeRoundedDoctor01,
+                'Doctor',
+                cita.assignedDoctor ?? 'No asignado',
+              ),
+              _buildDetailRow(
+                HugeIcons.strokeRoundedHospitalBed01,
+                'Consultorio',
+                cita.clinicOffice ?? 'No asignado',
+              ),
+              _buildDetailRow(
+                HugeIcons.strokeRoundedTask01,
+                'Razón de Consulta',
+                cita.reason,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          ModalButton(
+            text: 'Cerrar',
+            onPressed: () => Navigator.of(ctx).pop(),
+            isPrimary: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Nuevo widget auxiliar para crear las filas de detalles en el diálogo.
+  Widget _buildDetailRow(IconData icon, String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18, color: AppColors.primaryColor(context)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  // --- FIN DE LA MODIFICACIÓN ---
 
   void _showConfirmationSnackBar(String message) {
     if (!mounted) return;
@@ -40,8 +134,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
             Expanded(
               child: Text(
                 message,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
@@ -158,10 +254,19 @@ class _AppointmentCardState extends State<AppointmentCard> {
         widget.isUpcoming && widget.appointment.status == 'confirmada';
     final cita = widget.appointment;
 
-    // --- NUEVO: Lógica para el color dinámico del Header ---
     List<Color> headerGradientColors;
-
     switch (cita.status) {
+      case 'no_asistio':
+        final primaryColor = AppColors.textLightColor(context).withAlpha(220);
+        headerGradientColors = [
+          primaryColor,
+          Color.lerp(
+            primaryColor.withAlpha(210),
+            const Color.fromARGB(255, 88, 88, 88),
+            0.3,
+          )!,
+        ];
+        break;
       case 'confirmada':
         final primaryColor = AppColors.primaryColor(context);
         headerGradientColors = [
@@ -172,8 +277,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
       case 'cancelada':
         final warningColor = AppColors.warningColor(context);
         headerGradientColors = [
-          warningColor.withAlpha(220),
-          Color.lerp(warningColor, Colors.black, 0.1)!,
+          warningColor.withAlpha(230),
+          Color.lerp(warningColor.withAlpha(220), Colors.black, 0.1)!,
         ];
         break;
       case 'pendiente':
@@ -184,9 +289,14 @@ class _AppointmentCardState extends State<AppointmentCard> {
         ];
         break;
       case 'finalizada':
+        final secondaryColor = AppColors.secondaryColor(context);
         headerGradientColors = [
-          Colors.grey.shade700,
-          Colors.grey.shade900,
+          secondaryColor.withAlpha(200),
+          Color.lerp(
+            AppColors.primaryColor(context).withAlpha(200),
+            Colors.black,
+            0.15,
+          )!,
         ];
         break;
       case 'pendiente_reprogramacion':
@@ -197,17 +307,14 @@ class _AppointmentCardState extends State<AppointmentCard> {
         ];
         break;
       default:
-        headerGradientColors = [
-          Colors.grey.shade800,
-          Colors.black,
-        ];
+        headerGradientColors = [Colors.grey.shade800, Colors.black];
     }
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha(20),
@@ -223,19 +330,18 @@ class _AppointmentCardState extends State<AppointmentCard> {
       ),
       child: Column(
         children: [
-          // Header con el nuevo color dinámico
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: headerGradientColors, // <-- Color dinámico aplicado aquí
+                colors: headerGradientColors,
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(24),
-                topRight: Radius.circular(24),
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
             ),
             child: Row(
@@ -289,54 +395,21 @@ class _AppointmentCardState extends State<AppointmentCard> {
             ),
           ),
 
-          // Contenido de la Cita (sin cambios)
+          // --- CAMBIO: Padding más compacto solo para cards finalizadas ---
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        cita.hospital,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textColor(context),
-                          letterSpacing: -0.2,
-                          height: 1.2,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 10),
-                      _buildInfoRow(
-                        HugeIcons.strokeRoundedCalendar01,
-                        _formatDate(),
-                      ),
-                      if (!widget.isUpcoming) ...[
-                        const SizedBox(height: 6),
-                        _buildInfoRow(
-                          HugeIcons.strokeRoundedDoctor01,
-                          cita.assignedDoctor ?? 'Por Asignar',
-                          maxLines: 1,
-                        ),
-                      ],
-                      const SizedBox(height: 6),
-                      _buildInfoRow(
-                        HugeIcons.strokeRoundedHospitalBed01,
-                        cita.clinicOffice ?? 'Por Asignar',
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            padding: EdgeInsets.fromLTRB(
+              20,
+              10,
+              20,
+              cita.status == 'finalizada'
+                  ? 12
+                  : 16, // Reducido bottom padding para finalizadas
             ),
+            child: widget.isUpcoming
+                ? _buildUpcomingContent(cita)
+                : _buildPastContent(cita),
           ),
 
-          // Sección de Opciones (sin cambios)
           if (showOptions) ...[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -354,9 +427,124 @@ class _AppointmentCardState extends State<AppointmentCard> {
               ),
             ),
             _buildOptionsSection(),
-          ]
+          ],
         ],
       ),
+    );
+  }
+
+  Widget _buildUpcomingContent(CitaModel cita) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          cita.hospital,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textColor(context),
+            letterSpacing: -0.2,
+            height: 1.2,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 10),
+        _buildInfoRow(HugeIcons.strokeRoundedCalendar01, _formatDate()),
+        const SizedBox(height: 6),
+        _buildInfoRow(
+          HugeIcons.strokeRoundedHospitalBed01,
+          cita.clinicOffice ?? 'Por Asignar',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPastContent(CitaModel cita) {
+    switch (cita.status) {
+      case 'no_asistio':
+        return _buildContent(cita);
+      case 'cancelada':
+        return _buildContent(cita);
+      case 'finalizada':
+        return _buildFinalizadaContent(cita);
+      default:
+        return _buildContent(cita);
+    }
+  }
+
+  Widget _buildContent(CitaModel cita) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          cita.hospital,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textColor(context),
+            letterSpacing: -0.2,
+            height: 1.2,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 6),
+        _buildInfoRow(HugeIcons.strokeRoundedCalendar01, _formatDate()),
+      ],
+    );
+  }
+
+  Widget _buildFinalizadaContent(CitaModel cita) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          cita.hospital,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textColor(context),
+            letterSpacing: -0.2,
+            height: 1.2,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        // --- CAMBIOS: Espacios reducidos para hacerla más compacta ---
+        const SizedBox(height: 6), // Reducido de 10 a 8
+        _buildInfoRow(HugeIcons.strokeRoundedCalendar01, _formatDate()),
+        const SizedBox(height: 6), // Reducido espacio antes del botón
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            onPressed: _showDetailsDialog,
+            // Ícono más pequeño
+            label: const Text(
+              'Ver Detalles',
+              style: TextStyle(
+                fontWeight: FontWeight.w700, // Cambiado a w600 en lugar de bold
+                fontSize: 13.5, // Texto más pequeño
+              ),
+            ),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.primaryColor(context),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 4,
+              ), // Padding más compacto
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  10,
+                ), // Border radius más pequeño
+              ),
+              minimumSize: Size.zero, // Elimina tamaño mínimo
+              tapTargetSize: MaterialTapTargetSize
+                  .shrinkWrap, // Hace el área táctil más compacta
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -369,7 +557,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
           child: Text(
             text,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 14,
               color: AppColors.textLightColor(context),
               height: 1.4,
               fontWeight: FontWeight.w500,
@@ -433,25 +621,30 @@ class _AppointmentCardState extends State<AppointmentCard> {
               children: [
                 if (_isExpanded)
                   Padding(
-                    padding:
-                        const EdgeInsets.only(top: 8.0, bottom: 8, left: 4, right: 4),
+                    padding: const EdgeInsets.only(
+                      top: 8.0,
+                      bottom: 8,
+                      left: 4,
+                      right: 4,
+                    ),
                     child: Row(
                       children: [
                         Expanded(
                           child: ElevatedButton(
                             onPressed: _rescheduleAppointment,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.accentColor(context)
-                                  .withAlpha(200),
+                              backgroundColor: AppColors.accentColor(
+                                context,
+                              ).withAlpha(200),
                               foregroundColor: Colors.white,
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 10),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               elevation: 1,
-                              shadowColor: AppColors.accentColor(context)
-                                  .withAlpha(100),
+                              shadowColor: AppColors.accentColor(
+                                context,
+                              ).withAlpha(100),
                             ),
                             child: const Text(
                               "Reprogramar",
@@ -469,8 +662,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white.withAlpha(20),
                               foregroundColor: AppColors.warningColor(context),
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 10),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 side: BorderSide(
@@ -500,9 +692,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
     );
   }
 
-  // --- WIDGET AUXILIAR MODIFICADO ---
   Widget _buildStatusChip(String status) {
-    // --- NUEVO: Variables de color constantes para el chip ---
     const Color chipTextColor = Colors.white;
     final Color chipBackgroundColor = Colors.white.withAlpha(40);
     IconData? icon;
@@ -511,8 +701,10 @@ class _AppointmentCardState extends State<AppointmentCard> {
         ? status[0].toUpperCase() + status.substring(1).replaceAll('_', ' ')
         : '';
 
-    // El switch ahora solo define el ícono
     switch (status) {
+      case 'no_asistio':
+        icon = HugeIcons.strokeRoundedCalendarRemove02;
+        break;
       case 'confirmada':
         icon = HugeIcons.strokeRoundedTickDouble01;
         break;
@@ -535,19 +727,19 @@ class _AppointmentCardState extends State<AppointmentCard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: chipBackgroundColor, // <-- Color de fondo constante
+        color: chipBackgroundColor,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: Colors.white.withAlpha(80), width: 0.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: chipTextColor), // <-- Color de ícono constante
+          Icon(icon, size: 12, color: chipTextColor),
           const SizedBox(width: 4),
           Text(
             displayStatus,
             style: const TextStyle(
-              color: chipTextColor, // <-- Color de texto constante
+              color: chipTextColor,
               fontWeight: FontWeight.w600,
               fontSize: 10,
             ),

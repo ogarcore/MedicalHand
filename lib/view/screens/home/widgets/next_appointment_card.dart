@@ -3,7 +3,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/data/models/cita_model.dart';
-import 'package:p_hn25/view/screens/home/widgets/appointment_details_screen.dart';
+import 'package:p_hn25/view/screens/home/widgets/appointment_details_modal.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; 
 
@@ -222,12 +222,10 @@ class NextAppointmentCard extends StatelessWidget {
                     primaryColor,
                     hasBorder: true,
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AppointmentDetailsScreen(
-                            appointment: appointment,
-                          ),
+                      showDialog(
+                        context: context,
+                        builder: (context) => AppointmentDetailsModal(
+                          appointment: appointment,
                         ),
                       );
                     },

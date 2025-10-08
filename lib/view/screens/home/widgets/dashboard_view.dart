@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:p_hn25/data/models/cita_model.dart';
@@ -20,10 +21,43 @@ class DashboardView extends StatefulWidget {
 }
 
 class _DashboardViewState extends State<DashboardView> {
+  Timer? _timer;
+  // Esta variable ahora solo se usa para controlar el timer y evitar que se reinicie innecesariamente.
+  String? _monitoredAppointmentId;
+
   @override
   void initState() {
     super.initState();
     initializeDateFormatting('es_ES', null);
+  }
+
+  void _startTimer(CitaModel? appointment) {
+    _timer?.cancel();
+    _monitoredAppointmentId = appointment?.id;
+    if (appointment?.assignedDate == null || !mounted) return;
+
+    final monitoredAppointment = appointment!;
+
+    _timer = Timer.periodic(const Duration(seconds: 30), (timer) { // Verificación más frecuente
+      // Si el widget ya no existe o la cita que monitoreamos ha cambiado, detenemos este timer.
+      if (!mounted || _monitoredAppointmentId != monitoredAppointment.id) {
+        timer.cancel();
+        return;
+      }
+      final hasPassed = DateTime.now().isAfter(monitoredAppointment.assignedDate!);
+      if (hasPassed) {
+        context
+            .read<AppointmentViewModel>()
+            .updateAppointmentStatus(monitoredAppointment.id!, 'no_asistio');
+        timer.cancel(); // El stream se encargará de actualizar la UI.
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -48,23 +82,61 @@ class _DashboardViewState extends State<DashboardView> {
   }
 
   Widget _buildDashboardContent(BuildContext context, UserModel activeProfile) {
-    final appointmentViewModel = context.read<AppointmentViewModel>();
+    final appointmentViewModel = context.watch<AppointmentViewModel>();
 
     return StreamBuilder<CitaModel?>(
+      // La Key es CRUCIAL para que al cambiar de perfil, el StreamBuilder se reconstruya
+      // desde cero, garantizando que no queden datos del perfil anterior.
       key: ValueKey(activeProfile.uid),
-      // CAMBIO CLAVE 4: Le damos al StreamBuilder los datos que ya cargamos.
       initialData: appointmentViewModel.initialDashboardAppointment,
-      stream: appointmentViewModel.getDashboardAppointmentStream(
-        activeProfile.uid,
-      ),
+      stream: appointmentViewModel.getDashboardAppointmentStream(activeProfile.uid),
       builder: (context, snapshot) {
+        // --- INICIO DE LA CORRECCIÓN DEFINITIVA ---
+        
+        // La ÚNICA fuente de la verdad para la UI es el dato que llega del StreamBuilder.
+        // Ya no usamos una variable de estado local para decidir qué mostrar.
+        final CitaModel? currentAppointment = snapshot.data;
+        
+        // El timer se gestiona de forma independiente, solo para la lógica de expirar la cita.
+        // Se reinicia solo si la cita que llega del stream es diferente a la que ya estamos monitoreando.
+        if (_monitoredAppointmentId != currentAppointment?.id) {
+          _startTimer(currentAppointment);
+        }
+
+        // La validez de la cita se calcula SIEMPRE con el dato más reciente del stream.
+        final bool isAppointmentStillValid = currentAppointment?.assignedDate != null &&
+            currentAppointment!.assignedDate!.isAfter(DateTime.now());
+
+        final Widget appointmentSection;
+        
+        // La lógica para decidir qué widget mostrar es ahora simple y directa.
+        if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+          appointmentSection = const _DashboardLoadingShimmer(key: ValueKey('loading'));
+        } else if (isAppointmentStillValid) {
+          appointmentSection = NextAppointmentCard(
+            key: ValueKey(currentAppointment.id),
+            appointment: currentAppointment,
+          );
+        } else {
+          appointmentSection = const NoAppointmentCard(key: ValueKey('no-appointment'));
+        }
+
+        // --- FIN DE LA CORRECCIÓN DEFINITIVA ---
+
         return Column(
           children: [
-            // El shimmer ahora solo se mostrará si estamos esperando Y no tenemos datos iniciales.
-            // Gracias a la pre-carga, esto casi nunca pasará, evitando el parpadeo.
-            _buildAppointmentSection(context, snapshot),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 400),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              child: appointmentSection,
+            ),
             const SizedBox(height: 16),
-            DashboardActionButtons(appointment: snapshot.data),
+            DashboardActionButtons(
+              // Pasamos directamente la cita del stream a los botones.
+              appointment: isAppointmentStillValid ? currentAppointment : null,
+            ),
             const SizedBox(height: 18),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -88,42 +160,18 @@ class _DashboardViewState extends State<DashboardView> {
       },
     );
   }
-
-  Widget _buildAppointmentSection(
-    BuildContext context,
-    AsyncSnapshot<CitaModel?> snapshot,
-  ) {
-    // CAMBIO CLAVE 5: Ajustamos la condición de carga.
-    // Solo muestra el shimmer si está esperando Y NO tiene datos para mostrar.
-    if (snapshot.connectionState == ConnectionState.waiting &&
-        !snapshot.hasData) {
-      return const _DashboardLoadingShimmer();
-    }
-
-    // Si hay un error, lo mostramos.
-    if (snapshot.hasError) {
-      return const NoAppointmentCard();
-    }
-
-    // Si tenemos datos (ya sea iniciales o del stream), los mostramos.
-    final appointment = snapshot.data;
-    if (appointment != null) {
-      return NextAppointmentCard(appointment: appointment);
-    } else {
-      return const NoAppointmentCard();
-    }
-  }
 }
 
-// El resto de los widgets de shimmer no necesitan cambios.
+// El Shimmer no necesita cambios.
 class _DashboardLoadingShimmer extends StatelessWidget {
-  const _DashboardLoadingShimmer();
+  const _DashboardLoadingShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      period: const Duration(milliseconds: 1500),
       child: const _AppointmentCardPlaceholder(),
     );
   }
@@ -132,13 +180,13 @@ class _DashboardLoadingShimmer extends StatelessWidget {
 class _AppointmentCardPlaceholder extends StatelessWidget {
   const _AppointmentCardPlaceholder();
 
-  Widget _buildPlaceholderLine({required double width, double height = 14}) {
+  Widget _buildPlaceholderLine({required double width, double height = 14, double borderRadius = 8}) {
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(borderRadius),
       ),
     );
   }
@@ -146,48 +194,134 @@ class _AppointmentCardPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      width: double.infinity,
+      height: 188,
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(220),
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(15),
+            blurRadius: 32,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildPlaceholderLine(width: 150, height: 18),
-              _buildPlaceholderLine(width: 80, height: 24),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Container(height: 3, width: 40, color: Colors.white),
-          const SizedBox(height: 12),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade400,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildPlaceholderLine(width: double.infinity),
-                    const SizedBox(height: 8),
-                    _buildPlaceholderLine(width: 180),
-                  ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildPlaceholderLine(width: 160, height: 18, borderRadius: 6),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Container(
+                            width: 16,
+                            height: 16,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildPlaceholderLine(width: 80, height: 16, borderRadius: 6),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Container(
+                            width: 16,
+                            height: 16,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildPlaceholderLine(width: 60, height: 15, borderRadius: 6),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withAlpha(150),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildPlaceholderLine(width: 30, height: 27, borderRadius: 6),
+                      const SizedBox(height: 2),
+                      _buildPlaceholderLine(width: 40, height: 14, borderRadius: 4),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildButtonPlaceholder(),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildButtonPlaceholder(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildButtonPlaceholder() {
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 18,
+            height: 18,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(6),
+            ),
+          ),
+          const SizedBox(width: 8),
+          _buildPlaceholderLine(width: 80, height: 14, borderRadius: 6),
         ],
       ),
     );
