@@ -10,7 +10,7 @@ class NoAppointmentCard extends StatelessWidget {
     final primaryColor = AppColors.primaryColor(context);
     
     return Container(
-      margin: const EdgeInsets.only(top: 10),
+      
       width: double.infinity,
       padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(

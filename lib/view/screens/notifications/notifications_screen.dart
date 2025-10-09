@@ -154,19 +154,20 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         ),
       ),
 
-      // --- NUEVA ANIMACIÓN MÁS FLUIDA Y ELEGANTE DEL FOOTER ---
+      // --- FOOTER CON ANIMACIÓN FLUIDA TAMBIÉN AL DESLIZAR ---
       bottomNavigationBar: AnimatedBuilder(
         animation: _tabController.animation!,
         builder: (context, child) {
-          final showFooter = _tabController.index == 0;
-          return AnimatedSlide(
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeInOut,
-            offset: showFooter ? Offset.zero : const Offset(0, 1),
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 250),
-              opacity: showFooter ? 1 : 0,
-              curve: Curves.easeInOut,
+          // 0 = Notificaciones, 1 = Referencias
+          final animationValue = _tabController.animation!.value;
+          final footerVisible =
+              (1.0 - (animationValue.clamp(0.0, 1.0))) // valor inverso
+                  .clamp(0.0, 1.0);
+
+          return Transform.translate(
+            offset: Offset(0, 85 * (1 - footerVisible)),
+            child: Opacity(
+              opacity: footerVisible,
               child: SizedBox(
                 height: 85.0,
                 child: Wrap(children: [child!]),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class PermissionService {
-  Future<bool> handleCameraPermission(BuildContext context) async {
+  Future<bool> handleCameraPermission(BuildContext context, {String? reason}) async {
     var status = await Permission.camera.status;
 
     if (status.isGranted) {

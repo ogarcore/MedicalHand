@@ -249,14 +249,19 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                 final navigator = Navigator.of(context);
                 Navigator.of(dialogContext).pop();
 
-                showDialog(
+                // --- NUEVA TRANSICIÓN MÁS SUAVE AL CERRAR SESIÓN ---
+                showGeneralDialog(
                   context: context,
                   barrierDismissible: false,
-                  barrierColor: AppColors.backgroundColor(context),
-                  builder: (BuildContext context) {
-                    return Scaffold(
-                      backgroundColor: AppColors.backgroundColor(context),
-                      body: Center(
+                  barrierColor: Colors.black.withOpacity(0.15),
+                  transitionDuration: const Duration(milliseconds: 250),
+                  pageBuilder: (_, __, ___) => Scaffold(
+                    backgroundColor: AppColors.backgroundColor(context),
+                    body: Center(
+                      child: AnimatedScale(
+                        scale: 1,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOutBack,
                         child: Container(
                           width: 280,
                           padding: const EdgeInsets.all(32),
@@ -275,26 +280,22 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              // Contenedor circular con gradiente y borde
                               Container(
                                 width: 80,
                                 height: 80,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: AppColors.primaryColor(
-                                      context,
-                                    ).withAlpha(60),
+                                    color: AppColors.primaryColor(context)
+                                        .withAlpha(60),
                                     width: 2,
                                   ),
                                   gradient: RadialGradient(
                                     colors: [
-                                      AppColors.primaryColor(
-                                        context,
-                                      ).withAlpha(30),
-                                      AppColors.primaryColor(
-                                        context,
-                                      ).withAlpha(10),
+                                      AppColors.primaryColor(context)
+                                          .withAlpha(30),
+                                      AppColors.primaryColor(context)
+                                          .withAlpha(10),
                                     ],
                                     center: Alignment.center,
                                     radius: 0.7,
@@ -306,7 +307,8 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                                     height: 50,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 3,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                      valueColor:
+                                          AlwaysStoppedAnimation<Color>(
                                         AppColors.primaryColor(context),
                                       ),
                                     ),
@@ -314,7 +316,6 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                                 ),
                               ),
                               const SizedBox(height: 24),
-                              // Texto principal
                               Text(
                                 'Cerrando sesión',
                                 style: TextStyle(
@@ -325,15 +326,13 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              // Texto secundario
                               Text(
                                 'Su sesión se está cerrando de forma segura',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
-                                  color: AppColors.textColor(
-                                    context,
-                                  ).withAlpha(180),
+                                  color: AppColors.textColor(context)
+                                      .withAlpha(180),
                                   height: 1.4,
                                 ),
                                 textAlign: TextAlign.center,
@@ -342,14 +341,32 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                           ),
                         ),
                       ),
-                    );
-                  },
+                    ),
+                  ),
                 );
+
                 await authViewModel.signOut(context);
+
+                // Espera breve para dejar respirar la animación
+                await Future.delayed(const Duration(milliseconds: 300));
+
                 if (!navigator.mounted) return;
-                navigator.pop();
+                navigator.pop(); // Cierra el diálogo suave
+                await Future.delayed(const Duration(milliseconds: 100));
+
                 navigator.pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const SplashScreen()),
+                  PageRouteBuilder(
+                    pageBuilder: (_, __, ___) => const SplashScreen(),
+                    transitionDuration: const Duration(milliseconds: 300),
+                    transitionsBuilder:
+                        (_, animation, __, child) => FadeTransition(
+                      opacity: CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeOut,
+                      ),
+                      child: child,
+                    ),
+                  ),
                   (Route<dynamic> route) => false,
                 );
               },

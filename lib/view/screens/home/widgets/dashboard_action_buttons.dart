@@ -1,20 +1,22 @@
-//
-// =========================================================================
-// ARCHIVO: lib/view/screens/home/widgets/dashboard_action_buttons.dart (MODIFICADO CON ANIMACIÓN SHAKE)
-// =========================================================================
-//
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/data/models/cita_model.dart';
+import 'package:p_hn25/data/network/permission_service.dart';
 import 'package:p_hn25/view/screens/appointments/appointment_options_screen.dart';
+import 'package:p_hn25/view/screens/home/pre_check_in_instructions_screen.dart';
+import 'package:p_hn25/view/screens/home/qr_scanner_screen.dart';
+import 'package:p_hn25/view_model/appointment_view_model.dart';
+import 'package:p_hn25/view_model/user_view_model.dart';
+import 'package:provider/provider.dart';
 
 class DashboardActionButtons extends StatelessWidget {
   final CitaModel? appointment;
+  // Instancia del servicio de permisos.
+  final PermissionService _permissionService = PermissionService();
 
-  const DashboardActionButtons({super.key, this.appointment});
+  DashboardActionButtons({super.key, this.appointment});
 
   bool get _isCheckInAvailable {
     final appt = appointment;
@@ -27,27 +29,119 @@ class DashboardActionButtons extends StatelessWidget {
         now.day == appointmentDate.day;
   }
 
+  Future<void> _handleScanQRPressed(BuildContext context) async {
+    final hasPermission = await _permissionService.handleCameraPermission(
+      context,
+      reason: 'MedicalHand necesita acceso a tu cámara para escanear el código QR de llegada y registrarte en la fila virtual.',
+    );
+    if (!hasPermission || !context.mounted) return;
+
+    final scannedData = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (context) => const QRScannerScreen()),
+    );
+
+    if (scannedData != null && context.mounted) {
+      // Obtenemos los ViewModels y los datos necesarios.
+      final appointmentViewModel = context.read<AppointmentViewModel>();
+      final userViewModel = context.read<UserViewModel>();
+      final activeProfile = userViewModel.activeProfile;
+
+      if (appointment == null || activeProfile == null) return;
+      
+      // Mostramos un diálogo de carga.
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+
+      // Llamamos a la función del ViewModel.
+      final result = await appointmentViewModel.performCheckIn(
+        qrData: scannedData,
+        appointment: appointment!,
+        patientUid: activeProfile.uid,
+        patientName: "${activeProfile.firstName} ${" "} ${activeProfile.lastName}",
+      );
+
+      if (context.mounted) {
+        Navigator.of(context).pop(); // Cerramos el diálogo de carga.
+        
+        if (result['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('¡Check-in exitoso! Tu turno es el #${result['turnNumber']}.'),
+              backgroundColor: AppColors.successColor(context).withAlpha(240),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['message'] ?? 'Ocurrió un error desconocido.'),
+              backgroundColor: AppColors.warningColor(context).withAlpha(240),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
+    final primaryColor = AppColors.warningColor(context).withAlpha(190);
     final warningColor = AppColors.warningColor(context);
     final accentColor = AppColors.accentColor(context);
 
     final bool canCheckIn = _isCheckInAvailable;
+    final bool isAsistenciaConfirmada =
+        appointment?.status == 'asistencia_confirmada';
 
     return Column(
       children: [
         if (canCheckIn)
-          _ShakeButton(
-            child: _buildCompactGlamorousButton(
-              context: context,
-              title: 'Confirmar asistencia',
-              subtitle: 'Recibir turno',
-              icon: HugeIcons.strokeRoundedTickDouble04,
-              primaryColor: warningColor,
-              onPressed: () {
-                // Tu lógica para el check-in va aquí
-              },
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 400),
+            switchInCurve: Curves.easeOutBack,
+            switchOutCurve: Curves.easeInBack,
+            transitionBuilder: (child, animation) => FadeTransition(
+              opacity: animation,
+              child: ScaleTransition(scale: animation, child: child),
             ),
+            child: isAsistenciaConfirmada
+                ? _ShakeButton(
+                    key: const ValueKey('escanearQR'),
+                    child: _buildCompactGlamorousButton(
+                      context: context,
+                      title: 'Escanear QR',
+                      subtitle: 'Recibir turno',
+                      icon: HugeIcons.strokeRoundedQrCode01,
+                      primaryColor: warningColor,
+                      onPressed: () => _handleScanQRPressed(context),
+                    ),
+                  )
+                : _ShakeButton(
+                    key: const ValueKey('confirmarAsistencia'),
+                    child: _buildCompactGlamorousButton(
+                      context: context,
+                      title: 'Confirmar asistencia',
+                      subtitle: 'Registra de asistencia',
+                      icon: HugeIcons.strokeRoundedTickDouble04,
+                      primaryColor: primaryColor,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PreCheckInInstructionsScreen(
+                              appointment: appointment!,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
           ),
         if (canCheckIn) const SizedBox(height: 12),
         _buildCompactGlamorousButton(
@@ -58,15 +152,14 @@ class DashboardActionButtons extends StatelessWidget {
           primaryColor: accentColor,
           onPressed: () => Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) => const AppointmentOptionsScreen(),
-            ),
+            MaterialPageRoute(builder: (_) => const AppointmentOptionsScreen()),
           ),
         ),
       ],
     );
   }
 
+  // El resto del código de este widget no necesita ningún cambio.
   Widget _buildCompactGlamorousButton({
     required BuildContext context,
     required String title,
@@ -112,10 +205,7 @@ class DashboardActionButtons extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: Colors.white.withAlpha(50),
-                width: 1.2,
-              ),
+              border: Border.all(color: Colors.white.withAlpha(50), width: 1.2),
             ),
             child: Row(
               children: [
@@ -130,11 +220,7 @@ class DashboardActionButtons extends StatelessWidget {
                       width: 1.2,
                     ),
                   ),
-                  child: Icon(
-                    icon,
-                    color: Colors.white,
-                    size: 20,
-                  ),
+                  child: Icon(icon, color: Colors.white, size: 20),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -191,14 +277,9 @@ class DashboardActionButtons extends StatelessWidget {
   }
 }
 
-// ==========================================================================
-// NUEVO WIDGET: _ShakeButton
-// ==========================================================================
-
 class _ShakeButton extends StatefulWidget {
   final Widget child;
-
-  const _ShakeButton({required this.child});
+  const _ShakeButton({required this.child, super.key});
 
   @override
   State<_ShakeButton> createState() => _ShakeButtonState();
@@ -213,19 +294,16 @@ class _ShakeButtonState extends State<_ShakeButton>
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
-
     _offsetAnimation = TweenSequence<double>([
       TweenSequenceItem(tween: Tween(begin: 0, end: -6), weight: 1),
       TweenSequenceItem(tween: Tween(begin: -6, end: 6), weight: 2),
       TweenSequenceItem(tween: Tween(begin: 6, end: -6), weight: 2),
       TweenSequenceItem(tween: Tween(begin: -6, end: 0), weight: 1),
     ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-
     _timer = Timer.periodic(const Duration(seconds: 10), (_) {
       if (mounted) _controller.forward(from: 0);
     });

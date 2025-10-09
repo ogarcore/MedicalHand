@@ -48,13 +48,11 @@ class _ChatScreenState extends State<ChatScreen> {
       _focusNode.unfocus();
       viewModel.sendMessage(_textController.text.trim());
       _textController.clear();
-      // El scroll se activa inmediatamente para mostrar el nuevo mensaje.
       _scrollToLatestMessage();
     }
   }
 
   void _scrollToLatestMessage() {
-    // Un pequeño retraso asegura que el ListView tenga tiempo de añadir el nuevo item.
     Future.delayed(const Duration(milliseconds: 50), () {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
@@ -130,7 +128,8 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               child: Consumer<ChatViewModel>(
                 builder: (context, viewModel, child) {
-                  if (viewModel.isLoading && viewModel.messages.isEmpty) {
+                  // Si está cargando los mensajes iniciales, mostramos solo el spinner.
+                  if (viewModel.isInitializing) {
                     return _buildInitialState();
                   }
 
@@ -138,34 +137,28 @@ class _ChatScreenState extends State<ChatScreen> {
                     return _buildEmptyState();
                   }
 
-                  // --- INICIO DE LA CORRECCIÓN CLAVE ---
+                  // Mostrar el indicador de "escribiendo..." solo si ya hay mensajes cargados.
+                  final showTyping = viewModel.isLoading && viewModel.messages.isNotEmpty;
+
                   return ListView.builder(
                     controller: _scrollController,
                     reverse: true,
                     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    // El itemCount es la cantidad de mensajes + 1 si estamos esperando respuesta.
-                    itemCount: viewModel.messages.length + (viewModel.isLoading ? 1 : 0),
+                    itemCount: viewModel.messages.length + (showTyping ? 1 : 0),
                     itemBuilder: (context, index) {
-                      // Si estamos esperando respuesta y es el primer item de la lista (la más nueva),
-                      // mostramos el indicador de "escribiendo...".
-                      if (viewModel.isLoading && index == 0) {
+                      if (showTyping && index == 0) {
                         return const TypingIndicator();
                       }
-                      
-                      // Para el resto de los items, calculamos el índice correcto en la lista de mensajes.
-                      // Si estamos cargando, restamos 1 al índice porque el TypingIndicator ocupa la posición 0.
-                      final messageIndex = viewModel.isLoading ? index - 1 : index;
 
-                      // Esta comprobación de seguridad previene el error 'RangeError'.
+                      final messageIndex = showTyping ? index - 1 : index;
                       if (messageIndex < 0 || messageIndex >= viewModel.messages.length) {
-                        return const SizedBox.shrink(); // No dibuja nada si el índice es inválido.
+                        return const SizedBox.shrink();
                       }
 
                       final message = viewModel.messages[messageIndex];
                       return ChatBubble(message: message);
                     },
                   );
-                  // --- FIN DE LA CORRECCIÓN CLAVE ---
                 },
               ),
             ),

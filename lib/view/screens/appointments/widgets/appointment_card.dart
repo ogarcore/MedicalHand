@@ -273,6 +273,12 @@ class _AppointmentCardState extends State<AppointmentCard> {
           primaryColor,
           Color.lerp(primaryColor, Colors.blue.shade700, 0.3)!,
         ];
+        case 'asistencia_confirmada':
+        final primaryColor = AppColors.primaryColor(context);
+        headerGradientColors = [
+          primaryColor,
+          Color.lerp(primaryColor, Colors.blue.shade700, 0.3)!,
+        ];
         break;
       case 'cancelada':
         final warningColor = AppColors.warningColor(context);

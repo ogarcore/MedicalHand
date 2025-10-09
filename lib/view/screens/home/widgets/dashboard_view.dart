@@ -22,8 +22,8 @@ class DashboardView extends StatefulWidget {
 
 class _DashboardViewState extends State<DashboardView> {
   Timer? _timer;
-  // Esta variable ahora solo se usa para controlar el timer y evitar que se reinicie innecesariamente.
   String? _monitoredAppointmentId;
+  bool _showTransitionShimmer = false; // <-- 🔥 agregado
 
   @override
   void initState() {
@@ -38,8 +38,7 @@ class _DashboardViewState extends State<DashboardView> {
 
     final monitoredAppointment = appointment!;
 
-    _timer = Timer.periodic(const Duration(seconds: 30), (timer) { // Verificación más frecuente
-      // Si el widget ya no existe o la cita que monitoreamos ha cambiado, detenemos este timer.
+    _timer = Timer.periodic(const Duration(seconds: 30), (timer) {
       if (!mounted || _monitoredAppointmentId != monitoredAppointment.id) {
         timer.cancel();
         return;
@@ -49,7 +48,7 @@ class _DashboardViewState extends State<DashboardView> {
         context
             .read<AppointmentViewModel>()
             .updateAppointmentStatus(monitoredAppointment.id!, 'no_asistio');
-        timer.cancel(); // El stream se encargará de actualizar la UI.
+        timer.cancel();
       }
     });
   }
@@ -85,57 +84,66 @@ class _DashboardViewState extends State<DashboardView> {
     final appointmentViewModel = context.watch<AppointmentViewModel>();
 
     return StreamBuilder<CitaModel?>(
-      // La Key es CRUCIAL para que al cambiar de perfil, el StreamBuilder se reconstruya
-      // desde cero, garantizando que no queden datos del perfil anterior.
       key: ValueKey(activeProfile.uid),
-      initialData: appointmentViewModel.initialDashboardAppointment,
+      // 🔥 Corrección: limpiamos initialData al cambiar perfil
+      initialData: _monitoredAppointmentId == null
+          ? appointmentViewModel.initialDashboardAppointment
+          : null,
       stream: appointmentViewModel.getDashboardAppointmentStream(activeProfile.uid),
       builder: (context, snapshot) {
-        // --- INICIO DE LA CORRECCIÓN DEFINITIVA ---
-        
-        // La ÚNICA fuente de la verdad para la UI es el dato que llega del StreamBuilder.
-        // Ya no usamos una variable de estado local para decidir qué mostrar.
         final CitaModel? currentAppointment = snapshot.data;
-        
-        // El timer se gestiona de forma independiente, solo para la lógica de expirar la cita.
-        // Se reinicia solo si la cita que llega del stream es diferente a la que ya estamos monitoreando.
+
+        // 🔥 Detectar cambio de perfil o cita para mostrar shimmer corto
         if (_monitoredAppointmentId != currentAppointment?.id) {
           _startTimer(currentAppointment);
+          _showTransitionShimmer = true;
+          Future.delayed(const Duration(milliseconds: 300), () {
+            if (mounted) {
+              setState(() => _showTransitionShimmer = false);
+            }
+          });
         }
 
-        // La validez de la cita se calcula SIEMPRE con el dato más reciente del stream.
         final bool isAppointmentStillValid = currentAppointment?.assignedDate != null &&
             currentAppointment!.assignedDate!.isAfter(DateTime.now());
 
-        final Widget appointmentSection;
-        
-        // La lógica para decidir qué widget mostrar es ahora simple y directa.
-        if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+        Widget appointmentSection;
+
+        if (_showTransitionShimmer ||
+            (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData)) {
           appointmentSection = const _DashboardLoadingShimmer(key: ValueKey('loading'));
         } else if (isAppointmentStillValid) {
           appointmentSection = NextAppointmentCard(
-            key: ValueKey(currentAppointment.id),
+            key: ValueKey('next-${currentAppointment.id}'),
             appointment: currentAppointment,
           );
         } else {
           appointmentSection = const NoAppointmentCard(key: ValueKey('no-appointment'));
         }
 
-        // --- FIN DE LA CORRECCIÓN DEFINITIVA ---
-
+        // 🔥 Animación suave y uniforme en ambos casos
         return Column(
           children: [
             AnimatedSwitcher(
-              duration: const Duration(milliseconds: 400),
+              duration: const Duration(milliseconds: 450),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeIn,
               transitionBuilder: (Widget child, Animation<double> animation) {
-                return FadeTransition(opacity: animation, child: child);
+                final fade = FadeTransition(opacity: animation, child: child);
+                final slide = SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0, 0.05),
+                    end: Offset.zero,
+                  ).animate(animation),
+                  child: fade,
+                );
+                return slide;
               },
               child: appointmentSection,
             ),
             const SizedBox(height: 16),
             DashboardActionButtons(
-              // Pasamos directamente la cita del stream a los botones.
-              appointment: isAppointmentStillValid ? currentAppointment : null,
+              appointment: isAppointmentStillValid ? currentAppointment : null ,
             ),
             const SizedBox(height: 18),
             Padding(
@@ -162,7 +170,6 @@ class _DashboardViewState extends State<DashboardView> {
   }
 }
 
-// El Shimmer no necesita cambios.
 class _DashboardLoadingShimmer extends StatelessWidget {
   const _DashboardLoadingShimmer({super.key});
 
@@ -180,7 +187,11 @@ class _DashboardLoadingShimmer extends StatelessWidget {
 class _AppointmentCardPlaceholder extends StatelessWidget {
   const _AppointmentCardPlaceholder();
 
-  Widget _buildPlaceholderLine({required double width, double height = 14, double borderRadius = 8}) {
+  Widget _buildPlaceholderLine({
+    required double width,
+    double height = 14,
+    double borderRadius = 8,
+  }) {
     return Container(
       width: width,
       height: height,
@@ -286,13 +297,9 @@ class _AppointmentCardPlaceholder extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               child: Row(
                 children: [
-                  Expanded(
-                    child: _buildButtonPlaceholder(),
-                  ),
+                  Expanded(child: _buildButtonPlaceholder()),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildButtonPlaceholder(),
-                  ),
+                  Expanded(child: _buildButtonPlaceholder()),
                 ],
               ),
             ),

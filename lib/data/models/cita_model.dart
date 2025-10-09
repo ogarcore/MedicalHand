@@ -11,7 +11,7 @@ class CitaModel {
   final String hospital;
   final String reason;
   final DateTime requestTimestamp;
-  final String status;
+  String status;
   final String requestType;
   final bool isActive;
   final DateTime? assignedDate;
@@ -65,8 +65,9 @@ class CitaModel {
       'status': status,
       'requestType': requestType,
       'isActive': isActive,
-      'assignedDate':
-          assignedDate != null ? Timestamp.fromDate(assignedDate!) : null,
+      'assignedDate': assignedDate != null
+          ? Timestamp.fromDate(assignedDate!)
+          : null,
       'assignedDoctor': assignedDoctor,
       'clinicOffice': clinicOffice,
       'specialty': specialty,
