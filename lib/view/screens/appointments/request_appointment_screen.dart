@@ -41,16 +41,21 @@ class _RequestAppointmentScreenState extends State<RequestAppointmentScreen> {
     _loadDepartments();
   }
 
-  Future<void> _loadDepartments() async {
-    final viewModel = Provider.of<AppointmentViewModel>(context, listen: false);
-    final departments = viewModel.getNicaraguaDepartments();
-    if (mounted) {
-      setState(() {
-        _departmentsList = departments;
-        _isLoadingDepartments = false;
-      });
-    }
+Future<void> _loadDepartments() async {
+  final viewModel = Provider.of<AppointmentViewModel>(context, listen: false);
+  final departments = viewModel.getNicaraguaDepartments();
+
+  if (mounted) {
+    setState(() {
+      _departmentsList = departments;
+      _selectedDepartament = 'Managua';
+      _isLoadingDepartments = false;
+    });
+
+    _fetchHospitalsForDepartment('Managua');
   }
+}
+
 
   Future<void> _fetchHospitalsForDepartment(String department) async {
     setState(() {

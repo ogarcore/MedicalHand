@@ -79,43 +79,36 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       backgroundColor: isDark ? Colors.grey.shade900 : const Color(0xFFF8FAFD),
       appBar: AppBar(
-        title: const Text(
-          'Asistente Virtual',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18, letterSpacing: -0.3),
+  title: const Text(
+    'Asistente Virtual',
+    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18, letterSpacing: -0.3),
+  ),
+  backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+  surfaceTintColor: Colors.transparent,
+  elevation: 0,
+  centerTitle: false,
+  leading: IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () {
+      Navigator.of(context).pop();
+    },
+  ),
+  actions: [
+    IconButton(
+      icon: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: primaryColor.withAlpha(26),
+          shape: BoxShape.circle,
         ),
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: false,
-        leading: Container(
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                primaryColor,
-                Color.lerp(primaryColor, Colors.blue.shade600, 0.4)!,
-              ],
-            ),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(HugeIcons.strokeRoundedCovidInfo, color: Colors.white, size: 22),
-        ),
-        actions: [
-          IconButton(
-            icon: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: primaryColor.withAlpha(26),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(HugeIcons.strokeRoundedInformationCircle, color: primaryColor, size: 18),
-            ),
-            onPressed: _showInfoDialog,
-          ),
-          const SizedBox(width: 8),
-        ],
+        child: Icon(HugeIcons.strokeRoundedInformationCircle, color: primaryColor, size: 18),
       ),
+      onPressed: _showInfoDialog,
+    ),
+    const SizedBox(width: 8),
+  ],
+),
       body: Column(
         children: [
           const ChatDisclaimerBanner(),

@@ -87,6 +87,41 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
+Future<bool> updateEmergencyContact(String name, String phone) async {
+  final user = _auth.currentUser;
+  if (user == null) {
+    print("Error: Usuario no autenticado.");
+    return false;
+  }
+
+  try {
+
+    final String emergencyContactPath = 'contactInfo.emergencyContact';
+
+    // 2. Se crea el mapa únicamente con la nueva información.
+    final Map<String, dynamic> newEmergencyContactData = {
+      'name': name,
+      'phone': phone,
+    };
+
+    // 3. Se ejecuta la actualización directa en Firestore sobre el campo específico.
+    // Firestore se encarga de encontrar la ruta y actualizar solo esa parte.
+    await _firestore
+        .collection('usuarios_movil')
+        .doc(user.uid)
+        .update({emergencyContactPath: newEmergencyContactData});
+
+    // 4. Una vez la base de datos está actualizada, refrescamos los datos locales del usuario.
+    await fetchCurrentUser();
+
+    return true;
+  } catch (e) {
+    print("Error al actualizar contacto de emergencia: $e");
+    return false;
+  }
+}
+
+
   Future<void> saveFcmToken(String token) async {
     final user = _auth.currentUser;
     if (user == null) return;

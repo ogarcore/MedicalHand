@@ -19,49 +19,60 @@ class ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          colors: [
+            AppColors.primaryColor(context),
+            Color.lerp(AppColors.primaryColor(context), Colors.white, 0.3)!,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(25),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: AppColors.primaryColor(context).withAlpha(60),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Row(
         children: [
+          // Avatar con diseño mejorado
           Container(
-            width: 72,
-            height: 72,
+            width: 76,
+            height: 76,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.primaryColor(context).withAlpha(30),
+              color: Colors.white.withAlpha(30),
               border: Border.all(
-                color: AppColors.primaryColor(context).withAlpha(100),
-                width: 1.5,
+                color: Colors.white.withAlpha(120),
+                width: 2,
               ),
             ),
             child: Icon(
-              HugeIcons.strokeRoundedUser,
-              size: 32,
-              color: AppColors.primaryColor(context),
+              HugeIcons.strokeRoundedUserCircle02,
+              size: 34,
+              color: Colors.white,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 20),
+          
+          // Información del usuario
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   _getShortName(user),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textColor(context),
+                    color: Colors.white,
                     letterSpacing: -0.3,
+                    height: 1.2,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -69,42 +80,43 @@ class ProfileHeader extends StatelessWidget {
                   user.email,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[600],
-                    overflow: TextOverflow.ellipsis,
+                    color: Colors.white.withAlpha(220),
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 14),
+                
+                // Badge de miembro desde - MEJORADO
                 Container(
-                  padding: const EdgeInsets.only(
-                    left: 3,
-                    right: 6,
-                    top: 4,
-                    bottom: 4,
-                  ),
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryColor(context).withAlpha(30),
-                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.white.withAlpha(25),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Colors.white.withAlpha(60),
+                      width: 1.2,
+                    ),
                   ),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
                         HugeIcons.strokeRoundedCalendar04,
-                        size: 14,
-                        color: AppColors.primaryColor(context),
+                        size: 18,
+                        color: Colors.white.withAlpha(220),
                       ),
-                      const SizedBox(width: 8),
-                      Flexible(
+                      const SizedBox(width: 10),
+                      Expanded(
                         child: Text(
-                          'Miembro desde el\n${DateFormat.yMMMMd('es_ES').format(user.createdAt!.toDate())}',
-                          maxLines: 2,
-                          softWrap: true,
-                          overflow: TextOverflow.visible,
+                          'Miembro desde ${DateFormat.yMMMMd('es_ES').format(user.createdAt!.toDate())}',
                           style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textLightColor(context),
-                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            color: Colors.white.withAlpha(220),
+                            fontWeight: FontWeight.w600,
+                            height: 1.3,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.visible,
                         ),
                       ),
                     ],

@@ -9,6 +9,8 @@ import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'widgets/appointment_card.dart';
 import 'widgets/empty_state_widget.dart';
+// Importamos el archivo de filtros
+import 'widgets/past_appointments_filter_bar.dart';
 
 class AppointmentsListScreen extends StatefulWidget {
   const AppointmentsListScreen({super.key});
@@ -20,6 +22,11 @@ class AppointmentsListScreen extends StatefulWidget {
 class _AppointmentsListScreenState extends State<AppointmentsListScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final GlobalKey<PastAppointmentsFilterBarState> _filterBarKey =
+      GlobalKey<PastAppointmentsFilterBarState>();
+
+  // 🔥 1. AÑADIMOS UNA VARIABLE DE ESTADO PARA SABER SI LOS FILTROS ESTÁN ACTIVOS.
+  bool _areFiltersActive = false;
 
   @override
   void initState() {
@@ -27,8 +34,17 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
     _tabController = TabController(length: 2, vsync: this);
     initializeDateFormatting('es_ES', null);
 
-    // Esta función se mantiene para la consistencia de datos (Enfoque Híbrido).
-    // Se ejecuta una vez para actualizar el estado en Firestore.
+    _tabController.addListener(() {
+      if (mounted) {
+        setState(() {
+          // Si no estamos en la pestaña de "Pasadas", reseteamos el estado del filtro.
+          if (_tabController.index != 1) {
+            _areFiltersActive = false;
+          }
+        });
+      }
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final userViewModel = context.read<UserViewModel>();
       final appointmentViewModel = context.read<AppointmentViewModel>();
@@ -41,6 +57,7 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
 
   @override
   void dispose() {
+    _tabController.removeListener(() {});
     _tabController.dispose();
     super.dispose();
   }
@@ -66,6 +83,14 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
                   key: ValueKey('past_${activeProfile.uid}'),
                   profileId: activeProfile.uid,
                   isUpcoming: false,
+                  filterBarKey: _filterBarKey,
+                  // 🔥 2. PASAMOS UNA FUNCIÓN CALLBACK PARA RECIBIR EL ESTADO DE LOS FILTROS.
+                  onFilterStateChanged: (isActive) {
+                    // Actualizamos el estado en el widget padre para que el AppBar se reconstruya.
+                    setState(() {
+                      _areFiltersActive = isActive;
+                    });
+                  },
                 ),
               ],
             ),
@@ -104,6 +129,30 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
           const SizedBox(height: 4),
         ],
       ),
+      actions: [
+        if (_tabController.index == 1)
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              icon: Icon(
+                _areFiltersActive
+                    ? HugeIcons
+                          .strokeRoundedFilterEdit 
+                    : HugeIcons.strokeRoundedFilter, 
+                color: _areFiltersActive
+                    ? AppColors.warningColor(
+                        context,
+                      ) // Color cuando los filtros están activos
+                    : AppColors.primaryColor(context), // Color por defecto
+              ),
+
+              onPressed: () {
+                _filterBarKey.currentState?.showFilterBottomSheet();
+              },
+              tooltip: 'Filtrar citas pasadas',
+            ),
+          ),
+      ],
       bottom: TabBar(
         controller: _tabController,
         labelColor: AppColors.primaryColor(context),
@@ -113,25 +162,33 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
           color: AppColors.primaryColor(context).withAlpha(70),
         ),
         indicatorSize: TabBarIndicatorSize.tab,
-        indicatorPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        indicatorPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 6,
+        ),
         labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        unselectedLabelStyle:
-            const TextStyle(fontWeight: FontWeight.normal, fontSize: 15),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.normal,
+          fontSize: 15,
+        ),
         overlayColor: WidgetStateProperty.all(Colors.transparent),
         splashFactory: NoSplash.splashFactory,
         tabs: [
           Tab(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: const Text('Próximas'),
             ),
           ),
           Tab(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: const Text('Pasadas'),
             ),
           ),
@@ -144,11 +201,16 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
 class _AppointmentTabPage extends StatefulWidget {
   final String profileId;
   final bool isUpcoming;
+  final GlobalKey<PastAppointmentsFilterBarState>? filterBarKey;
+  // 🔥 4. AÑADIMOS EL PARÁMETRO PARA LA FUNCIÓN CALLBACK.
+  final ValueChanged<bool>? onFilterStateChanged;
 
   const _AppointmentTabPage({
     super.key,
     required this.profileId,
     required this.isUpcoming,
+    this.filterBarKey,
+    this.onFilterStateChanged, // El callback es opcional.
   });
 
   @override
@@ -158,6 +220,7 @@ class _AppointmentTabPage extends StatefulWidget {
 class _AppointmentTabPageState extends State<_AppointmentTabPage>
     with AutomaticKeepAliveClientMixin {
   late Stream<List<CitaModel>> _appointmentsStream;
+  AppointmentFilters _filters = AppointmentFilters();
 
   @override
   void initState() {
@@ -170,6 +233,26 @@ class _AppointmentTabPageState extends State<_AppointmentTabPage>
 
   @override
   bool get wantKeepAlive => true;
+
+  List<CitaModel> _applyFilters(List<CitaModel> appointments) {
+    if (!_filters.hasActiveFilters) {
+      return appointments;
+    }
+
+    return appointments.where((cita) {
+      final dateMatch =
+          _filters.date == null ||
+          (cita.assignedDate != null &&
+              cita.assignedDate!.year == _filters.date!.year &&
+              cita.assignedDate!.month == _filters.date!.month &&
+              cita.assignedDate!.day == _filters.date!.day);
+
+      final statusMatch =
+          _filters.status == null || cita.status == _filters.status;
+
+      return dateMatch && statusMatch;
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -186,8 +269,11 @@ class _AppointmentTabPageState extends State<_AppointmentTabPage>
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const _AppointmentsShimmer();
         }
-        final appointments = snapshot.data ?? [];
-        if (appointments.isEmpty) {
+
+        final allAppointments = snapshot.data ?? [];
+        final filteredAppointments = _applyFilters(allAppointments);
+
+        if (allAppointments.isEmpty) {
           return widget.isUpcoming
               ? const EmptyStateWidget(
                   icon: HugeIcons.strokeRoundedCardiogram01,
@@ -202,9 +288,38 @@ class _AppointmentTabPageState extends State<_AppointmentTabPage>
                       'Aquí aparecerán tus citas una vez que hayan sido finalizadas o canceladas.',
                 );
         }
-        return _buildAppointmentsList(
-          appointments: appointments,
-          isUpcoming: widget.isUpcoming,
+
+        return Stack(
+          children: [
+            if (!widget.isUpcoming)
+              PastAppointmentsFilterBar(
+                key: widget.filterBarKey,
+                allAppointments: allAppointments,
+                currentFilters: _filters,
+                onFiltersChanged: (newFilters) {
+                  setState(() {
+                    _filters = newFilters;
+                  });
+                  // 🔥 5. LLAMAMOS AL CALLBACK PARA NOTIFICAR AL PADRE SOBRE EL CAMBIO.
+                  widget.onFilterStateChanged?.call(
+                    newFilters.hasActiveFilters,
+                  );
+                },
+              ),
+
+            if (filteredAppointments.isEmpty && allAppointments.isNotEmpty)
+              const EmptyStateWidget(
+                icon: HugeIcons.strokeRoundedSearch02,
+                title: 'Sin Resultados',
+                message:
+                    'No se encontraron citas que coincidan con los filtros seleccionados.',
+              )
+            else
+              _buildAppointmentsList(
+                appointments: filteredAppointments,
+                isUpcoming: widget.isUpcoming,
+              ),
+          ],
         );
       },
     );
@@ -214,10 +329,9 @@ class _AppointmentTabPageState extends State<_AppointmentTabPage>
     required List<CitaModel> appointments,
     required bool isUpcoming,
   }) {
-    final screenHeight = MediaQuery.of(context).size.height;
     return ListView.builder(
       padding: const EdgeInsets.all(16.0),
-      cacheExtent: screenHeight,
+      cacheExtent: MediaQuery.of(context).size.height,
       itemCount: appointments.length,
       itemBuilder: (context, index) {
         final cita = appointments[index];
@@ -234,7 +348,6 @@ class _AppointmentTabPageState extends State<_AppointmentTabPage>
         return AppointmentCard(
           key: ValueKey(cita.id),
           appointment: cita,
-          // Usamos nuestra nueva variable para decidir el estilo de la tarjeta.
           isUpcoming: displayAsUpcoming,
         );
       },

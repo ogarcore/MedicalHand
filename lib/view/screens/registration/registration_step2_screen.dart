@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:intl/intl.dart'; // Importado para el formato de fecha
 import 'package:p_hn25/view/screens/registration/registration_step3_screen.dart';
 import 'package:p_hn25/view/widgets/custom_modal.dart';
 import 'package:p_hn25/view/widgets/gradient_background.dart';
@@ -15,7 +16,6 @@ import '../../../view_model/auth_view_model.dart';
 import 'package:provider/provider.dart';
 import '../welcome/welcome_screen.dart';
 
-// PASO 1: Convertido a StatefulWidget
 class RegistrationStep2Screen extends StatefulWidget {
   const RegistrationStep2Screen({super.key});
 
@@ -25,8 +25,71 @@ class RegistrationStep2Screen extends StatefulWidget {
 }
 
 class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
-  // PASO 2: Añadida la clave del formulario
   final _formKey = GlobalKey<FormState>();
+  
+  // La lógica para el selector de fecha se mantiene aquí.
+  DateTime? _selectedDate;
+
+  void _pickDate() async {
+    final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+    final primaryColor = AppColors.primaryColor(context);
+
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(1920),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light(
+              primary: primaryColor,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: primaryColor),
+            ), dialogTheme: DialogThemeData(backgroundColor: Colors.white),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (pickedDate != null && mounted) {
+      setState(() {
+        _selectedDate = pickedDate;
+        authViewModel.birthDateController.text =
+            DateFormat('dd/MM/yyyy').format(pickedDate);
+      });
+    }
+  }
+  
+  void _onDateTextChanged(String value) {
+    // Esta función actualiza el _selectedDate si el usuario escribe una fecha válida manualmente.
+    if (AppValidators.validateBirthDate(value) == null) {
+      try {
+        final dateParts = value.split('/');
+        final newDate = DateTime(
+          int.parse(dateParts[2]),
+          int.parse(dateParts[1]),
+          int.parse(dateParts[0]),
+        );
+        setState(() {
+          _selectedDate = newDate;
+        });
+      } catch (e) {
+        setState(() {
+          _selectedDate = null;
+        });
+      }
+    } else {
+      setState(() {
+        _selectedDate = null;
+      });
+    }
+  }
 
   Future<void> _onWillPop() async {
     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
@@ -48,9 +111,8 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
           ),
           ModalButton(
             text: 'Salir',
-            isWarning: true, // Usa tu estilo de botón de advertencia.
+            isWarning: true,
             onPressed: () async {
-              // La lógica de salida es exactamente la misma que antes.
               await authViewModel.cancelGoogleRegistration();
               if (context.mounted) {
                 Navigator.of(context).pushAndRemoveUntil(
@@ -70,6 +132,7 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
   @override
   Widget build(BuildContext context) {
     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
+    final secondaryColor = AppColors.secondaryColor(context);
 
     return PopScope(
       canPop: false,
@@ -86,7 +149,6 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
             child: SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24.0),
-                // PASO 3: Envuelto en un widget Form
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -95,8 +157,7 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                       Row(
                         children: [
                           IconButton(
-                            onPressed:
-                                _onWillPop, // Llama a la misma función de salida
+                            onPressed: _onWillPop,
                             icon: Icon(
                               Icons.arrow_back,
                               color: AppColors.textColor(context),
@@ -131,12 +192,7 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                         labelText: 'Nombres',
                         hintText: 'Ingresa tus nombres',
                         icon: Icons.person,
-                        // Aplicando validador
-                        validator: (value) =>
-                            AppValidators.validateGenericEmpty(
-                              value,
-                              'Nombres',
-                            ),
+                        validator: (value) => AppValidators.validateGenericEmpty(value, 'Nombres'),
                       ),
                       const SizedBox(height: 20),
                       CustomTextField(
@@ -144,12 +200,7 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                         labelText: 'Apellidos',
                         hintText: 'Ingresa tus apellidos',
                         icon: Icons.person_outline,
-                        // Aplicando validador
-                        validator: (value) =>
-                            AppValidators.validateGenericEmpty(
-                              value,
-                              'Apellidos',
-                            ),
+                        validator: (value) => AppValidators.validateGenericEmpty(value, 'Apellidos'),
                       ),
                       const SizedBox(height: 10),
                       Consumer<AuthViewModel>(
@@ -166,19 +217,29 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                         },
                       ),
                       const SizedBox(height: 20),
+
+                      // 🔥 =================== INICIO DE CAMBIOS VISUALES ===================
+                      // Se vuelve a usar CustomTextField, pero con la nueva funcionalidad.
                       CustomTextField(
                         controller: authViewModel.birthDateController,
                         labelText: 'Fecha de Nacimiento',
                         hintText: 'DD/MM/AAAA',
-                        icon: Icons.calendar_today_outlined,
+                        icon: HugeIcons.strokeRoundedCalendar01, // Icono de prefijo
                         keyboardType: TextInputType.number,
                         inputFormatters: [
                           LengthLimitingTextInputFormatter(10),
                           DateInputFormatter(),
                         ],
-                        // Aplicando validador
                         validator: AppValidators.validateBirthDate,
+                        onChanged: _onDateTextChanged, // Se conecta con la lógica de escritura manual
+                        // Se añade un icono de sufijo que funciona como botón para abrir el calendario.
+                        suffixIcon: IconButton(
+                          icon: Icon(HugeIcons.strokeRoundedCalendar02, color: secondaryColor),
+                          onPressed: _pickDate, // Llama al método para mostrar el calendario
+                        ),
                       ),
+                      // 🔥 =================== FIN DE CAMBIOS VISUALES ===================
+                      
                       const SizedBox(height: 50),
                       PrimaryButton(
                         text: 'Siguiente',
@@ -186,10 +247,8 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                           if (authViewModel.selectedSex == null) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Por favor, selecciona tu sexo.'),
-                                backgroundColor: AppColors.warningColor(
-                                  context,
-                                ),
+                                content: const Text('Por favor, selecciona tu sexo.'),
+                                backgroundColor: AppColors.warningColor(context),
                               ),
                             );
                             return;
@@ -198,8 +257,7 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const RegistrationStep3Screen(),
+                                builder: (context) => const RegistrationStep3Screen(),
                               ),
                             );
                           }

@@ -116,4 +116,6 @@ class CitaModel {
           : null,
     );
   }
+
+  get hospitalName => null;
 }

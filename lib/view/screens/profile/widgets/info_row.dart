@@ -5,13 +5,24 @@ import 'package:p_hn25/app/core/constants/app_colors.dart';
 class InfoRow extends StatelessWidget {
   final String label;
   final String value;
+  final bool isFirst;
+  final bool isLast;
 
-  const InfoRow(this.label, this.value, {super.key});
+  const InfoRow({
+    super.key,
+    required this.label,
+    required this.value,
+    this.isFirst = false,
+    this.isLast = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      padding: EdgeInsets.only(
+        top: isFirst ? 0 : 12,
+        bottom: isLast ? 0 : 12,
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

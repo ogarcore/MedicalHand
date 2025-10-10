@@ -21,11 +21,8 @@ class AddFamilyMemberScreen extends StatefulWidget {
 class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // Función auxiliar para calcular la edad de forma segura.
   int? _calculateAge(String dateText) {
-    if (AppValidators.validateBirthDate(dateText) != null) {
-      return null; // Si la fecha no es válida, no hay edad.
-    }
+    if (AppValidators.validateBirthDate(dateText) != null) return null;
     try {
       final dateParts = dateText.split('/');
       final birthDate = DateTime(
@@ -33,7 +30,6 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
         int.parse(dateParts[1]),
         int.parse(dateParts[0]),
       );
-      // Usamos ~/ para obtener un entero de la división.
       return DateTime.now().difference(birthDate).inDays ~/ 365;
     } catch (e) {
       return null;
@@ -43,11 +39,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
   @override
   Widget build(BuildContext context) {
     final familyViewModel = context.watch<FamilyViewModel>();
-
-    // --- LÓGICA DE EDAD ---
-    // Calculamos la edad en cada rebuild.
     final age = _calculateAge(familyViewModel.birthDateController.text);
-    // La validación del teléfono depende de si es menor de 14 años.
     final bool isPhoneOptional = age != null && age < 14;
 
     return GestureDetector(
@@ -69,13 +61,12 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
           centerTitle: false,
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(20),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Sección de Información Esencial (sin cambios)
                 _buildSectionContainer(
                   title: 'Información Esencial',
                   icon: HugeIcons.strokeRoundedUserWarning01,
@@ -128,22 +119,18 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                       keyboardType: TextInputType.number,
                       inputFormatters: [DateInputFormatter()],
                       validator: AppValidators.validateBirthDate,
-                      // Este setState es clave para que la pantalla se redibuje y la lógica de la edad funcione.
                       onChanged: (value) => setState(() {}),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
-                // --- SECCIÓN DE CONTACTO MODIFICADA ---
-                // Ahora es siempre visible y con la nueva lógica de validación.
                 _buildSectionContainer(
                   title: 'Información de Contacto',
                   icon: HugeIcons.strokeRoundedContactBook,
                   children: [
                     CustomTextField(
                       controller: familyViewModel.phoneController,
-                      // El label cambia dinámicamente.
                       labelText: isPhoneOptional
                           ? 'Teléfono (Opcional)'
                           : 'Teléfono',
@@ -151,7 +138,6 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                       icon: HugeIcons.strokeRoundedTelephone,
                       keyboardType: TextInputType.phone,
                       inputFormatters: [PhoneInputFormatter()],
-                      // El validador cambia según la edad.
                       validator: isPhoneOptional
                           ? AppValidators.validateOptionalPhone
                           : AppValidators.validatePhone,
@@ -159,11 +145,9 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                     const SizedBox(height: 16),
                     CustomTextField(
                       controller: familyViewModel.addressController,
-                      // El campo ya no es opcional.
                       labelText: 'Dirección',
                       hintText: 'Dirección de domicilio',
                       icon: HugeIcons.strokeRoundedLocation01,
-                      // Se añade el validador para que sea obligatorio.
                       validator: (value) => AppValidators.validateGenericEmpty(
                         value,
                         'La dirección',
@@ -171,10 +155,8 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 16),
 
-                const SizedBox(height: 20),
-
-                // Sección de Información Médica (sin cambios)
                 _buildSectionContainer(
                   title: 'Información Médica (Opcional)',
                   icon: HugeIcons.strokeRoundedHealth,
@@ -197,12 +179,11 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 28),
+                const SizedBox(height: 24),
                 PrimaryButton(
                   text: 'Siguiente Paso',
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      // Se reutiliza la lógica de la edad para pasarla a la siguiente pantalla.
                       final currentAge =
                           _calculateAge(
                             familyViewModel.birthDateController.text,
@@ -222,7 +203,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                     }
                   },
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
               ],
             ),
           ),
@@ -236,12 +217,26 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
     required IconData icon,
     required List<Widget> children,
   }) {
+    final primaryColor = AppColors.primaryColor(context);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withAlpha(40), width: 1),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(15),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: Colors.black.withAlpha(5),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+        border: Border.all(color: Colors.grey.withAlpha(30), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,32 +244,51 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
           Row(
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryColor(context).withAlpha(15),
-                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                      primaryColor,
+                      Color.lerp(primaryColor, Colors.white, 0.3)!,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: primaryColor.withAlpha(40),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                 ),
-                child: Icon(
-                  icon,
-                  size: 20,
-                  color: AppColors.primaryColor(context),
-                ),
+                child: Icon(icon, color: Colors.white, size: 20),
               ),
               const SizedBox(width: 12),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textColor(context),
-                  letterSpacing: -0.3,
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textColor(context),
+                    letterSpacing: -0.3,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          const Divider(height: 1, thickness: 1, color: Color(0xFFF0F0F0)),
+          Container(
+            height: 2,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [primaryColor.withAlpha(20), Colors.transparent],
+              ),
+            ),
+          ),
           const SizedBox(height: 16),
           ...children,
         ],

@@ -8,6 +8,7 @@ import 'package:p_hn25/view/screens/home/widgets/dashboard_action_buttons.dart';
 import 'package:p_hn25/view/screens/home/widgets/dashboard_header.dart';
 import 'package:p_hn25/view/screens/home/widgets/next_appointment_card.dart';
 import 'package:p_hn25/view/screens/home/widgets/no_appointment_card.dart';
+import 'package:p_hn25/view/screens/home/widgets/virtual_ticket_card.dart'; // <-- 🔥 AGREGADO
 import 'package:p_hn25/view_model/appointment_view_model.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +24,7 @@ class DashboardView extends StatefulWidget {
 class _DashboardViewState extends State<DashboardView> {
   Timer? _timer;
   String? _monitoredAppointmentId;
-  bool _showTransitionShimmer = false; // <-- 🔥 agregado
+  bool _showTransitionShimmer = false;
 
   @override
   void initState() {
@@ -85,7 +86,6 @@ class _DashboardViewState extends State<DashboardView> {
 
     return StreamBuilder<CitaModel?>(
       key: ValueKey(activeProfile.uid),
-      // 🔥 Corrección: limpiamos initialData al cambiar perfil
       initialData: _monitoredAppointmentId == null
           ? appointmentViewModel.initialDashboardAppointment
           : null,
@@ -93,7 +93,6 @@ class _DashboardViewState extends State<DashboardView> {
       builder: (context, snapshot) {
         final CitaModel? currentAppointment = snapshot.data;
 
-        // 🔥 Detectar cambio de perfil o cita para mostrar shimmer corto
         if (_monitoredAppointmentId != currentAppointment?.id) {
           _startTimer(currentAppointment);
           _showTransitionShimmer = true;
@@ -112,7 +111,20 @@ class _DashboardViewState extends State<DashboardView> {
         if (_showTransitionShimmer ||
             (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData)) {
           appointmentSection = const _DashboardLoadingShimmer(key: ValueKey('loading'));
-        } else if (isAppointmentStillValid) {
+        }
+        // =========================================================================
+        // INICIO DE LA MODIFICACIÓN
+        // =========================================================================
+        else if (currentAppointment?.status == 'en_fila') {
+          appointmentSection = VirtualTicketCard(
+            key: ValueKey('virtual-ticket-${currentAppointment!.id}'),
+            appointment: currentAppointment, 
+          );
+        }
+        // =========================================================================
+        // FIN DE LA MODIFICACIÓN
+        // =========================================================================
+        else if (isAppointmentStillValid) {
           appointmentSection = NextAppointmentCard(
             key: ValueKey('next-${currentAppointment.id}'),
             appointment: currentAppointment,
@@ -121,7 +133,6 @@ class _DashboardViewState extends State<DashboardView> {
           appointmentSection = const NoAppointmentCard(key: ValueKey('no-appointment'));
         }
 
-        // 🔥 Animación suave y uniforme en ambos casos
         return Column(
           children: [
             AnimatedSwitcher(
@@ -143,7 +154,7 @@ class _DashboardViewState extends State<DashboardView> {
             ),
             const SizedBox(height: 16),
             DashboardActionButtons(
-              appointment: isAppointmentStillValid ? currentAppointment : null ,
+              appointment: isAppointmentStillValid ? currentAppointment : null,
             ),
             const SizedBox(height: 18),
             Padding(

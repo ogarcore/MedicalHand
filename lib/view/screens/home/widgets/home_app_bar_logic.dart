@@ -127,7 +127,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
           'profile',
           'Mi Perfil',
           HugeIcons.strokeRoundedUser,
-          AppColors.successColor(context),
+          AppColors.secondaryColor(context),
         ),
       );
     }
@@ -216,7 +216,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
           const SizedBox(width: 12),
           Text(
             text,
-            style: TextStyle(color: color, fontWeight: FontWeight.w500),
+            style: TextStyle( fontWeight: FontWeight.w500),
           ),
         ],
       ),

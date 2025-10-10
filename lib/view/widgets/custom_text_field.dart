@@ -1,4 +1,3 @@
-// lib/view/widgets/custom_text_field.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../app/core/constants/app_colors.dart';
@@ -18,6 +17,8 @@ class CustomTextField extends StatefulWidget {
   final Color? iconColor;
   final Color? focusedBorderColor;
   final ValueChanged<String>? onChanged;
+  // 🔥 1. AÑADIDO EL NUEVO PARÁMETRO OPCIONAL (NULLABLE)
+  final Widget? suffixIcon;
 
   const CustomTextField({
     super.key,
@@ -35,6 +36,8 @@ class CustomTextField extends StatefulWidget {
     this.iconColor,
     this.focusedBorderColor,
     this.onChanged,
+    // 🔥 2. AÑADIDO AL CONSTRUCTOR
+    this.suffixIcon,
   });
 
   @override
@@ -65,16 +68,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
     }
   }
 
-  // CAMBIO: Helper para decidir qué tipo de capitalización usar.
   TextCapitalization _getTextCapitalization() {
-    // Si es un campo de contraseña, email o URL, no aplicamos ninguna capitalización.
     if (widget.isPassword ||
         widget.keyboardType == TextInputType.emailAddress ||
         widget.keyboardType == TextInputType.visiblePassword ||
         widget.keyboardType == TextInputType.url) {
       return TextCapitalization.none;
     }
-    // Para el resto (texto normal, nombres, direcciones), capitalizamos la primera letra de las oraciones.
     return TextCapitalization.sentences;
   }
 
@@ -86,7 +86,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
       controller: widget.controller,
       obscureText: widget.isPassword && _isObscured,
       keyboardType: widget.keyboardType,
-      // CAMBIO: Se añade la propiedad aquí
       textCapitalization: _getTextCapitalization(),
       validator: widget.validator,
       inputFormatters: widget.inputFormatters,
@@ -112,19 +111,25 @@ class _CustomTextFieldState extends State<CustomTextField> {
           color: widget.iconColor ?? AppColors.primaryColor(context),
           size: 22,
         ),
-        suffixIcon: widget.isPassword
-            ? IconButton(
-                icon: Icon(
-                  _isObscured ? Icons.visibility_off : Icons.visibility,
-                  color: widget.iconColor ?? AppColors.primaryColor(context),
-                ),
-                onPressed: () {
-                  setState(() {
-                    _isObscured = !_isObscured;
-                  });
-                },
-              )
-            : null,
+        // 🔥 3. LÓGICA ACTUALIZADA PARA EL SUFFIXICON
+        // Prioridad 1: Si se pasa un suffixIcon personalizado, úsalo.
+        // Prioridad 2: Si no, y es un campo de contraseña, usa el botón de visibilidad.
+        // Prioridad 3: Si no es ninguna de las anteriores, no muestres nada (null).
+        suffixIcon: widget.suffixIcon != null
+            ? widget.suffixIcon
+            : widget.isPassword
+                ? IconButton(
+                    icon: Icon(
+                      _isObscured ? Icons.visibility_off : Icons.visibility,
+                      color: widget.iconColor ?? AppColors.primaryColor(context),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isObscured = !_isObscured;
+                      });
+                    },
+                  )
+                : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.transparent, width: 0.6),

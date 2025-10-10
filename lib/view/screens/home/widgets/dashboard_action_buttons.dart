@@ -32,7 +32,8 @@ class DashboardActionButtons extends StatelessWidget {
   Future<void> _handleScanQRPressed(BuildContext context) async {
     final hasPermission = await _permissionService.handleCameraPermission(
       context,
-      reason: 'MedicalHand necesita acceso a tu cámara para escanear el código QR de llegada y registrarte en la fila virtual.',
+      reason:
+          'MedicalHand necesita acceso a tu cámara para escanear el código QR de llegada y registrarte en la fila virtual.',
     );
     if (!hasPermission || !context.mounted) return;
 
@@ -48,12 +49,136 @@ class DashboardActionButtons extends StatelessWidget {
       final activeProfile = userViewModel.activeProfile;
 
       if (appointment == null || activeProfile == null) return;
-      
+
       // Mostramos un diálogo de carga.
+      // Mostramos un diálogo de carga mejorado.
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
+        barrierColor: Colors.black.withAlpha(100),
+        builder: (context) => Center(
+          child: Container(
+            padding: const EdgeInsets.all(28),
+            margin: const EdgeInsets.symmetric(horizontal: 32),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 25,
+                  offset: const Offset(0, 8),
+                ),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Icono con contenedor decorativo
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.primaryColor(context),
+                        Color.lerp(
+                          AppColors.primaryColor(context),
+                          Colors.white,
+                          0.2,
+                        )!,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryColor(context).withAlpha(80),
+                        blurRadius: 15,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    HugeIcons.strokeRoundedQrCode01,
+                    color: Colors.white,
+                    size: 36,
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Texto principal
+                Text(
+                  'Procesando código QR',
+                  style: TextStyle(
+                    color: AppColors.primaryColor(context),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // Texto secundario
+                Text(
+                  'Estamos asignando tu lugar en la fila virtual',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Indicador de progreso con diseño mejorado
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.primaryColor(context),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Asignando turno...',
+                      style: TextStyle(
+                        color: Colors.grey.shade700,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 8),
+
+                // Mensaje adicional pequeño
+                Text(
+                  'Esto puede tomar unos segundos',
+                  style: TextStyle(
+                    color: Colors.grey.shade400,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       );
 
       // Llamamos a la función del ViewModel.
@@ -61,16 +186,19 @@ class DashboardActionButtons extends StatelessWidget {
         qrData: scannedData,
         appointment: appointment!,
         patientUid: activeProfile.uid,
-        patientName: "${activeProfile.firstName} ${" "} ${activeProfile.lastName}",
+        patientName:
+            "${activeProfile.firstName} ${" "} ${activeProfile.lastName}",
       );
 
       if (context.mounted) {
         Navigator.of(context).pop(); // Cerramos el diálogo de carga.
-        
+
         if (result['success'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('¡Check-in exitoso! Tu turno es el #${result['turnNumber']}.'),
+              content: Text(
+                '¡Check-in exitoso! Tu turno es el #${result['turnNumber']}.',
+              ),
               backgroundColor: AppColors.successColor(context).withAlpha(240),
               behavior: SnackBarBehavior.floating,
             ),
@@ -78,7 +206,9 @@ class DashboardActionButtons extends StatelessWidget {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(result['message'] ?? 'Ocurrió un error desconocido.'),
+              content: Text(
+                result['message'] ?? 'Ocurrió un error desconocido.',
+              ),
               backgroundColor: AppColors.warningColor(context).withAlpha(240),
               behavior: SnackBarBehavior.floating,
             ),
@@ -88,20 +218,20 @@ class DashboardActionButtons extends StatelessWidget {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final primaryColor = AppColors.warningColor(context).withAlpha(190);
+    final graceColor = AppColors.secondaryColor(context).withAlpha(200);
     final warningColor = AppColors.warningColor(context);
     final accentColor = AppColors.accentColor(context);
 
     final bool canCheckIn = _isCheckInAvailable;
     final bool isAsistenciaConfirmada =
         appointment?.status == 'asistencia_confirmada';
+    final bool isEnFila = appointment?.status == 'en_fila';
 
     return Column(
       children: [
-        if (canCheckIn)
+        if (canCheckIn && !isEnFila)
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 400),
             switchInCurve: Curves.easeOutBack,
@@ -129,7 +259,7 @@ class DashboardActionButtons extends StatelessWidget {
                       title: 'Confirmar asistencia',
                       subtitle: 'Registra de asistencia',
                       icon: HugeIcons.strokeRoundedTickDouble04,
-                      primaryColor: primaryColor,
+                      primaryColor: graceColor,
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -175,7 +305,7 @@ class DashboardActionButtons extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             primaryColor,
-            Color.lerp(primaryColor.withAlpha(190), Colors.black, 0.08)!,
+            Color.lerp(primaryColor.withAlpha(190), Colors.black, 0.1)!,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

@@ -59,7 +59,6 @@ class AppointmentViewModel extends ChangeNotifier {
         batch.update(doc.reference, {'status': 'no_asistio'});
       }
       await batch.commit();
-
     } catch (e) {
       //;
     }
@@ -96,45 +95,47 @@ class AppointmentViewModel extends ChangeNotifier {
   }
 
   Stream<List<CitaModel>> getUpcomingAppointments(String userId) {
-  return _firestore
-      .collection('citas')
-      .where('uid', isEqualTo: userId)
-      .where(
-        'status',
-        whereIn: ['pendiente', 'confirmada', 'pendiente_reprogramacion', 'asistencia_confirmada'],
-      )
-      .snapshots()
-      .map((snapshot) {
-        var citas = snapshot.docs
-            .map((doc) {
-              var cita = CitaModel.fromFirestore(doc);
-              if (cita.status == 'asistencia_confirmada') {
-                cita.status = 'confirmada';
-              }
-
-              return cita;
-            })
-            .toList();
-
-        citas.sort((a, b) {
-          if (a.status == 'confirmada' && b.status == 'pendiente') return -1;
-          if ((a.status == 'pendiente' ||
-                  a.status == 'pendiente_reprogramacion') &&
-              b.status == 'confirmada') {
-            return 1;
-          }
-          if (a.status == 'pendiente' && b.status == 'confirmada') return 1;
-          if (a.status == 'confirmada' && b.status == 'confirmada') {
-            if (a.assignedDate != null && b.assignedDate != null) {
-              return a.assignedDate!.compareTo(b.assignedDate!);
+    return _firestore
+        .collection('citas')
+        .where('uid', isEqualTo: userId)
+        .where(
+          'status',
+          whereIn: [
+            'pendiente',
+            'confirmada',
+            'pendiente_reprogramacion',
+            'asistencia_confirmada',
+          ],
+        )
+        .snapshots()
+        .map((snapshot) {
+          var citas = snapshot.docs.map((doc) {
+            var cita = CitaModel.fromFirestore(doc);
+            if (cita.status == 'asistencia_confirmada') {
+              cita.status = 'confirmada';
             }
-          }
-          return 0;
-        });
-        return citas;
-      });
-}
 
+            return cita;
+          }).toList();
+
+          citas.sort((a, b) {
+            if (a.status == 'confirmada' && b.status == 'pendiente') return -1;
+            if ((a.status == 'pendiente' ||
+                    a.status == 'pendiente_reprogramacion') &&
+                b.status == 'confirmada') {
+              return 1;
+            }
+            if (a.status == 'pendiente' && b.status == 'confirmada') return 1;
+            if (a.status == 'confirmada' && b.status == 'confirmada') {
+              if (a.assignedDate != null && b.assignedDate != null) {
+                return a.assignedDate!.compareTo(b.assignedDate!);
+              }
+            }
+            return 0;
+          });
+          return citas;
+        });
+  }
 
   Future<void> fetchInitialDashboardAppointment(String userId) async {
     try {
@@ -239,39 +240,53 @@ class AppointmentViewModel extends ChangeNotifier {
 
     final queueId = qrJson['queueId'] as String?;
     if (queueId == null) {
-      return {'success': false, 'message': 'El código QR no tiene el formato correcto.'};
+      return {
+        'success': false,
+        'message': 'El código QR no tiene el formato correcto.',
+      };
     }
 
     // 2. Construir el ID del documento de la fila
     final today = DateTime.now();
     final formattedDate = DateFormat('dd-MM-yyyy').format(today);
     final queueDocId = '$queueId-$formattedDate';
-    
+
     // Obtenemos el token de notificación del dispositivo
     final notificationToken = await _notificationService.getFcmToken();
     if (notificationToken == null) {
-      return {'success': false, 'message': 'No se pudo obtener el token para notificaciones.'};
+      return {
+        'success': false,
+        'message': 'No se pudo obtener el token para notificaciones.',
+      };
     }
 
     // 3. Ejecutar la transacción en Firestore
     try {
-      final newTurnNumber = await _firestore.runTransaction((transaction) async {
-        final queueRef = _firestore.collection('filas_virtuales').doc(queueDocId);
+      final newTurnNumber = await _firestore.runTransaction((
+        transaction,
+      ) async {
+        final queueRef = _firestore
+            .collection('filas_virtuales')
+            .doc(queueDocId);
         final patientRef = queueRef.collection('pacientes').doc(patientUid);
-        final appointmentRef = _firestore.collection('citas').doc(appointment.id);
-        
+        final appointmentRef = _firestore
+            .collection('citas')
+            .doc(appointment.id);
+
         // Leemos el documento de la fila actual
         final queueSnapshot = await transaction.get(queueRef);
-        
+
         int nextTurn;
-        
+
         if (!queueSnapshot.exists) {
           // Si la fila no existe para hoy, la creamos.
           nextTurn = 1;
           transaction.set(queueRef, {
             'hospitalId': appointment.idHospital,
             'queueName': appointment.specialty ?? 'Consulta General',
-            'queueDate': Timestamp.fromDate(DateTime(today.year, today.month, today.day)),
+            'queueDate': Timestamp.fromDate(
+              DateTime(today.year, today.month, today.day),
+            ),
             'queueStatus': 'activo',
             'currentTurn': 0,
             'lastAssignedTurn': nextTurn,
@@ -283,7 +298,7 @@ class AppointmentViewModel extends ChangeNotifier {
           nextTurn = lastTurn + 1;
           transaction.update(queueRef, {'lastAssignedTurn': nextTurn});
         }
-        
+
         // Creamos el documento para el paciente en la sub-colección.
         transaction.set(patientRef, {
           'patientName': patientName,
@@ -293,27 +308,29 @@ class AppointmentViewModel extends ChangeNotifier {
           'patientStatus': 'esperando',
           'notificationToken': notificationToken,
         });
-        
+
         // Actualizamos el estado de la cita original.
         transaction.update(appointmentRef, {'status': 'en_fila'});
-        
+
         return nextTurn;
       });
 
       return {'success': true, 'turnNumber': newTurnNumber};
-
     } catch (e) {
       print('Error en la transacción de check-in: $e');
-      return {'success': false, 'message': 'Ocurrió un error al registrar tu llegada. Inténtalo de nuevo.'};
+      return {
+        'success': false,
+        'message':
+            'Ocurrió un error al registrar tu llegada. Inténtalo de nuevo.',
+      };
     }
   }
 
   Future<bool> confirmAttendance(String appointmentId) async {
     try {
-      await _firestore
-          .collection('citas')
-          .doc(appointmentId)
-          .update({'status': 'asistencia_confirmada'});
+      await _firestore.collection('citas').doc(appointmentId).update({
+        'status': 'asistencia_confirmada',
+      });
       return true;
     } catch (e) {
       //;
@@ -325,7 +342,7 @@ class AppointmentViewModel extends ChangeNotifier {
     final query = _firestore
         .collection('citas')
         .where('uid', isEqualTo: userId)
-        .where('status', whereIn: ['confirmada', 'asistencia_confirmada'])
+        .where('status', whereIn: ['confirmada', 'asistencia_confirmada','en_fila'])
         .orderBy('assignedDate')
         .limit(1);
 
@@ -336,6 +353,22 @@ class AppointmentViewModel extends ChangeNotifier {
       return CitaModel.fromFirestore(snapshot.docs.first);
     });
   }
+
+Stream<DocumentSnapshot> getVirtualQueueStream(String queueDocId) {
+  return FirebaseFirestore.instance
+      .collection('filas_virtuales')
+      .doc(queueDocId)
+      .snapshots();
+}
+
+Stream<DocumentSnapshot> getPatientQueueStream(String queueDocId, String userId) {
+  return FirebaseFirestore.instance
+      .collection('filas_virtuales')
+      .doc(queueDocId)
+      .collection('pacientes')
+      .doc(userId)
+      .snapshots();
+}
 
   void listenToNextAppointment(String userId) {
     if (_listeningForUserId == userId) return;
