@@ -21,7 +21,7 @@ class AppThemes {
         successColor: Color(0xFF2E7D32),
         textColor: Color(0xFF333333),
         textLightColor: Color(0xFF757575),
-        graceColor:  Color(0xFFFFC066),
+        graceColor: Color(0xFFFFB85C),
       ),
     ],
   );

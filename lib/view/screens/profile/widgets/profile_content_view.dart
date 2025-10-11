@@ -2,20 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/data/models/user_model.dart';
 import 'package:p_hn25/view/screens/profile/edit_medical_info_screen.dart';
 import 'package:p_hn25/view/screens/profile/edit_personal_info_screen.dart';
 import 'package:p_hn25/view/screens/profile/settings/app_preferences_screen.dart';
 import 'package:p_hn25/view/screens/profile/settings/notification_preferences_screen.dart';
 import 'package:p_hn25/view/screens/profile/settings/account_security_screen.dart';
+import 'package:shimmer/shimmer.dart'; // 🔥 1. IMPORTAMOS EL PAQUETE SHIMMER
 import 'info_row.dart';
 import 'profile_header.dart';
 import 'settings_row.dart';
 import 'info_card.dart';
 import 'profile_section_header.dart';
 import 'emergency_contact_dialog.dart';
-import 'emergency_contact_row.dart'; // <-- NUEVO
-import 'profile_divider.dart'; // <-- NUEVO
+import 'emergency_contact_row.dart';
+import 'profile_divider.dart';
 
 class ProfileContentView extends StatelessWidget {
   final UserModel user;
@@ -49,6 +51,42 @@ class ProfileContentView extends StatelessWidget {
     );
   }
 
+  void _showImageDialog(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(10),
+          child: GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: InteractiveViewer(
+              panEnabled: true,
+              minScale: 0.5,
+              maxScale: 4,
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.contain,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const Center(child: CircularProgressIndicator(color: Colors.white));
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.black45,
+                    child: const Center(
+                      child: Icon(Icons.broken_image, color: Colors.white, size: 60),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final emergencyContact = _getEmergencyContact();
@@ -56,6 +94,9 @@ class ProfileContentView extends StatelessWidget {
         emergencyContact.isNotEmpty &&
         emergencyContact['name'] != null &&
         emergencyContact['phone'] != null;
+    
+    final String? idFrontUrl = user.verification?['idFrontUrl'];
+    final String? idBackUrl = user.verification?['idBackUrl'];
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
@@ -90,7 +131,14 @@ class ProfileContentView extends StatelessWidget {
                 value: _formatDateOfBirth(),
               ),
               const ProfileDivider(),
-              InfoRow(label: 'Cédula', value: user.idNumber),
+              Column(
+                children: [
+                  InfoRow(label: 'Cédula', value: user.idNumber),
+                  if (idFrontUrl != null || idBackUrl != null)
+                    _buildIdImageViewer(context, idFrontUrl, idBackUrl),
+                ],
+              ),
+              const SizedBox(height: 10),
               const ProfileDivider(),
               InfoRow(label: 'Teléfono', value: user.phoneNumber),
               const ProfileDivider(),
@@ -120,8 +168,7 @@ class ProfileContentView extends StatelessWidget {
               const ProfileDivider(),
               InfoRow(
                 label: 'Alergias',
-                value:
-                    user.medicalInfo?['knownAllergies'] ?? 'Ninguna reportada',
+                value: user.medicalInfo?['knownAllergies'] ?? 'Ninguna reportada',
               ),
               const ProfileDivider(),
               InfoRow(
@@ -148,9 +195,7 @@ class ProfileContentView extends StatelessWidget {
                 icon: HugeIcons.strokeRoundedPhoneArrowDown,
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const AppPreferencesScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const AppPreferencesScreen()),
                 ),
                 isFirst: true,
               ),
@@ -160,9 +205,7 @@ class ProfileContentView extends StatelessWidget {
                 icon: HugeIcons.strokeRoundedNotification01,
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const NotificationPreferencesScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const NotificationPreferencesScreen()),
                 ),
               ),
               const ProfileDivider(),
@@ -171,9 +214,7 @@ class ProfileContentView extends StatelessWidget {
                 icon: HugeIcons.strokeRoundedShield01,
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const AccountSecurityScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const AccountSecurityScreen()),
                 ),
                 isLast: true,
               ),
@@ -193,6 +234,79 @@ class ProfileContentView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildIdImageViewer(BuildContext context, String? frontUrl, String? backUrl) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          if (frontUrl != null)
+            Expanded(
+              child: _buildImageContainer('Frente', frontUrl, context),
+            ),
+          if (frontUrl != null && backUrl != null)
+            const SizedBox(width: 16),
+          if (backUrl != null)
+            Expanded(
+              child: _buildImageContainer('Dorso', backUrl, context),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageContainer(String label, String url, BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: () => _showImageDialog(context, url),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              height: 100,
+              width: double.infinity,
+              color: Colors.grey.shade200,
+              child: Image.network(
+                url,
+                fit: BoxFit.cover,
+                // 🔥 2. SE REEMPLAZA EL CIRCULARPROGRESSINDICATOR POR EL SHIMMER
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child; // Cuando la imagen carga, se muestra
+                  // Mientras carga, se muestra el efecto shimmer
+                  return Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      width: double.infinity,
+                      height: 100,
+                      color: Colors.white, // El color base del shimmer
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(
+                    Icons.error_outline,
+                    color: AppColors.warningColor(context),
+                    size: 40,
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

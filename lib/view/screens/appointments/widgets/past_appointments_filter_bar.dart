@@ -29,11 +29,11 @@ class PastAppointmentsFilterBar extends StatefulWidget {
   });
 
   @override
-  State<PastAppointmentsFilterBar> createState() => PastAppointmentsFilterBarState();
+  State<PastAppointmentsFilterBar> createState() =>
+      PastAppointmentsFilterBarState();
 }
 
 class PastAppointmentsFilterBarState extends State<PastAppointmentsFilterBar> {
-  
   void showFilterBottomSheet() {
     showModalBottomSheet(
       context: context,
@@ -93,7 +93,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
 
   void _pickDate() async {
     final primaryColor = AppColors.primaryColor(context);
-    
+
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedDate ?? DateTime.now(),
@@ -108,16 +108,15 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
               surface: Colors.white,
               onSurface: Colors.black,
             ),
-            dialogBackgroundColor: Colors.white,
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(foregroundColor: primaryColor),
-            ),
+            ), dialogTheme: DialogThemeData(backgroundColor: Colors.white),
           ),
           child: child!,
         );
       },
     );
-    
+
     if (pickedDate != null && mounted) {
       setState(() {
         _selectedDate = pickedDate;
@@ -180,7 +179,12 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
   Widget build(BuildContext context) {
     final primaryColor = AppColors.primaryColor(context);
     final backgroundColor = AppColors.backgroundColor(context);
-    
+
+    // 🔥 1. SE CREA UNA VARIABLE PARA VERIFICAR SI HAY FILTROS ACTIVOS
+    // Se usa el estado actual de los selectores, no el inicial.
+    final bool hasActiveFilters =
+        _selectedDate != null || _selectedStatus != null;
+
     return Container(
       padding: EdgeInsets.only(
         top: 20,
@@ -199,7 +203,6 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header compacto
           Row(
             children: [
               Container(
@@ -214,25 +217,39 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(HugeIcons.strokeRoundedFilter, color: Colors.white, size: 20),
+                child: const Icon(
+                  HugeIcons.strokeRoundedFilter,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Filtrar Citas Pasadas', 
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textColor(context))),
-                    Text('Selecciona los criterios',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                    Text(
+                      'Filtrar Citas Pasadas',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textColor(context),
+                      ),
+                    ),
+                    Text(
+                      'Selecciona los criterios',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          
-          // Contenido compacto
+
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -254,21 +271,38 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 20),
-          
-          // Botones compactos
+
           Row(
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: _clearFilters,
+                  // 🔥 2. SE APLICA LA LÓGICA CONDICIONAL
+                  // Si no hay filtros, `onPressed` es null y el botón se desactiva.
+                  onPressed: hasActiveFilters ? _clearFilters : null,
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    side: BorderSide(color: Colors.grey.shade300),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    // 🔥 3. EL COLOR DEL BORDE AHORA DEPENDE DE SI HAY FILTROS.
+                    side: BorderSide(
+                      color: hasActiveFilters
+                          ? AppColors.warningColor(context)
+                          : Colors.grey.shade300,
+                    ),
                   ),
-                  child: Text('Limpiar', style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.w600)),
+                  // 🔥 4. EL COLOR DEL TEXTO TAMBIÉN CAMBIA.
+                  child: Text(
+                    'Limpiar',
+                    style: TextStyle(
+                      color: hasActiveFilters
+                          ? AppColors.warningColor(context)
+                          : Colors.grey.shade500,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -278,14 +312,22 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     elevation: 2,
                   ),
-                  child: const Text('Aplicar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                  child: const Text(
+                    'Aplicar',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -295,7 +337,14 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Fecha', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+        Text(
+          'Fecha',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade700,
+          ),
+        ),
         const SizedBox(height: 8),
         Row(
           children: [
@@ -316,8 +365,15 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(color: primaryColor, width: 1.5),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  prefixIcon: Icon(HugeIcons.strokeRoundedCalendar01, color: primaryColor, size: 18),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  prefixIcon: Icon(
+                    HugeIcons.strokeRoundedCalendar01,
+                    color: primaryColor,
+                    size: 18,
+                  ),
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [
@@ -334,16 +390,17 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
               height: 44,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    primaryColor.withOpacity(0.8),
-                    primaryColor,
-                  ],
+                  colors: [primaryColor.withOpacity(0.8), primaryColor],
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: IconButton(
                 onPressed: _pickDate,
-                icon: Icon(HugeIcons.strokeRoundedCalendar01, color: Colors.white, size: 18),
+                icon: const Icon(
+                  HugeIcons.strokeRoundedCalendar01,
+                  color: Colors.white,
+                  size: 18,
+                ),
                 padding: EdgeInsets.zero,
               ),
             ),
@@ -359,12 +416,20 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
             ),
             child: Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.green.shade600, size: 16),
+                Icon(
+                  Icons.check_circle,
+                  color: Colors.green.shade600,
+                  size: 16,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Fecha seleccionada: ${DateFormat('d \'de\' MMMM, y', 'es_ES').format(_selectedDate!)}',
-                    style: TextStyle(fontSize: 12, color: Colors.green.shade700, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.green.shade700,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
@@ -379,7 +444,14 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Estado', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+        Text(
+          'Estado',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade700,
+          ),
+        ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
@@ -388,15 +460,26 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButtonFormField<String>(
-              value: _selectedStatus,
+              initialValue: _selectedStatus,
               isExpanded: true,
               decoration: InputDecoration(
                 border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                prefixIcon: Icon(HugeIcons.strokeRoundedInformationCircle, color: primaryColor, size: 18),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
+                prefixIcon: Icon(
+                  HugeIcons.strokeRoundedInformationCircle,
+                  color: primaryColor,
+                  size: 18,
+                ),
               ),
               hint: const Text('Seleccionar estado'),
-              icon: Icon(Icons.arrow_drop_down, color: Colors.grey.shade600, size: 20),
+              icon: Icon(
+                Icons.arrow_drop_down,
+                color: Colors.grey.shade600,
+                size: 20,
+              ),
               dropdownColor: Colors.white,
               borderRadius: BorderRadius.circular(12),
               menuMaxHeight: 200,
@@ -405,7 +488,10 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                   value: status,
                   child: Text(
                     _statusDisplayNames[status]!,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 );
               }).toList(),

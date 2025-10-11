@@ -25,7 +25,6 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
   final GlobalKey<PastAppointmentsFilterBarState> _filterBarKey =
       GlobalKey<PastAppointmentsFilterBarState>();
 
-  // 🔥 1. AÑADIMOS UNA VARIABLE DE ESTADO PARA SABER SI LOS FILTROS ESTÁN ACTIVOS.
   bool _areFiltersActive = false;
 
   @override
@@ -34,14 +33,15 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
     _tabController = TabController(length: 2, vsync: this);
     initializeDateFormatting('es_ES', null);
 
+    // 🔥 LA CORRECCIÓN ESTÁ AQUÍ.
+    // Se ha eliminado la lógica interna que reseteaba `_areFiltersActive`.
+    // Ahora, el listener solo llama a `setState`, lo que hace que el AppBar se 
+    // reconstruya para mostrar u ocultar el botón de filtro.
+    // El estado del color (`_areFiltersActive`) ya no se altera aquí, 
+    // por lo que se mantendrá al cambiar de pestaña.
     _tabController.addListener(() {
       if (mounted) {
-        setState(() {
-          // Si no estamos en la pestaña de "Pasadas", reseteamos el estado del filtro.
-          if (_tabController.index != 1) {
-            _areFiltersActive = false;
-          }
-        });
+        setState(() {});
       }
     });
 
@@ -84,11 +84,15 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
                   profileId: activeProfile.uid,
                   isUpcoming: false,
                   filterBarKey: _filterBarKey,
-                  // 🔥 2. PASAMOS UNA FUNCIÓN CALLBACK PARA RECIBIR EL ESTADO DE LOS FILTROS.
                   onFilterStateChanged: (isActive) {
-                    // Actualizamos el estado en el widget padre para que el AppBar se reconstruya.
-                    setState(() {
-                      _areFiltersActive = isActive;
+                    // Usamos Future.microtask para asegurar que setState se llame de forma segura
+                    // y evitar errores si la actualización ocurre durante la construcción del widget.
+                    Future.microtask(() {
+                      if (mounted && _areFiltersActive != isActive) {
+                        setState(() {
+                          _areFiltersActive = isActive;
+                        });
+                      }
                     });
                   },
                 ),
@@ -136,16 +140,12 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
             child: IconButton(
               icon: Icon(
                 _areFiltersActive
-                    ? HugeIcons
-                          .strokeRoundedFilterEdit 
+                    ? HugeIcons.strokeRoundedFilterEdit 
                     : HugeIcons.strokeRoundedFilter, 
                 color: _areFiltersActive
-                    ? AppColors.warningColor(
-                        context,
-                      ) // Color cuando los filtros están activos
-                    : AppColors.primaryColor(context), // Color por defecto
+                    ? AppColors.warningColor(context)
+                    : AppColors.primaryColor(context),
               ),
-
               onPressed: () {
                 _filterBarKey.currentState?.showFilterBottomSheet();
               },
@@ -202,7 +202,6 @@ class _AppointmentTabPage extends StatefulWidget {
   final String profileId;
   final bool isUpcoming;
   final GlobalKey<PastAppointmentsFilterBarState>? filterBarKey;
-  // 🔥 4. AÑADIMOS EL PARÁMETRO PARA LA FUNCIÓN CALLBACK.
   final ValueChanged<bool>? onFilterStateChanged;
 
   const _AppointmentTabPage({
@@ -210,7 +209,7 @@ class _AppointmentTabPage extends StatefulWidget {
     required this.profileId,
     required this.isUpcoming,
     this.filterBarKey,
-    this.onFilterStateChanged, // El callback es opcional.
+    this.onFilterStateChanged,
   });
 
   @override
@@ -240,8 +239,7 @@ class _AppointmentTabPageState extends State<_AppointmentTabPage>
     }
 
     return appointments.where((cita) {
-      final dateMatch =
-          _filters.date == null ||
+      final dateMatch = _filters.date == null ||
           (cita.assignedDate != null &&
               cita.assignedDate!.year == _filters.date!.year &&
               cita.assignedDate!.month == _filters.date!.month &&
@@ -300,13 +298,11 @@ class _AppointmentTabPageState extends State<_AppointmentTabPage>
                   setState(() {
                     _filters = newFilters;
                   });
-                  // 🔥 5. LLAMAMOS AL CALLBACK PARA NOTIFICAR AL PADRE SOBRE EL CAMBIO.
                   widget.onFilterStateChanged?.call(
                     newFilters.hasActiveFilters,
                   );
                 },
               ),
-
             if (filteredAppointments.isEmpty && allAppointments.isNotEmpty)
               const EmptyStateWidget(
                 icon: HugeIcons.strokeRoundedSearch02,
@@ -376,15 +372,115 @@ class _AppointmentsShimmer extends StatelessWidget {
 class _ShimmerCard extends StatelessWidget {
   const _ShimmerCard();
 
-  @override
-  Widget build(BuildContext context) {
+  // Helper para crear las líneas grises del placeholder
+  Widget _buildPlaceholderLine({
+    required double width,
+    double height = 14,
+    double borderRadius = 8,
+  }) {
     return Container(
-      height: 154,
-      margin: const EdgeInsets.only(bottom: 16.0),
-      padding: const EdgeInsets.all(16.0),
+      width: width,
+      height: height,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Se replica la misma decoración y margen de la tarjeta real
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16.0),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.5), // Usamos un color base semitransparente para el shimmer
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(10),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // --- Placeholder para el Encabezado ---
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade400, // Simula el área del gradiente
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: Row(
+              children: [
+                // Icono del hospital
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha(100),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Título de la especialidad
+                Expanded(
+                  child: _buildPlaceholderLine(width: 150, height: 16),
+                ),
+                const SizedBox(width: 8),
+                // Chip de estado
+                _buildPlaceholderLine(width: 80, height: 22, borderRadius: 10),
+              ],
+            ),
+          ),
+
+          // --- Placeholder para el Contenido ---
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Nombre del hospital
+                _buildPlaceholderLine(width: double.infinity, height: 18),
+                const SizedBox(height: 4),
+                _buildPlaceholderLine(width: 180, height: 18),
+                const SizedBox(height: 12),
+                // Fila de información (Fecha)
+                Row(
+                  children: [
+                    Container(width: 14, height: 14, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle)),
+                    const SizedBox(width: 8),
+                    _buildPlaceholderLine(width: 160),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                // Fila de información (Consultorio)
+                Row(
+                  children: [
+                    Container(width: 14, height: 14, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle)),
+                    const SizedBox(width: 8),
+                    _buildPlaceholderLine(width: 120),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // --- Placeholder para la sección de Opciones ---
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Container(height: 1, color: Colors.grey.shade200),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 14.0),
+            child: _buildPlaceholderLine(width: 120, height: 13),
+          ),
+        ],
       ),
     );
   }

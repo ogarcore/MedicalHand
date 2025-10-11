@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-// --- Modelos para los datos anidados (se mantienen igual) ---
+// --- Modelos anidados (no necesitan cambios) ---
 class Prescription {
   final String nombre;
   final String dosis;
@@ -24,7 +25,7 @@ class Prescription {
     );
   }
 
-  Map<String, dynamic> toMap() {
+   Map<String, dynamic> toMap() {
     return {
       'nombre': nombre,
       'dosis': dosis,
@@ -47,27 +48,24 @@ class ExamRequested {
     );
   }
 
-  Map<String, dynamic> toMap() {
+   Map<String, dynamic> toMap() {
     return {'nombre': nombre, 'estado': estado};
   }
 }
 
-// --- Modelo principal de la Consulta (adaptado a tu estructura) ---
+// --- Modelo principal de la Consulta (AJUSTADO) ---
 class ConsultationModel {
-  // Datos que vienen del documento de la subcolección 'consultas'
   final String id;
   final String diagnostico;
   final Timestamp fechaConsulta;
   final String motivoConsulta;
   final String tratamiento;
   final String doctorName;
-  final String specialty;
+  final String especialidad;
+  final String hospitalName; // <--- CAMBIO: Ahora es el nombre, no el ID
   final List<Prescription> prescriptions;
   final List<ExamRequested> examsRequested;
   final String observaciones;
-
-  // Datos que vienen del documento 'padre' en la colección 'expedientes'
-  final String hospital;
 
   ConsultationModel({
     required this.id,
@@ -76,57 +74,51 @@ class ConsultationModel {
     required this.motivoConsulta,
     required this.tratamiento,
     required this.doctorName,
-    required this.specialty,
+    required this.especialidad,
+    required this.hospitalName, // <--- CAMBIO
     required this.prescriptions,
     required this.examsRequested,
     required this.observaciones,
-    required this.hospital,
   });
 
-  // Constructor Factory para crear el modelo desde Firestore
-  factory ConsultationModel.fromFirestore({
-    required DocumentSnapshot consultaDoc,
-    required Map<String, dynamic> expedienteData,
-  }) {
-    final data = consultaDoc.data() as Map<String, dynamic>;
+  // --- CONSTRUCTOR AJUSTADO ---
+  // Ahora recibe el nombre del hospital como un parámetro extra.
+  factory ConsultationModel.fromFirestore(DocumentSnapshot doc, String hospitalName) {
+    final data = doc.data() as Map<String, dynamic>;
 
     return ConsultationModel(
-      id: consultaDoc.id,
-      // Leyendo los campos del documento de consulta
+      id: doc.id,
       fechaConsulta: data['fechaConsulta'] ?? Timestamp.now(),
       diagnostico: data['diagnostico'] ?? 'Sin diagnóstico',
       motivoConsulta: data['motivoConsulta'] ?? 'Sin motivo',
       tratamiento: data['tratamiento'] ?? 'Sin tratamiento',
       observaciones: data['observaciones'] ?? '',
-      doctorName: data['doctorName'] ?? 'No especificado', // Campo que añadirás
-      specialty: data['specialty'] ?? 'No especificada', // Campo que añadirás
-      // Mapeando los arrays
-      prescriptions:
-          (data['prescriptions'] as List<dynamic>?)
+      doctorName: data['doctor_name'] ?? 'No especificado',
+      especialidad: data['especialidad'] ?? 'No especificada',
+      
+      hospitalName: hospitalName, // <--- CAMBIO: Usa el nombre que le pasamos
+
+      prescriptions: (data['medicamentos'] as List<dynamic>?)
               ?.map((p) => Prescription.fromMap(p as Map<String, dynamic>))
               .toList() ??
           [],
-      examsRequested:
-          (data['examsRequested'] as List<dynamic>?)
+      examsRequested: (data['examsRequested'] as List<dynamic>?)
               ?.map((e) => ExamRequested.fromMap(e as Map<String, dynamic>))
               .toList() ??
           [],
-
-      // Leyendo el nombre del hospital desde los datos del expediente 'padre'
-      hospital: expedienteData['hospitalName'] ?? 'Hospital no especificado',
     );
   }
 
   String get formattedDate {
+    initializeDateFormatting('es_ES', null); 
     final date = fechaConsulta.toDate();
     return DateFormat('d \'de\' MMMM, y', 'es_ES').format(date);
   }
-
-  // Método para pasar los datos a la pantalla de detalles (no necesita cambios)
+  
   Map<String, dynamic> toMap() {
     return {
-      'hospital': hospital,
-      'specialty': specialty,
+      'hospital': hospitalName, // <--- CAMBIO: Pasamos el nombre
+      'specialty': especialidad,
       'date': formattedDate,
       'motivoConsulta': motivoConsulta,
       'diagnostico': diagnostico,

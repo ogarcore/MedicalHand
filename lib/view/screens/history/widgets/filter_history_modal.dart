@@ -1,13 +1,13 @@
-// lib/view/screens/history/widgets/filter_history_modal.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:hugeicons/hugeicons.dart';
+import 'package:intl/intl.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
-
-// Creamos un callback para comunicar los filtros seleccionados a la pantalla principal.
-typedef FilterCallback = void Function(String specialty, bool withResults);
+import 'package:p_hn25/app/core/utils/input_formatters.dart';
 
 class FilterHistoryModal extends StatefulWidget {
   final List<String> specialties;
-  final FilterCallback onApplyFilters;
+  final Function(String specialty, DateTime? date, bool withResults) onApplyFilters;
   final VoidCallback onResetFilters;
 
   const FilterHistoryModal({
@@ -22,230 +22,219 @@ class FilterHistoryModal extends StatefulWidget {
 }
 
 class _FilterHistoryModalState extends State<FilterHistoryModal> {
-  // El estado interno del modal (los valores seleccionados) vive aquí.
-  late String selectedSpecialty;
-  late bool withResults;
+  String? _selectedSpecialty;
+  bool _withResultsOnly = false;
+  DateTime? _selectedDate;
+  final TextEditingController _dateController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    selectedSpecialty = 'Todas';
-    withResults = false;
+    if (widget.specialties.contains('Todas')) {
+      _selectedSpecialty = 'Todas';
+    }
+  }
+
+  @override
+  void dispose() {
+    _dateController.dispose();
+    super.dispose();
+  }
+
+  
+    
+  
+  void _onDateTextChanged(String value) {
+    if (_validateDate(value) == null && value.length == 10) {
+      try {
+        final dateParts = value.split('/');
+        final newDate = DateTime(
+          int.parse(dateParts[2]),
+          int.parse(dateParts[1]),
+          int.parse(dateParts[0]),
+        );
+        setState(() {
+          _selectedDate = newDate;
+        });
+      } catch (e) {
+        setState(() { _selectedDate = null; });
+      }
+    } else {
+      setState(() { _selectedDate = null; });
+    }
+  }
+
+  // 🔥 VALIDADOR DE FECHA LOCAL (CORREGIDO)
+  String? _validateDate(String? value) {
+    if (value == null || value.isEmpty) {
+      return null; // El campo puede estar vacío, no es un error
+    }
+    final dateRegex = RegExp(r'^\d{2}/\d{2}/\d{4}$');
+    if (!dateRegex.hasMatch(value)) {
+      return 'Formato: DD/MM/AAAA.';
+    }
+    try {
+      DateFormat('dd/MM/yyyy').parseStrict(value);
+      return null; // La fecha es válida
+    } catch (e) {
+      return 'Fecha no válida.';
+    }
+  }
+
+  void _apply() {
+    widget.onApplyFilters(_selectedSpecialty ?? 'Todas', _selectedDate, _withResultsOnly);
+    Navigator.of(context).pop();
+  }
+
+  void _reset() {
+    widget.onResetFilters();
+    Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = AppColors.primaryColor(context);
+    final backgroundColor = AppColors.backgroundColor(context);
+
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(24.0),
-          topRight: Radius.circular(24.0),
+      padding: EdgeInsets.only(
+        top: 20,
+        left: 20,
+        right: 20,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+      ),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 44, height: 44,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [primaryColor, Color.lerp(primaryColor, Colors.white, 0.2)!]),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(HugeIcons.strokeRoundedFilter, color: Colors.white, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Filtrar Historial', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textColor(context))),
+                    Text('Selecciona los criterios de búsqueda', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 8, offset: const Offset(0, 2))],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSpecialtyDropdown(primaryColor),
+                const SizedBox(height: 16),
+                _buildDatePicker(primaryColor),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: _reset,
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    side: BorderSide(color: AppColors.warningColor(context)),
+                  ),
+                  child: Text('Limpiar Filtros', style: TextStyle(color: AppColors.warningColor(context), fontWeight: FontWeight.w600)),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _apply,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text('Aplicar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSpecialtyDropdown(Color primaryColor) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Especialidad', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<String>(
+          initialValue: _selectedSpecialty,
+          items: widget.specialties.map((specialty) => DropdownMenuItem(value: specialty, child: Text(specialty))).toList(),
+          onChanged: (value) => setState(() => _selectedSpecialty = value),
+          decoration: InputDecoration(
+            prefixIcon: Icon(HugeIcons.strokeRoundedStethoscope, color: primaryColor, size: 20),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDatePicker(Color primaryColor) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Fecha', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+        const SizedBox(height: 8),
+        Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header con icono y título
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
+            Expanded(
+              child: TextFormField(
+                controller: _dateController,
+                decoration: InputDecoration(
+                  hintText: 'DD/MM/AAAA',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: primaryColor, width: 1.5)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  prefixIcon: Icon(HugeIcons.strokeRoundedCalendar01, color: primaryColor, size: 18),
                 ),
+                keyboardType: TextInputType.number,
+                inputFormatters: [LengthLimitingTextInputFormatter(10), DateInputFormatter()],
+                validator: _validateDate, // Se usa el validador local
+                onChanged: _onDateTextChanged,
               ),
             ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Icon(
-                  Icons.filter_list_rounded,
-                  color: AppColors.primaryColor(context),
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                const Text(
-                  'Filtrar Historial',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Sección de especialidad
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[200]!),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Especialidad médica',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    initialValue: selectedSpecialty,
-                    items: widget.specialties.map((String specialty) {
-                      return DropdownMenuItem<String>(
-                        value: specialty,
-                        child: Text(
-                          specialty,
-                          style: const TextStyle(fontSize: 15),
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      setState(() {
-                        selectedSpecialty = newValue!;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                    ),
-                    icon: Icon(
-                      Icons.arrow_drop_down_rounded,
-                      color: AppColors.primaryColor(context),
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Switch para resultados
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[200]!),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Solo con resultados',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Mostrar únicamente consultas con documentos adjuntos',
-                          style: TextStyle(fontSize: 13, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Transform.scale(
-                    scale: 1.2,
-                    child: Switch(
-                      value: withResults,
-                      onChanged: (newValue) {
-                        setState(() {
-                          withResults = newValue;
-                        });
-                      },
-                      activeThumbColor: AppColors.primaryColor(context),
-                      activeTrackColor: AppColors.primaryColor(
-                        context,
-                      ).withAlpha(35),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            // Botones de acción
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      widget.onResetFilters();
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primaryColor(context),
-                      side: BorderSide(color: AppColors.primaryColor(context)),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      'Limpiar',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      widget.onApplyFilters(selectedSpecialty, withResults);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryColor(context),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: const Text(
-                      'Aplicar Filtros',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
           ],
         ),
-      ),
+      ],
     );
   }
 }

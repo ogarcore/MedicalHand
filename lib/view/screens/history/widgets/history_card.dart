@@ -7,7 +7,6 @@ class HistoryCard extends StatefulWidget {
   final String hospital;
   final String specialty;
   final String date;
-  final String motivoConsulta;
   final String diagnostico;
   final VoidCallback onDetailsPressed;
 
@@ -16,7 +15,6 @@ class HistoryCard extends StatefulWidget {
     required this.hospital,
     required this.specialty,
     required this.date,
-    required this.motivoConsulta,
     required this.onDetailsPressed,
     required this.diagnostico,
   });
@@ -28,211 +26,218 @@ class HistoryCard extends StatefulWidget {
 class _HistoryCardState extends State<HistoryCard> {
   @override
   Widget build(BuildContext context) {
+    // Se definen los colores para el gradiente del header, similar al estado 'finalizada'
+    final secondaryColor = AppColors.secondaryColor(context);
+    final headerGradientColors = [
+      secondaryColor.withAlpha(200),
+      Color.lerp(
+        AppColors.primaryColor(context).withAlpha(200),
+        Colors.black,
+        0.15,
+      )!,
+    ];
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 12.0),
+      margin: const EdgeInsets.only(bottom: 16.0),
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(220),
-        borderRadius: BorderRadius.circular(14),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryColor(context).withAlpha(10),
+            color: Colors.black.withAlpha(20),
+            blurRadius: 32,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.black.withAlpha(10),
             blurRadius: 8,
             offset: const Offset(0, 2),
-            spreadRadius: 1,
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(14.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header compacto
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        children: [
+          // ---- Header con gradiente (del primer código) ----
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: headerGradientColors,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: Row(
               children: [
                 Expanded(
                   child: Text(
-                    widget.specialty,
+                    widget.specialty, // Usamos la especialidad
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textColor(context),
-                      height: 1.2,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white.withAlpha(240),
+                      letterSpacing: 0.3,
                     ),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const SizedBox(width: 8),
-                _buildDateChip(),
+                _buildDateChip(widget.date), // Chip para la fecha
               ],
             ),
+          ),
 
-            const SizedBox(height: 10),
-
-            // Línea divisoria más delgada
-            Container(
-              height: 2,
-              width: 32,
-              decoration: BoxDecoration(
-                color: AppColors.primaryColor(context).withAlpha(150),
-                borderRadius: BorderRadius.circular(1),
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            // Contenido compacto
-            Row(
+          // ---- Cuerpo de la tarjeta (del primer código) ----
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Icono más compacto
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.primaryColor(context).withAlpha(150),
-                        AppColors.primaryColor(context).withAlpha(170),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(9),
-                  ),
-                  child: const Icon(
-                    HugeIcons.strokeRoundedHospital01,
-                    color: Colors.white,
-                    size: 18,
-                  ),
+                _buildInfoRow(title: widget.hospital),
+                const SizedBox(height: 8),
+                _buildInfoRow(
+                  icon: HugeIcons.strokeRoundedBloodBottle,
+                  text: widget.diagnostico, // Mostramos el diagnóstico
+                  subtitle: 'Diagnóstico',
                 ),
-                const SizedBox(width: 12),
-
-                // Información compacta
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Hospital
-                      Text(
-                        widget.hospital,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textColor(context),
-                          height: 1.2,
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: widget.onDetailsPressed,
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.primaryColor(context),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "Diagnostico:",
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textColor(context),
-                          fontWeight: FontWeight.w700,
-                          height: 1.3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        minimumSize: Size.zero, // evita que ocupe todo el ancho
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-
-                      const SizedBox(height: 4),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
+                        mainAxisSize:
+                            MainAxisSize.min, // ocupa solo lo necesario
                         children: [
-                          Expanded(
-                            child: Text(
-                              widget.diagnostico,
-                              style: TextStyle(
-                                fontSize: 12.5,
-                                color: AppColors.textLightColor(context),
-                                fontWeight: FontWeight.w500,
-                                height: 1.3,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                          const Text(
+                            'Ver Detalles',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
                             ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            HugeIcons.strokeRoundedArrowRight01,
+                            size: 18,
+                            color: AppColors.primaryColor(context),
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 10),
-
-            // Botón más compacto
-            _buildDetailsSection(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailsSection() {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: widget.onDetailsPressed,
-          borderRadius: BorderRadius.circular(10),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 10),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "Ver Detalles",
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.secondaryColor(context).withAlpha(220),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Icon(
-                  HugeIcons.strokeRoundedArrowRight01,
-                  size: 16,
-                  color: AppColors.primaryColor(context).withAlpha(200),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  Widget _buildDateChip() {
+  // ---- Helper para mostrar información con ícono (del primer código) ----
+  Widget _buildInfoRow({
+    IconData? icon,
+    String? title,
+    String? subtitle,
+    String? text,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (icon != null) ...[
+          Icon(icon, size: 16.5, color: AppColors.primaryColor(context)),
+          const SizedBox(width: 6),
+        ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (title != null) ...[
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: AppColors.textColor(context),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+              ],
+              if (subtitle != null) ...[
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textColor(context).withAlpha(220),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+              ],
+              if (text != null) ...[
+                Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textLightColor(context),
+                    height: 1.4,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ---- Helper para el chip de fecha (estilo del primer código) ----
+  Widget _buildDateChip(String date) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.accentColor(context).withAlpha(30),
+        color: Colors.white.withAlpha(40),
         borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.white.withAlpha(80), width: 0.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          const Icon(
             HugeIcons.strokeRoundedCalendar01,
             size: 12,
-            color: AppColors.accentColor(context),
+            color: Colors.white,
           ),
-          const SizedBox(width: 3),
+          const SizedBox(width: 4),
           Text(
-            widget.date,
-            style: TextStyle(
-              color: AppColors.accentColor(context),
+            date,
+            style: const TextStyle(
+              color: Colors.white,
               fontWeight: FontWeight.w600,
-              fontSize: 10,
+              fontSize: 10.5,
             ),
           ),
         ],

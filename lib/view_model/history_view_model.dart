@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../data/models/consultation_model.dart';
+import '../data/models/consultation_model.dart'; // Asegúrate que la ruta sea correcta
 
 class HistoryViewModel extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -17,9 +17,7 @@ class HistoryViewModel extends ChangeNotifier {
   Future<void> fetchClinicalHistory() async {
     final user = _auth.currentUser;
     if (user == null) {
-      _historyFuture = Future.value(
-        [],
-      ); // Devuelve futuro con lista vacía si no hay usuario
+      _historyFuture = Future.value([]);
       notifyListeners();
       return;
     }
@@ -27,61 +25,61 @@ class HistoryViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Lógica de obtención de datos adaptada a tu estructura
-  Future<List<ConsultationModel>> _getHistoryFromFirestore(
-    String userId,
-  ) async {
+  // --- LÓGICA MODIFICADA PARA BUSCAR NOMBRE DE HOSPITAL ---
+  Future<List<ConsultationModel>> _getHistoryFromFirestore(String userId) async {
     try {
-      // 1. Obtiene los documentos 'expedientes' que pertenecen al usuario.
-      final expedientesSnapshot = await _firestore
-          .collection('expedientes')
-          .where('id_usuario', isEqualTo: userId)
+      // 1. Obtiene todas las consultas del usuario (igual que antes)
+      final consultationsSnapshot = await _firestore
+          .collection('consultas')
+          .where('patient_uid', isEqualTo: userId)
+          .orderBy('fechaConsulta', descending: true)
           .get();
 
-      if (expedientesSnapshot.docs.isEmpty) {
-        return []; // Si no hay expedientes, devuelve una lista vacía.
+      if (consultationsSnapshot.docs.isEmpty) {
+        return [];
       }
 
-      final List<ConsultationModel> allConsultations = [];
+      // 2. Crea una lista de "futuros" para buscar cada nombre de hospital en paralelo
+      final futures = consultationsSnapshot.docs.map((doc) async {
+        final data = doc.data();
+        final hospitalId = data['hospital_id'] as String?;
+        String hospitalName = 'Hospital no especificado'; // Nombre por defecto
 
-      // 2. Itera sobre cada documento 'expediente' del usuario.
-      for (final expedienteDoc in expedientesSnapshot.docs) {
-        final expedienteData = expedienteDoc.data();
-
-        // 3. Por cada expediente, accede a su subcolección 'consultas'.
-        final consultasSnapshot = await expedienteDoc.reference
-            .collection('consultas')
-            .orderBy('fechaConsulta', descending: true)
-            .get();
-
-        // 4. Convierte cada documento de consulta en un ConsultationModel.
-        //    Le pasamos los datos del expediente 'padre' para que obtenga el nombre del hospital.
-        for (final consultaDoc in consultasSnapshot.docs) {
-          allConsultations.add(
-            ConsultationModel.fromFirestore(
-              consultaDoc: consultaDoc,
-              expedienteData: expedienteData,
-            ),
-          );
+        // 3. Si hay un ID, búscalo en la colección de hospitales
+        if (hospitalId != null && hospitalId.isNotEmpty) {
+          final hospitalDoc = await _firestore
+              .collection('hospitales_MedicalHand')
+              .doc(hospitalId)
+              .get();
+          
+          if (hospitalDoc.exists) {
+            // Si encuentra el hospital, extrae el campo 'name'
+            hospitalName = hospitalDoc.data()?['name'] ?? 'Nombre no encontrado';
+          }
         }
-      }
 
-      // 5. Ordena la lista combinada de todas las consultas por fecha.
-      //    Esto asegura que el historial se vea cronológicamente correcto en la app.
-      allConsultations.sort(
-        (a, b) => b.fechaConsulta.compareTo(a.fechaConsulta),
-      );
+        // 4. Crea el modelo pasándole el documento y el nombre del hospital ya resuelto
+        return ConsultationModel.fromFirestore(doc, hospitalName);
+      }).toList();
 
+      // 5. Espera a que todas las búsquedas de nombres terminen y devuelve la lista completa
+      final allConsultations = await Future.wait(futures);
       return allConsultations;
+
     } on FirebaseException catch (e) {
-      print(e);
+      debugPrint("Error de Firebase al cargar el historial: $e");
       throw Exception("No se pudo cargar el historial. Inténtalo de nuevo.");
     } catch (e) {
+      debugPrint("Error inesperado: $e");
       throw Exception("Ocurrió un error inesperado.");
     }
   }
 
-  // Método para refrescar los datos, no necesita cambios.
+  Future<List<ConsultationModel>> getHistory(String userId) async {
+    // Simplemente llama a la función privada que ya contiene toda la lógica correcta.
+    return _getHistoryFromFirestore(userId);
+  }
+
   Future<void> refreshHistory() async {
     await fetchClinicalHistory();
   }

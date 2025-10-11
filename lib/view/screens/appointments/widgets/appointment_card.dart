@@ -290,7 +290,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
       case 'pendiente':
         final graceColor = AppColors.graceColor(context);
         headerGradientColors = [
-          Color.lerp(graceColor.withAlpha(180), Colors.black, 0.1)!,
+          Color.lerp(graceColor.withAlpha(180), Colors.black, 0.08)!,
           graceColor.withAlpha(200),
           Color.lerp(graceColor.withAlpha(180), Colors.brown, 0.2)!,
         ];
