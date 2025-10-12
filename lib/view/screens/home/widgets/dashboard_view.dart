@@ -8,7 +8,7 @@ import 'package:p_hn25/view/screens/home/widgets/dashboard_action_buttons.dart';
 import 'package:p_hn25/view/screens/home/widgets/dashboard_header.dart';
 import 'package:p_hn25/view/screens/home/widgets/next_appointment_card.dart';
 import 'package:p_hn25/view/screens/home/widgets/no_appointment_card.dart';
-import 'package:p_hn25/view/screens/home/widgets/virtual_ticket_card.dart'; // <-- 🔥 AGREGADO
+import 'package:p_hn25/view/screens/home/widgets/virtual_ticket_card.dart';
 import 'package:p_hn25/view_model/appointment_view_model.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
@@ -39,16 +39,39 @@ class _DashboardViewState extends State<DashboardView> {
 
     final monitoredAppointment = appointment!;
 
-    _timer = Timer.periodic(const Duration(seconds: 30), (timer) {
+    // ✅ Si está en fila, no se inicia el timer ni se marca como no_asistio
+    if (monitoredAppointment.status == 'en_fila') {
+      return;
+    }
+
+    _timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
       if (!mounted || _monitoredAppointmentId != monitoredAppointment.id) {
         timer.cancel();
         return;
       }
-      final hasPassed = DateTime.now().isAfter(monitoredAppointment.assignedDate!);
+
+      // 🔥 Vuelve a verificar el estado actual desde Firestore antes de cambiarlo
+      final updatedAppointment = await context
+          .read<AppointmentViewModel>()
+          .getAppointmentById(monitoredAppointment.id!);
+
+      if (updatedAppointment == null) {
+        timer.cancel();
+        return;
+      }
+
+      // Si el estado ya cambió a "en_fila" o "terminada", no hacer nada
+      if (updatedAppointment.status == 'en_fila' ||
+          updatedAppointment.status == 'terminada') {
+        timer.cancel();
+        return;
+      }
+
+      final hasPassed = DateTime.now().isAfter(updatedAppointment.assignedDate!);
       if (hasPassed) {
         context
             .read<AppointmentViewModel>()
-            .updateAppointmentStatus(monitoredAppointment.id!, 'no_asistio');
+            .updateAppointmentStatus(updatedAppointment.id!, 'no_asistio');
         timer.cancel();
       }
     });
@@ -86,20 +109,22 @@ class _DashboardViewState extends State<DashboardView> {
 
     return StreamBuilder<CitaModel?>(
       key: ValueKey(activeProfile.uid),
-      initialData: _monitoredAppointmentId == null
-          ? appointmentViewModel.initialDashboardAppointment
-          : null,
+      initialData: appointmentViewModel.initialDashboardAppointment,
       stream: appointmentViewModel.getDashboardAppointmentStream(activeProfile.uid),
       builder: (context, snapshot) {
         final CitaModel? currentAppointment = snapshot.data;
+
+        // ✅ Evita mostrar el "NoAppointmentCard" antes de que haya datos reales
+        if (snapshot.connectionState == ConnectionState.waiting &&
+            currentAppointment == null) {
+          return const _DashboardLoadingShimmer();
+        }
 
         if (_monitoredAppointmentId != currentAppointment?.id) {
           _startTimer(currentAppointment);
           _showTransitionShimmer = true;
           Future.delayed(const Duration(milliseconds: 300), () {
-            if (mounted) {
-              setState(() => _showTransitionShimmer = false);
-            }
+            if (mounted) setState(() => _showTransitionShimmer = false);
           });
         }
 
@@ -112,24 +137,27 @@ class _DashboardViewState extends State<DashboardView> {
             (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData)) {
           appointmentSection = const _DashboardLoadingShimmer(key: ValueKey('loading'));
         }
-        // =========================================================================
-        // INICIO DE LA MODIFICACIÓN
-        // =========================================================================
+
+        // ✅ Virtual ticket permanece aunque el tiempo pase
         else if (currentAppointment?.status == 'en_fila') {
           appointmentSection = VirtualTicketCard(
             key: ValueKey('virtual-ticket-${currentAppointment!.id}'),
-            appointment: currentAppointment, 
+            appointment: currentAppointment,
           );
         }
-        // =========================================================================
-        // FIN DE LA MODIFICACIÓN
-        // =========================================================================
+
         else if (isAppointmentStillValid) {
           appointmentSection = NextAppointmentCard(
             key: ValueKey('next-${currentAppointment.id}'),
             appointment: currentAppointment,
           );
-        } else {
+        }
+
+        else if (currentAppointment == null) {
+          appointmentSection = const NoAppointmentCard(key: ValueKey('no-appointment'));
+        }
+
+        else {
           appointmentSection = const NoAppointmentCard(key: ValueKey('no-appointment'));
         }
 

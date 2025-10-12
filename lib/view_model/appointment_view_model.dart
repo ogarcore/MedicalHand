@@ -64,6 +64,19 @@ class AppointmentViewModel extends ChangeNotifier {
     }
   }
 
+
+Future<CitaModel?> getAppointmentById(String appointmentId) async {
+  try {
+    final doc = await _firestore.collection('citas').doc(appointmentId).get();
+    if (!doc.exists) return null;
+    return CitaModel.fromFirestore(doc);
+  } catch (e) {
+    debugPrint('Error al obtener la cita por ID: $e');
+    return null;
+  }
+}
+
+
   Future<List<HospitalModel>> getHospitals(String department) async {
     try {
       final snapshot = await _firestore

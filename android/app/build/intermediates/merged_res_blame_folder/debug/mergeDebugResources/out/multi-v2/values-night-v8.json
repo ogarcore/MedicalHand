@@ -1,0 +1,62 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.example.p_hn25.app-mergeDebugResources-78:/values-night-v8/values-night-v8.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\Oliver\\Desktop\\MedicalHand\\android\\app\\src\\main\\res\\values-night\\styles.xml",
+                    "from": {
+                        "startLines": "3,18",
+                        "startColumns": "4,4",
+                        "startOffsets": "175,1106",
+                        "endLines": "11,20",
+                        "endColumns": "12,12",
+                        "endOffsets": "757,1275"
+                    },
+                    "to": {
+                        "startLines": "3,11",
+                        "startColumns": "4,4",
+                        "startOffsets": "102,554",
+                        "endLines": "10,13",
+                        "endColumns": "12,12",
+                        "endOffsets": "549,721"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Oliver\\.gradle\\caches\\8.12.1\\transforms\\be0ef3aad19950a844d4413879b3b210\\transformed\\appcompat-1.6.1\\res\\values-night-v8\\values-night-v8.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,125,209,293,389,491,593,687",
+                        "endColumns": "69,83,83,95,101,101,93,88",
+                        "endOffsets": "120,204,288,384,486,588,682,771"
+                    },
+                    "to": {
+                        "startLines": "14,15,16,17,18,19,20,21",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "726,796,880,964,1060,1162,1264,1358",
+                        "endColumns": "69,83,83,95,101,101,93,88",
+                        "endOffsets": "791,875,959,1055,1157,1259,1353,1442"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Oliver\\Desktop\\MedicalHand\\android\\app\\src\\main\\res\\values-night\\colors.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "57",
+                        "endColumns": "46",
+                        "endOffsets": "99"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "46",
+                        "endOffsets": "97"
+                    }
+                }
+            ]
+        }
+    ]
+}

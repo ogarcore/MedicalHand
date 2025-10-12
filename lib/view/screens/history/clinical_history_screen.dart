@@ -6,7 +6,7 @@ import 'package:p_hn25/data/models/consultation_model.dart';
 import 'package:p_hn25/view_model/history_view_model.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
-import 'package:shimmer/shimmer.dart'; // 🔥 1. ASEGURARSE DE QUE SHIMMER ESTÉ IMPORTADO
+import 'package:shimmer/shimmer.dart';
 import 'widgets/history_card.dart';
 import 'widgets/empty_history_view.dart';
 import 'widgets/filter_history_modal.dart';
@@ -31,6 +31,7 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
     _filteredHistoryEntries = [];
   }
 
+  // --- NINGÚN CAMBIO EN LA LÓGICA DE FILTROS ---
   void _applyFilters(String specialty, DateTime? date, bool withResults) {
     setState(() {
       List<ConsultationModel> tempList = List.from(_allHistoryEntries);
@@ -119,13 +120,17 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
         slivers: [
           _buildSliverAppBar(),
           if (activeProfile == null)
-            const _HistoryShimmer() // Muestra shimmer si no hay perfil
+            const _HistoryShimmer()
           else
-            FutureBuilder<List<ConsultationModel>>(
+            // =================================================================
+            // 🔥 INICIO DEL CAMBIO: FutureBuilder -> StreamBuilder
+            // =================================================================
+            StreamBuilder<List<ConsultationModel>>(
               key: ValueKey(activeProfile.uid),
-              future: historyViewModel.getHistory(activeProfile.uid),
+              // Debes crear este método en tu ViewModel. Devolverá un Stream
+              // en lugar de un Future, usando .snapshots() de Firestore.
+              stream: historyViewModel.getHistoryStream(activeProfile.uid),
               builder: (context, snapshot) {
-                // 🔥 2. SE REEMPLAZA EL CIRCULARPROGRESSINDICATOR POR EL WIDGET DE SHIMMER.
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const _HistoryShimmer();
                 }
@@ -148,12 +153,23 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
                 }
 
                 if (snapshot.hasData) {
+                  // Actualiza la lista principal con los datos más recientes del stream.
+                  _allHistoryEntries = snapshot.data!;
+
+                  // Si el perfil activo ha cambiado, reseteamos el filtro.
                   if (_lastLoadedProfileId != activeProfile.uid) {
-                    _allHistoryEntries = snapshot.data!;
-                    _filteredHistoryEntries = List.from(_allHistoryEntries);
                     _isFilterActive = false;
                     _lastLoadedProfileId = activeProfile.uid;
                   }
+
+                  // Si no hay un filtro activo, la lista filtrada es igual a la lista principal.
+                  // Esto asegura que los nuevos datos se muestren inmediatamente.
+                  if (!_isFilterActive) {
+                    _filteredHistoryEntries = List.from(_allHistoryEntries);
+                  }
+                  // NOTA: Si un filtro está activo, la lista no se actualizará en tiempo real
+                  // hasta que el filtro se reinicie. Para un comportamiento más avanzado,
+                  // necesitarías guardar el estado del filtro y reaplicarlo aquí.
 
                   if (_filteredHistoryEntries.isEmpty) {
                     if (_allHistoryEntries.isNotEmpty) {
@@ -226,11 +242,15 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
                 return const SliverToBoxAdapter(child: EmptyHistoryView());
               },
             ),
+          // =================================================================
+          // 🔥 FIN DEL CAMBIO
+          // =================================================================
         ],
       ),
     );
   }
 
+  // --- NINGÚN CAMBIO EN EL APPBAR ---
   SliverAppBar _buildSliverAppBar() {
     return SliverAppBar(
       automaticallyImplyLeading: false,
@@ -284,7 +304,7 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
   }
 }
 
-// 🔥 3. NUEVO WIDGET PARA EL EFECTO SHIMMER
+// --- NINGÚN CAMBIO EN LOS WIDGETS DE SHIMMER ---
 class _HistoryShimmer extends StatelessWidget {
   const _HistoryShimmer();
 
@@ -298,7 +318,7 @@ class _HistoryShimmer extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          itemCount: 5, // Muestra 5 tarjetas de carga
+          itemCount: 5,
           itemBuilder: (context, index) => const _ShimmerHistoryCard(),
         ),
       ),
@@ -306,7 +326,6 @@ class _HistoryShimmer extends StatelessWidget {
   }
 }
 
-// 🔥 4. NUEVO WIDGET PARA LA TARJETA PLACEHOLDER
 class _ShimmerHistoryCard extends StatelessWidget {
   const _ShimmerHistoryCard();
 

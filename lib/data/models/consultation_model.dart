@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-// --- Modelos anidados (no necesitan cambios) ---
+// --- Modelos anidados (Prescription no necesita cambios) ---
 class Prescription {
   final String nombre;
   final String dosis;
@@ -25,7 +25,7 @@ class Prescription {
     );
   }
 
-   Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap() {
     return {
       'nombre': nombre,
       'dosis': dosis,
@@ -35,25 +35,44 @@ class Prescription {
   }
 }
 
+// =======================================================================
+// 🔥 INICIO DE LA CORRECCIÓN: Modelo de Examen ajustado
+// =======================================================================
 class ExamRequested {
   final String nombre;
   final String estado;
+  // 1. AÑADIR LA PROPIEDAD QUE FALTABA
+  final List<dynamic> resultados;
 
-  ExamRequested({required this.nombre, required this.estado});
+  ExamRequested({
+    required this.nombre,
+    required this.estado,
+    required this.resultados, // 2. AÑADIR AL CONSTRUCTOR
+  });
 
   factory ExamRequested.fromMap(Map<String, dynamic> map) {
     return ExamRequested(
       nombre: map['nombre'] ?? 'N/A',
       estado: map['estado'] ?? 'solicitado',
+      // 3. LEER LA LISTA DE RESULTADOS DESDE EL MAPA
+      resultados: map['resultados'] as List<dynamic>? ?? [],
     );
   }
 
-   Map<String, dynamic> toMap() {
-    return {'nombre': nombre, 'estado': estado};
+  Map<String, dynamic> toMap() {
+    return {
+      'nombre': nombre,
+      'estado': estado,
+      // 4. INCLUIR LA LISTA DE RESULTADOS AL CONVERTIR A MAPA
+      'resultados': resultados,
+    };
   }
 }
+// =======================================================================
+// 🔥 FIN DE LA CORRECCIÓN
+// =======================================================================
 
-// --- Modelo principal de la Consulta (AJUSTADO) ---
+// --- Modelo principal de la Consulta (sin cambios necesarios aquí) ---
 class ConsultationModel {
   final String id;
   final String diagnostico;
@@ -62,7 +81,7 @@ class ConsultationModel {
   final String tratamiento;
   final String doctorName;
   final String especialidad;
-  final String hospitalName; // <--- CAMBIO: Ahora es el nombre, no el ID
+  final String hospitalName;
   final List<Prescription> prescriptions;
   final List<ExamRequested> examsRequested;
   final String observaciones;
@@ -75,14 +94,12 @@ class ConsultationModel {
     required this.tratamiento,
     required this.doctorName,
     required this.especialidad,
-    required this.hospitalName, // <--- CAMBIO
+    required this.hospitalName,
     required this.prescriptions,
     required this.examsRequested,
     required this.observaciones,
   });
 
-  // --- CONSTRUCTOR AJUSTADO ---
-  // Ahora recibe el nombre del hospital como un parámetro extra.
   factory ConsultationModel.fromFirestore(DocumentSnapshot doc, String hospitalName) {
     final data = doc.data() as Map<String, dynamic>;
 
@@ -96,7 +113,7 @@ class ConsultationModel {
       doctorName: data['doctor_name'] ?? 'No especificado',
       especialidad: data['especialidad'] ?? 'No especificada',
       
-      hospitalName: hospitalName, // <--- CAMBIO: Usa el nombre que le pasamos
+      hospitalName: hospitalName,
 
       prescriptions: (data['medicamentos'] as List<dynamic>?)
               ?.map((p) => Prescription.fromMap(p as Map<String, dynamic>))
@@ -117,7 +134,7 @@ class ConsultationModel {
   
   Map<String, dynamic> toMap() {
     return {
-      'hospital': hospitalName, // <--- CAMBIO: Pasamos el nombre
+      'hospital': hospitalName,
       'specialty': especialidad,
       'date': formattedDate,
       'motivoConsulta': motivoConsulta,

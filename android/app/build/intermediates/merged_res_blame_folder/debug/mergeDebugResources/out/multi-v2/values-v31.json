@@ -1,0 +1,45 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.example.p_hn25.app-mergeDebugResources-78:/values-v31/values-v31.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\Oliver\\Desktop\\MedicalHand\\android\\app\\src\\main\\res\\values-v31\\colors.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "57",
+                        "endColumns": "46",
+                        "endOffsets": "99"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "46",
+                        "endOffsets": "97"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\Oliver\\Desktop\\MedicalHand\\android\\app\\src\\main\\res\\values-v31\\styles.xml",
+                    "from": {
+                        "startLines": "3,15",
+                        "startColumns": "4,4",
+                        "startOffsets": "176,896",
+                        "endLines": "8,17",
+                        "endColumns": "12,12",
+                        "endOffsets": "538,1065"
+                    },
+                    "to": {
+                        "startLines": "3,9",
+                        "startColumns": "4,4",
+                        "startOffsets": "102,464",
+                        "endLines": "8,11",
+                        "endColumns": "12,12",
+                        "endOffsets": "459,631"
+                    }
+                }
+            ]
+        }
+    ]
+}
