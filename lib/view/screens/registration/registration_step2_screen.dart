@@ -218,8 +218,6 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                       ),
                       const SizedBox(height: 20),
 
-                      // 🔥 =================== INICIO DE CAMBIOS VISUALES ===================
-                      // Se vuelve a usar CustomTextField, pero con la nueva funcionalidad.
                       CustomTextField(
                         controller: authViewModel.birthDateController,
                         labelText: 'Fecha de Nacimiento',
@@ -231,14 +229,12 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                           DateInputFormatter(),
                         ],
                         validator: AppValidators.validateBirthDate,
-                        onChanged: _onDateTextChanged, // Se conecta con la lógica de escritura manual
-                        // Se añade un icono de sufijo que funciona como botón para abrir el calendario.
+                        onChanged: _onDateTextChanged, 
                         suffixIcon: IconButton(
                           icon: Icon(HugeIcons.strokeRoundedCalendar02, color: secondaryColor),
-                          onPressed: _pickDate, // Llama al método para mostrar el calendario
+                          onPressed: _pickDate, 
                         ),
                       ),
-                      // 🔥 =================== FIN DE CAMBIOS VISUALES ===================
                       
                       const SizedBox(height: 50),
                       PrimaryButton(

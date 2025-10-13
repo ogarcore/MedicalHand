@@ -25,6 +25,7 @@ class _DashboardViewState extends State<DashboardView> {
   Timer? _timer;
   String? _monitoredAppointmentId;
   bool _showTransitionShimmer = false;
+  bool _firstLoadDone = false; // ✅ evita el doble parpadeo inicial
 
   @override
   void initState() {
@@ -50,7 +51,6 @@ class _DashboardViewState extends State<DashboardView> {
         return;
       }
 
-      // 🔥 Vuelve a verificar el estado actual desde Firestore antes de cambiarlo
       final updatedAppointment = await context
           .read<AppointmentViewModel>()
           .getAppointmentById(monitoredAppointment.id!);
@@ -60,14 +60,14 @@ class _DashboardViewState extends State<DashboardView> {
         return;
       }
 
-      // Si el estado ya cambió a "en_fila" o "terminada", no hacer nada
       if (updatedAppointment.status == 'en_fila' ||
           updatedAppointment.status == 'terminada') {
         timer.cancel();
         return;
       }
 
-      final hasPassed = DateTime.now().isAfter(updatedAppointment.assignedDate!);
+      final hasPassed =
+          DateTime.now().isAfter(updatedAppointment.assignedDate!);
       if (hasPassed) {
         context
             .read<AppointmentViewModel>()
@@ -110,55 +110,57 @@ class _DashboardViewState extends State<DashboardView> {
     return StreamBuilder<CitaModel?>(
       key: ValueKey(activeProfile.uid),
       initialData: appointmentViewModel.initialDashboardAppointment,
-      stream: appointmentViewModel.getDashboardAppointmentStream(activeProfile.uid),
+      stream:
+          appointmentViewModel.getDashboardAppointmentStream(activeProfile.uid),
       builder: (context, snapshot) {
         final CitaModel? currentAppointment = snapshot.data;
 
-        // ✅ Evita mostrar el "NoAppointmentCard" antes de que haya datos reales
-        if (snapshot.connectionState == ConnectionState.waiting &&
+        // ✅ solo mostrar shimmer la primera vez, no en cada conexión
+        if (!_firstLoadDone &&
+            snapshot.connectionState == ConnectionState.waiting &&
             currentAppointment == null) {
           return const _DashboardLoadingShimmer();
         }
 
         if (_monitoredAppointmentId != currentAppointment?.id) {
           _startTimer(currentAppointment);
-          _showTransitionShimmer = true;
-          Future.delayed(const Duration(milliseconds: 300), () {
-            if (mounted) setState(() => _showTransitionShimmer = false);
-          });
+
+          if (_firstLoadDone) {
+            // solo mostrar shimmer en cambios posteriores, no en el arranque
+            _showTransitionShimmer = true;
+            Future.delayed(const Duration(milliseconds: 300), () {
+              if (mounted) setState(() => _showTransitionShimmer = false);
+            });
+          }
+
+          _firstLoadDone = true;
         }
 
-        final bool isAppointmentStillValid = currentAppointment?.assignedDate != null &&
-            currentAppointment!.assignedDate!.isAfter(DateTime.now());
+        final bool isAppointmentStillValid =
+            currentAppointment?.assignedDate != null &&
+                currentAppointment!.assignedDate!.isAfter(DateTime.now());
 
         Widget appointmentSection;
 
-        if (_showTransitionShimmer ||
-            (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData)) {
-          appointmentSection = const _DashboardLoadingShimmer(key: ValueKey('loading'));
-        }
-
-        // ✅ Virtual ticket permanece aunque el tiempo pase
-        else if (currentAppointment?.status == 'en_fila') {
+        if (_showTransitionShimmer) {
+          appointmentSection =
+              const _DashboardLoadingShimmer(key: ValueKey('loading'));
+        } else if (currentAppointment?.status == 'en_fila') {
           appointmentSection = VirtualTicketCard(
             key: ValueKey('virtual-ticket-${currentAppointment!.id}'),
             appointment: currentAppointment,
           );
-        }
-
-        else if (isAppointmentStillValid) {
+        } else if (isAppointmentStillValid) {
           appointmentSection = NextAppointmentCard(
             key: ValueKey('next-${currentAppointment.id}'),
             appointment: currentAppointment,
           );
-        }
-
-        else if (currentAppointment == null) {
-          appointmentSection = const NoAppointmentCard(key: ValueKey('no-appointment'));
-        }
-
-        else {
-          appointmentSection = const NoAppointmentCard(key: ValueKey('no-appointment'));
+        } else if (currentAppointment == null) {
+          appointmentSection =
+              const NoAppointmentCard(key: ValueKey('no-appointment'));
+        } else {
+          appointmentSection =
+              const NoAppointmentCard(key: ValueKey('no-appointment'));
         }
 
         return Column(
@@ -274,7 +276,8 @@ class _AppointmentCardPlaceholder extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildPlaceholderLine(width: 160, height: 18, borderRadius: 6),
+                      _buildPlaceholderLine(
+                          width: 160, height: 18, borderRadius: 6),
                       const SizedBox(height: 6),
                       Row(
                         children: [
@@ -287,7 +290,8 @@ class _AppointmentCardPlaceholder extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          _buildPlaceholderLine(width: 80, height: 16, borderRadius: 6),
+                          _buildPlaceholderLine(
+                              width: 80, height: 16, borderRadius: 6),
                         ],
                       ),
                       const SizedBox(height: 6),
@@ -302,7 +306,8 @@ class _AppointmentCardPlaceholder extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          _buildPlaceholderLine(width: 60, height: 15, borderRadius: 6),
+                          _buildPlaceholderLine(
+                              width: 60, height: 15, borderRadius: 6),
                         ],
                       ),
                     ],
@@ -322,9 +327,11 @@ class _AppointmentCardPlaceholder extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildPlaceholderLine(width: 30, height: 27, borderRadius: 6),
+                      _buildPlaceholderLine(
+                          width: 30, height: 27, borderRadius: 6),
                       const SizedBox(height: 2),
-                      _buildPlaceholderLine(width: 40, height: 14, borderRadius: 4),
+                      _buildPlaceholderLine(
+                          width: 40, height: 14, borderRadius: 4),
                     ],
                   ),
                 ),

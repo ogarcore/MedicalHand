@@ -426,8 +426,8 @@ Stream<DocumentSnapshot> getPatientQueueStream(String queueDocId, String userId)
     try {
       final query = await _firestore
           .collection('expedientes')
-          .where('userId', isEqualTo: userId)
-          .where('hospitalId', isEqualTo: hospitalId)
+          .where('id_usuario', isEqualTo: userId)
+          .where('id_hospital', isEqualTo: hospitalId)
           .limit(1)
           .get();
 

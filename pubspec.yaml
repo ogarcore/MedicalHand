@@ -41,6 +41,7 @@ dependencies:
   device_info_plus: ^12.1.0
   image_gallery_saver_plus: ^4.0.1
   flutter_image_compress: ^2.4.0
+  easy_localization: ^3.0.8
 
 
 dev_dependencies:
@@ -62,6 +63,7 @@ flutter:
     - assets/images/
     - assets/icon/
     - assets/animation/
+    - assets/translations/
 
 flutter_native_splash:
   color: '#A5D6A7'

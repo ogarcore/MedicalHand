@@ -9,6 +9,7 @@ class CustomModal extends StatelessWidget {
   final bool showCloseButton;
   final double? maxWidth;
   final IconData? icon;
+  final bool isLoading; // ← agregado
 
   const CustomModal({
     super.key,
@@ -19,6 +20,7 @@ class CustomModal extends StatelessWidget {
     this.showCloseButton = true,
     this.maxWidth,
     this.icon,
+    this.isLoading = false, // ← valor opcional por defecto
   });
 
   @override
@@ -43,78 +45,93 @@ class CustomModal extends StatelessWidget {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            child: Stack(
               children: [
-                // Header con gradiente mejorado
-                Container(
-                  padding: const EdgeInsets.all(22),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.primaryColor(context).withAlpha(230),
-                        AppColors.accentColor(context).withAlpha(220),
-                      ],
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      if (icon != null)
-                        Container(
-                          width: 35,
-                          height: 35,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white.withAlpha(30),
-                          ),
-                          child: Icon(icon, color: Colors.white, size: 24),
-                        ),
-                      if (icon != null) const SizedBox(width: 18),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              title,
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            if (subtitle != null) ...[
-                              const SizedBox(height: 6),
-                              Text(
-                                subtitle!,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.white.withAlpha(220),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header con gradiente mejorado
+                    Container(
+                      padding: const EdgeInsets.all(22),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            AppColors.primaryColor(context).withAlpha(230),
+                            AppColors.accentColor(context).withAlpha(220),
                           ],
                         ),
                       ),
-                    ],
-                  ),
+                      child: Row(
+                        children: [
+                          if (icon != null)
+                            Container(
+                              width: 35,
+                              height: 35,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white.withAlpha(30),
+                              ),
+                              child: Icon(icon, color: Colors.white, size: 24),
+                            ),
+                          if (icon != null) const SizedBox(width: 18),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  title,
+                                  style: const TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                if (subtitle != null) ...[
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    subtitle!,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.white.withAlpha(220),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Contenido
+                    Padding(padding: const EdgeInsets.all(20), child: content),
+
+                    // Acciones (si existen)
+                    if (actions != null && actions!.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Wrap(
+                          alignment: WrapAlignment.end,
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: actions!.map((action) => action).toList(),
+                        ),
+                      ),
+                  ],
                 ),
 
-                // Contenido
-                Padding(padding: const EdgeInsets.all(20), child: content),
-
-                // Acciones (si existen)
-                if (actions != null && actions!.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    child: Wrap(
-                      alignment: WrapAlignment.end,
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: actions!.map((action) => action).toList(),
+                // 🌀 Capa de carga (opcional)
+                if (isLoading)
+                  Positioned.fill(
+                    child: Container(
+                      color: Colors.white.withOpacity(0.7),
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
                     ),
                   ),
               ],
@@ -132,6 +149,7 @@ class ModalButton extends StatelessWidget {
   final VoidCallback onPressed;
   final bool isPrimary;
   final bool isWarning;
+  final bool isLoading; // ← agregado
 
   const ModalButton({
     super.key,
@@ -139,6 +157,7 @@ class ModalButton extends StatelessWidget {
     required this.onPressed,
     this.isPrimary = false,
     this.isWarning = false,
+    this.isLoading = false, // ← valor opcional por defecto
   });
 
   @override
@@ -162,7 +181,7 @@ class ModalButton extends StatelessWidget {
     }
 
     return ElevatedButton(
-      onPressed: onPressed,
+      onPressed: isLoading ? null : onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: backgroundColor,
         foregroundColor: textColor,
@@ -179,7 +198,16 @@ class ModalButton extends StatelessWidget {
           color: textColor,
         ),
       ),
-      child: Text(text),
+      child: isLoading
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: Colors.white,
+              ),
+            )
+          : Text(text),
     );
   }
 }

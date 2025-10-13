@@ -56,8 +56,8 @@ class ProfileSectionHeader extends StatelessWidget {
           ),
           if (onEditPressed != null)
             Container(
-              width: 36,
-              height: 36,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 color: primaryColor.withAlpha(15),
                 borderRadius: BorderRadius.circular(10),
@@ -70,7 +70,7 @@ class ProfileSectionHeader extends StatelessWidget {
                 onPressed: onEditPressed,
                 icon: Icon(
                   HugeIcons.strokeRoundedEdit01,
-                  size: 18,
+                  size: 22,
                   color: secondayColor,
                 ),
                 padding: EdgeInsets.zero,

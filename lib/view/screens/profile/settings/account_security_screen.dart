@@ -1,13 +1,16 @@
 // lib/view/screens/profile/settings/account_security_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/app/core/utils/validators.dart';
+import 'package:p_hn25/view/screens/splash/splash_screen.dart';
 import 'package:p_hn25/view/widgets/custom_modal.dart';
 import 'package:p_hn25/view/widgets/custom_text_field.dart';
-// CAMBIO 1: Se importa FirebaseAuth para verificar el proveedor de autenticación
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:p_hn25/view_model/user_view_model.dart';
 
 class AccountSecurityScreen extends StatefulWidget {
   const AccountSecurityScreen({super.key});
@@ -19,6 +22,143 @@ class AccountSecurityScreen extends StatefulWidget {
 class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
   final TextEditingController _confirmController = TextEditingController();
   bool _isDeleteButtonEnabled = false;
+  bool _isDeleting = false;
+
+  void _showChangePasswordDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => Scaffold(
+        backgroundColor: Colors.transparent,
+        body: const _ChangePasswordDialog(),
+      ),
+    );
+  }
+
+  // Inicia el flujo completo de eliminación
+  void _startDeleteAccountProcess() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    bool reauthenticated = false;
+    final isGoogleProvider =
+        user.providerData.any((info) => info.providerId == 'google.com');
+
+    setState(() => _isDeleting = true);
+
+    if (isGoogleProvider) {
+      reauthenticated = await _reauthenticateWithGoogle();
+    } else {
+      final password = await _promptForPassword(context);
+      if (password != null && password.isNotEmpty) {
+        reauthenticated =
+            await Provider.of<UserViewModel>(context, listen: false)
+                .reauthenticate(user.email!, password);
+      }
+    }
+
+    if (!reauthenticated) {
+      setState(() => _isDeleting = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                const Text('Autenticación fallida. No se eliminó la cuenta.'),
+            backgroundColor: AppColors.warningColor(context),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      return;
+    }
+
+    final success =
+        await Provider.of<UserViewModel>(context, listen: false).deleteAccount();
+
+    setState(() => _isDeleting = false);
+
+    if (success && mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const SplashScreen()),
+        (Route<dynamic> route) => false,
+      );
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Ocurrió un error al eliminar la cuenta.'),
+          backgroundColor: AppColors.warningColor(context),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  // Función para reautenticar con Google
+  Future<bool> _reauthenticateWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        return false;
+      }
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      await FirebaseAuth.instance.currentUser
+          ?.reauthenticateWithCredential(credential);
+      return true;
+    } catch (e) {
+      print("Error en reautenticación con Google: $e");
+      return false;
+    }
+  }
+
+  // Modal para pedir la contraseña al usuario de correo
+  Future<String?> _promptForPassword(BuildContext context) {
+    final passwordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('Confirmar Identidad'),
+          content: Form(
+            key: formKey,
+            child: CustomTextField(
+              controller: passwordController,
+              labelText: "Contraseña",
+              hintText: "Ingresa tu contraseña actual",
+              icon: HugeIcons.strokeRoundedLockPassword,
+              obscureText: true,
+              validator: (value) =>
+                  AppValidators.validateGenericEmpty(value, 'La contraseña'),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(null),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () {
+                if (formKey.currentState!.validate()) {
+                  Navigator.of(context).pop(passwordController.text);
+                }
+              },
+              child: const Text('Confirmar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   void _showDeleteAccountFlow(BuildContext context) {
     final reasonController = TextEditingController();
@@ -27,51 +167,54 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => CustomModal(
-        icon: HugeIcons.strokeRoundedSad01,
-        title: 'Lamentamos que te vayas',
-        content: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Tu opinión es muy importante para nosotros. '
-                'Si tienes un momento, cuéntanos por qué quieres eliminar tu cuenta.',
-                style: TextStyle(
-                  color: AppColors.textLightColor(context),
-                  fontSize: 15,
-                  height: 1.5,
+      builder: (dialogContext) => GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: CustomModal(
+          icon: HugeIcons.strokeRoundedSad01,
+          title: 'Lamentamos que te vayas',
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Tu opinión es muy importante para nosotros. '
+                  'Si tienes un momento, cuéntanos por qué quieres eliminar tu cuenta.',
+                  style: TextStyle(
+                    color: AppColors.textLightColor(context),
+                    fontSize: 15,
+                    height: 1.5,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              CustomTextField(
-                labelText: "Motivo de la eliminación",
-                icon: HugeIcons.strokeRoundedAlertDiamond,
-                controller: reasonController,
-                hintText: 'Explícanos por qué deseas cerrar la cuenta...',
-                maxLines: 3,
-                validator: AppValidators.validateRescheduleReason,
-              ),
-            ],
+                const SizedBox(height: 20),
+                CustomTextField(
+                  labelText: "Motivo de la eliminación",
+                  icon: HugeIcons.strokeRoundedAlertDiamond,
+                  controller: reasonController,
+                  hintText: 'Explícanos por qué deseas cerrar la cuenta...',
+                  maxLines: 3,
+                  validator: AppValidators.validateRescheduleReason,
+                ),
+              ],
+            ),
           ),
+          actions: [
+            ModalButton(
+              text: 'Cancelar',
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+            ModalButton(
+              text: 'Siguiente',
+              isPrimary: true,
+              onPressed: () {
+                if (formKey.currentState!.validate()) {
+                  Navigator.of(dialogContext).pop();
+                  _showFinalConfirmationDialog(context);
+                }
+              },
+            ),
+          ],
         ),
-        actions: [
-          ModalButton(
-            text: 'Cancelar',
-            onPressed: () => Navigator.of(dialogContext).pop(),
-          ),
-          ModalButton(
-            text: 'Siguiente',
-            isPrimary: true,
-            onPressed: () {
-              if (formKey.currentState!.validate()) {
-                Navigator.of(dialogContext).pop();
-                _showFinalConfirmationDialog(context);
-              }
-            },
-          ),
-        ],
       ),
     );
   }
@@ -86,65 +229,71 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
       builder: (dialogContext) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
-            return CustomModal(
-              icon: HugeIcons.strokeRoundedAlertDiamond,
-              title: '¿Estás seguro?',
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Esta acción es permanente. Todos tus datos serán eliminados definitivamente.',
-                    style: TextStyle(
-                      color: AppColors.textLightColor(context),
-                      fontSize: 15,
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'Para confirmar, escribe la palabra "ELIMINAR" en el campo de abajo',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textColor(context),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  CustomTextField(
-                    labelText: "Escribelo aquí",
-                    icon: HugeIcons.strokeRoundedAlertDiamond,
-                    controller: _confirmController,
-                    hintText: 'ELIMINAR',
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp("[a-zA-Z]")),
-                      TextInputFormatter.withFunction(
-                        (oldValue, newValue) => newValue.copyWith(
-                          text: newValue.text.toUpperCase(),
-                        ),
+            return GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: CustomModal(
+                icon: HugeIcons.strokeRoundedAlertDiamond,
+                title: '¿Estás seguro?',
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Esta acción es permanente. Todos tus datos serán eliminados definitivamente.',
+                      style: TextStyle(
+                        color: AppColors.textLightColor(context),
+                        fontSize: 15,
+                        height: 1.5,
                       ),
-                    ],
-                    onChanged: (value) {
-                      setDialogState(() {
-                        _isDeleteButtonEnabled = (value == 'ELIMINAR');
-                      });
-                    },
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Para confirmar, escribe la palabra "ELIMINAR" en el campo de abajo',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textColor(context),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    CustomTextField(
+                      labelText: "Escribelo aquí",
+                      icon: HugeIcons.strokeRoundedAlertDiamond,
+                      controller: _confirmController,
+                      hintText: 'ELIMINAR',
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp("[a-zA-Z]")),
+                        TextInputFormatter.withFunction(
+                          (oldValue, newValue) => newValue.copyWith(
+                            text: newValue.text.toUpperCase(),
+                          ),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setDialogState(() {
+                          _isDeleteButtonEnabled = (value == 'ELIMINAR');
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                actions: [
+                  ModalButton(
+                    text: 'Cancelar',
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                  ),
+                  ModalButton(
+                    text: 'Sí, eliminar',
+                    isWarning: true,
+                    // ✅ FIX: Se corrige el tipo de la función onPressed.
+                    // En lugar de `null`, se pasa una función vacía si está deshabilitado.
+                    onPressed: _isDeleteButtonEnabled
+                        ? () {
+                            Navigator.of(dialogContext).pop();
+                            _startDeleteAccountProcess();
+                          }
+                        : () {},
                   ),
                 ],
               ),
-              actions: [
-                ModalButton(
-                  text: 'Cancelar',
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                ),
-                ModalButton(
-                  text: 'Sí, eliminar',
-                  isWarning: true,
-                  onPressed: _isDeleteButtonEnabled
-                      ? () {
-                          Navigator.of(dialogContext).pop();
-                        }
-                      : () {},
-                ),
-              ],
             );
           },
         );
@@ -168,41 +317,58 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
       );
     }
 
-    return Scaffold(
-      backgroundColor: AppColors.backgroundColor(context),
-      appBar: AppBar(
-        title: const Text('Cuenta y Seguridad'),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
         backgroundColor: AppColors.backgroundColor(context),
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
+        appBar: AppBar(
+          title: const Text('Cuenta y Seguridad'),
+          backgroundColor: AppColors.backgroundColor(context),
+          elevation: 0,
+          surfaceTintColor: Colors.transparent,
+        ),
+        body: Stack(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade200, width: 1),
-              ),
+            SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  if (showChangePassword) ...[
-                    _SettingsOptionRow(
-                      title: 'Cambiar Contraseña',
-                      onTap: () {},
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.shade200, width: 1),
                     ),
-                    Divider(height: 1, color: Colors.grey.shade200, indent: 16),
-                  ],
-                  _SettingsOptionRow(
-                    title: 'Eliminar Cuenta',
-                    onTap: () => _showDeleteAccountFlow(context),
-                    textColor: AppColors.warningColor(context),
+                    child: Column(
+                      children: [
+                        if (showChangePassword) ...[
+                          _SettingsOptionRow(
+                            title: 'Cambiar Contraseña',
+                            onTap: () => _showChangePasswordDialog(context),
+                          ),
+                          Divider(
+                              height: 1,
+                              color: Colors.grey.shade200,
+                              indent: 16),
+                        ],
+                        _SettingsOptionRow(
+                          title: 'Eliminar Cuenta',
+                          onTap: () => _showDeleteAccountFlow(context),
+                          textColor: AppColors.warningColor(context),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
+            if (_isDeleting)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
           ],
         ),
       ),
@@ -236,6 +402,165 @@ class _SettingsOptionRow extends StatelessWidget {
         Icons.arrow_forward_ios_rounded,
         size: 16,
         color: Colors.grey.shade400,
+      ),
+    );
+  }
+}
+
+class _ChangePasswordDialog extends StatefulWidget {
+  const _ChangePasswordDialog();
+
+  @override
+  State<_ChangePasswordDialog> createState() => __ChangePasswordDialogState();
+}
+
+class __ChangePasswordDialogState extends State<_ChangePasswordDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _currentPasswordController = TextEditingController();
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  bool _isCurrentPasswordObscured = true;
+  bool _isNewPasswordObscured = true;
+  bool _isConfirmPasswordObscured = true;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _currentPasswordController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleChangePassword() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    final viewModel = Provider.of<UserViewModel>(context, listen: false);
+    final success = await viewModel.changePassword(
+      _currentPasswordController.text,
+      _newPasswordController.text,
+    );
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    if (success) {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Contraseña actualizada con éxito.'),
+          backgroundColor: AppColors.secondaryColor(context),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Error: La contraseña actual es incorrecta.'),
+          backgroundColor: AppColors.warningColor(context),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: CustomModal(
+        isLoading: _isLoading,
+        icon: HugeIcons.strokeRoundedShield01,
+        title: 'Cambiar Contraseña',
+        content: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              Text(
+                'Para proteger tu cuenta, ingresa tu contraseña actual antes de elegir una nueva.',
+                style: TextStyle(color: AppColors.textLightColor(context)),
+              ),
+              const SizedBox(height: 24),
+              CustomTextField(
+                controller: _currentPasswordController,
+                labelText: 'Contraseña Actual',
+                hintText: 'Ingresa tu contraseña actual',
+                icon: HugeIcons.strokeRoundedCirclePassword,
+                obscureText: _isCurrentPasswordObscured,
+                validator: (value) => AppValidators.validateGenericEmpty(
+                    value, 'La contraseña actual'),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _isCurrentPasswordObscured
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                  ),
+                  onPressed: () => setState(() =>
+                      _isCurrentPasswordObscured = !_isCurrentPasswordObscured),
+                ),
+              ),
+              const SizedBox(height: 16),
+              CustomTextField(
+                controller: _newPasswordController,
+                labelText: 'Nueva Contraseña',
+                hintText: 'Mínimo 8 caracteres',
+                icon: HugeIcons.strokeRoundedLockPassword,
+                obscureText: _isNewPasswordObscured,
+                validator: AppValidators.validatePassword,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _isNewPasswordObscured
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                  ),
+                  onPressed: () => setState(
+                      () => _isNewPasswordObscured = !_isNewPasswordObscured),
+                ),
+              ),
+              const SizedBox(height: 16),
+              CustomTextField(
+                controller: _confirmPasswordController,
+                labelText: 'Confirmar Contraseña',
+                hintText: 'Repite la nueva contraseña',
+                icon: HugeIcons.strokeRoundedResetPassword,
+                obscureText: _isConfirmPasswordObscured,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, confirma tu contraseña.';
+                  }
+                  if (value != _newPasswordController.text) {
+                    return 'Las contraseñas no coinciden.';
+                  }
+                  return null;
+                },
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _isConfirmPasswordObscured
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                  ),
+                  onPressed: () => setState(() => _isConfirmPasswordObscured =
+                      !_isConfirmPasswordObscured),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          ModalButton(
+            text: 'Cancelar',
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          ModalButton(
+            text: 'Guardar',
+            isPrimary: true,
+            onPressed: _handleChangePassword,
+          ),
+        ],
       ),
     );
   }

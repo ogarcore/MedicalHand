@@ -227,16 +227,27 @@ class WelcomeScreen extends StatelessWidget {
                       const SizedBox(height: 120),
 
                       // Botones
-                      SecondaryButton(
-                        text: 'Registrarse',
-                        width: 280,
-                        onPressed: () => _handleRegister(context),
-                      ),
-                      const SizedBox(height: 18),
-
-                      PrimaryButton(
-                        text: 'Iniciar Sesión',
-                        onPressed: () => _handleLogin(context),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                        ), // 🔹 Ajusta el valor a tu gusto
+                        child: Column(
+                          children: [
+                            SecondaryButton(
+                              text: 'Registrarse',
+                              width: double
+                                  .infinity, // 🔹 para que ocupe todo el ancho disponible dentro del padding
+                              onPressed: () => _handleRegister(context),
+                            ),
+                            const SizedBox(height: 18),
+                            PrimaryButton(
+                              text: 'Iniciar Sesión',
+                              width:
+                                  double.infinity, // 🔹 igual que el anterior
+                              onPressed: () => _handleLogin(context),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),

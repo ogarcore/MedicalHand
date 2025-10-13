@@ -1,5 +1,6 @@
 // lib/view/screens/profile/settings/app_preferences_screen.dart
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/app/core/constants/app_theme.dart';
 import 'package:p_hn25/app/core/constants/custom_theme_colors.dart';
@@ -14,7 +15,14 @@ class AppPreferencesScreen extends StatefulWidget {
 }
 
 class _AppPreferencesScreenState extends State<AppPreferencesScreen> {
-  double _textScaleFactor = 1.0;
+  final List<String> _languages = [
+    'Español',
+    'Inglés',
+    'Miskito',
+    'Mayangna',
+    'Rama'
+  ];
+  String _selectedLanguage = 'Español';
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +35,10 @@ class _AppPreferencesScreenState extends State<AppPreferencesScreen> {
         backgroundColor: AppColors.backgroundColor(context),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
+        foregroundColor: AppColors.textColor(context),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -46,50 +55,77 @@ class _AppPreferencesScreenState extends State<AppPreferencesScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            _buildSectionTitle('ACCESIBILIDAD'),
+
+            _buildSectionTitle('IDIOMA'),
             _buildPreferencesCard(
               context,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Text(
-                      'Tamaño del Texto',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                        color: AppColors.textColor(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryColor(context).withAlpha(20),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            HugeIcons.strokeRoundedLanguageSquare,
+                            color: AppColors.primaryColor(context),
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Idioma de la Aplicación',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                            color: AppColors.textColor(context),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.grey.shade100,
+                      ),
+                      child: DropdownButton<String>(
+                        value: _selectedLanguage,
+                        underline: const SizedBox(),
+                        icon: Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: AppColors.textLightColor(context),
+                          size: 20,
+                        ),
+                        items: _languages.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              child: Text(
+                                value,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (newValue) {
+                          setState(() {
+                            _selectedLanguage = newValue!;
+                          });
+                        },
+                        dropdownColor: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        elevation: 2,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Slider(
-                    value: _textScaleFactor,
-                    min: 0.8,
-                    max: 1.5,
-                    divisions: 7,
-                    label: '${(_textScaleFactor * 100).toStringAsFixed(0)}%',
-                    activeColor: AppColors.primaryColor(context),
-                    inactiveColor: AppColors.primaryColor(
-                      context,
-                    ).withAlpha(50),
-                    onChanged: (value) {
-                      setState(() {
-                        _textScaleFactor = value;
-                      });
-                    },
-                  ),
-                  Center(
-                    child: Text(
-                      'Así se verá el texto en la app.',
-                      style: TextStyle(
-                        fontSize: 14 * _textScaleFactor,
-                        color: AppColors.textLightColor(context),
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
@@ -100,13 +136,14 @@ class _AppPreferencesScreenState extends State<AppPreferencesScreen> {
 
   Widget _buildSectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
+      padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
       child: Text(
         title,
         style: TextStyle(
           color: AppColors.textLightColor(context),
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w700,
           fontSize: 12,
+          letterSpacing: 0.5,
         ),
       ),
     );
@@ -114,12 +151,18 @@ class _AppPreferencesScreenState extends State<AppPreferencesScreen> {
 
   Widget _buildPreferencesCard(BuildContext context, {required Widget child}) {
     return Container(
-      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(15),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
         border: Border.all(
-          color: AppColors.primaryColor(context).withAlpha(50),
+          color: AppColors.primaryColor(context).withAlpha(40),
           width: 1,
         ),
       ),
@@ -137,25 +180,24 @@ class _ThemeOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    // Extraemos los colores específicos de la paleta de esta opción, no del tema global
     final optionColors = theme.data.extension<CustomThemeColors>()!;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 4.0),
       child: Material(
         color: isSelected
-            ? optionColors.primaryColor!.withAlpha(25)
+            ? optionColors.primaryColor!.withAlpha(20)
             : Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         child: InkWell(
           onTap: () => themeProvider.setTheme(theme),
-          borderRadius: BorderRadius.circular(12),
-          splashColor: optionColors.primaryColor!.withAlpha(40),
-          highlightColor: optionColors.primaryColor!.withAlpha(20),
+          borderRadius: BorderRadius.circular(14),
+          splashColor: optionColors.primaryColor!.withAlpha(30),
+          highlightColor: optionColors.primaryColor!.withAlpha(15),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: isSelected
                     ? optionColors.primaryColor!
@@ -166,8 +208,8 @@ class _ThemeOption extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: 36,
+                  height: 36,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
@@ -180,12 +222,13 @@ class _ThemeOption extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Text(
                     theme.name,
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
+                      fontSize: 15,
                       color: AppColors.textColor(context),
                     ),
                   ),
@@ -194,6 +237,7 @@ class _ThemeOption extends StatelessWidget {
                   Icon(
                     Icons.check_circle_rounded,
                     color: optionColors.primaryColor,
+                    size: 22,
                   ),
               ],
             ),

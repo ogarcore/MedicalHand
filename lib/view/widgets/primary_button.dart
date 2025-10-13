@@ -27,23 +27,31 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 🔹 Medidas responsivas
+    final screenWidth = MediaQuery.of(context).size.width;
+    final responsivePadding = padding ??
+        EdgeInsets.symmetric(
+          vertical: screenWidth * 0.035,
+          horizontal: screenWidth * 0.22,
+        );
+    final responsiveHeight = height ?? screenWidth * 0.13;
+
     return SizedBox(
-      height: height,
-      width: width,
+      height: responsiveHeight,
+      width: width ?? double.infinity, // ✅ ocupa todo el ancho si no se pasa width
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor ?? AppColors.primaryColor(context),
           foregroundColor: Colors.white,
-          padding:
-              padding ??
-              const EdgeInsets.symmetric(vertical: 15, horizontal: 90),
+          padding: responsivePadding,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           elevation: 3,
           shadowColor: (backgroundColor ?? AppColors.primaryColor(context))
               .withAlpha(80),
+          alignment: Alignment.center,
         ),
         child: isLoading
             ? const SizedBox(
@@ -61,38 +69,38 @@ class PrimaryButton extends StatelessWidget {
                     ? [
                         Text(
                           text,
-                          style: const TextStyle(
-                            fontSize: 16.5,
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.042,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.5,
                           ),
                         ),
                       ]
                     : iconAtEnd
-                    ? [
-                        Text(
-                          text,
-                          style: const TextStyle(
-                            fontSize: 16.5,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        icon!,
-                      ]
-                    : [
-                        icon!,
-                        const SizedBox(width: 8),
-                        Text(
-                          text,
-                          style: const TextStyle(
-                            fontSize: 16.5,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
+                        ? [
+                            Text(
+                              text,
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.042,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.02),
+                            icon!,
+                          ]
+                        : [
+                            icon!,
+                            SizedBox(width: screenWidth * 0.02),
+                            Text(
+                              text,
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.042,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
               ),
       ),
     );

@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
+// Asumo que estos archivos existen en tu proyecto
+import 'package:p_hn25/app/core/utils/input_formatters.dart';
+import 'package:p_hn25/app/core/utils/validators.dart';
 import 'package:p_hn25/data/models/user_model.dart';
-import 'package:p_hn25/view/widgets/custom_text_field.dart';
+
 import 'package:p_hn25/view/widgets/primary_button.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
@@ -23,35 +28,55 @@ class _EditPersonalInfoScreenState extends State<EditPersonalInfoScreen> {
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
   late TextEditingController _idNumberController;
-  late TextEditingController _dobController; // Para mostrar la fecha como texto
+  late TextEditingController _dobController;
   late TextEditingController _phoneController;
   late TextEditingController _addressController;
 
-  DateTime? _selectedDate; // Para guardar el objeto DateTime real
   bool _isLoading = false;
+
+  // ✅ FIX: Se crean funciones helper para formatear los valores iniciales.
+  String _formatInitialCedula(String rawText) {
+    if (rawText.length != 14) return rawText; // Devuelve el original si no tiene la longitud esperada
+    final buffer = StringBuffer();
+    for (int i = 0; i < rawText.length; i++) {
+      buffer.write(rawText[i]);
+      if ((i == 2 || i == 8) && i < rawText.length - 1) {
+        buffer.write('-');
+      }
+    }
+    return buffer.toString().toUpperCase();
+  }
+
+  String _formatInitialPhone(String rawText) {
+    if (rawText.length != 8) return rawText; // Devuelve el original si no tiene la longitud esperada
+    return '${rawText.substring(0, 4)}-${rawText.substring(4)}';
+  }
+
 
   @override
   void initState() {
     super.initState();
-    // Inicializar controladores con los datos del UserModel
     _firstNameController = TextEditingController(text: widget.user.firstName);
     _lastNameController = TextEditingController(text: widget.user.lastName);
-    _idNumberController = TextEditingController(text: widget.user.idNumber);
-
-    // El Timestamp de Firestore se convierte a DateTime para el DatePicker
-    _selectedDate = widget.user.dateOfBirth.toDate();
-    // Y se formatea como String para mostrarlo en el campo de texto
-    _dobController = TextEditingController(
-      text: DateFormat('dd/MM/yyyy').format(_selectedDate!),
-    );
-
-    _phoneController = TextEditingController(text: widget.user.phoneNumber);
     _addressController = TextEditingController(text: widget.user.address);
+
+    // ✅ FIX: Se aplican los formatos a los valores iniciales de cédula y teléfono.
+    _idNumberController = TextEditingController(text: _formatInitialCedula(widget.user.idNumber));
+    _phoneController = TextEditingController(text: _formatInitialPhone(widget.user.phoneNumber));
+
+    try {
+      final date = widget.user.dateOfBirth.toDate();
+      _dobController = TextEditingController(
+        text: DateFormat('dd/MM/yyyy').format(date),
+      );
+    } catch (e) {
+      // Si hay cualquier error al procesar la fecha, se inicializa vacío.
+      _dobController = TextEditingController();
+    }
   }
 
   @override
   void dispose() {
-    // Liberar todos los controladores
     _firstNameController.dispose();
     _lastNameController.dispose();
     _idNumberController.dispose();
@@ -61,46 +86,32 @@ class _EditPersonalInfoScreenState extends State<EditPersonalInfoScreen> {
     super.dispose();
   }
 
-  // --- Método para mostrar el selector de fecha ---
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? DateTime.now(),
-      firstDate: DateTime(1920),
-      lastDate: DateTime.now(),
-      locale: const Locale(
-        'es',
-        'ES',
-      ), // Para que el calendario salga en español
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-        _dobController.text = DateFormat('dd/MM/yyyy').format(picked);
-      });
-    }
-  }
-
   // --- Lógica para guardar los datos actualizados ---
-  Future<void> _handleSave() async {
+Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
+    
 
-    // Construye el mapa con la notación de puntos para actualizar campos anidados
     final Map<String, dynamic> updatedData = {
       'personalInfo.firstName': _firstNameController.text.trim(),
       'personalInfo.lastName': _lastNameController.text.trim(),
-      'personalInfo.idNumber': _idNumberController.text.trim(),
-      'contactInfo.phoneNumber': _phoneController.text.trim(),
+      'personalInfo.idNumber': _idNumberController.text, 
+      'contactInfo.phoneNumber': _phoneController.text, 
       'contactInfo.address': _addressController.text.trim(),
     };
 
-    // Solo añade la fecha si se seleccionó una, guardándola como Timestamp
-    if (_selectedDate != null) {
-      updatedData['personalInfo.dateOfBirth'] = Timestamp.fromDate(
-        _selectedDate!,
-      );
+
+    try {
+      final dateText = _dobController.text.trim();
+      if (dateText.isNotEmpty) {
+        final parsedDate = DateFormat('dd/MM/yyyy').parseLoose(dateText);
+        updatedData['personalInfo.dateOfBirth'] = Timestamp.fromDate(
+          parsedDate,
+        );
+      }
+    } catch (e) {
+      print('Error al parsear la fecha: $e');
     }
 
     final viewModel = Provider.of<UserViewModel>(context, listen: false);
@@ -142,126 +153,327 @@ class _EditPersonalInfoScreenState extends State<EditPersonalInfoScreen> {
           elevation: 0,
           centerTitle: true,
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(25)),
+          ),
+          leading: IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+            ),
+            onPressed: () => Navigator.pop(context),
           ),
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                _buildInfoCard(),
-                const SizedBox(height: 32),
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Header con mejor diseño
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.accentColor(context).withOpacity(0.1),
+                      AppColors.accentColor(context).withOpacity(0.05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: AppColors.accentColor(context).withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            AppColors.accentColor(context),
+                            AppColors.accentColor(context).withOpacity(0.8),
+                          ],
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.accentColor(
+                              context,
+                            ).withOpacity(0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.person_rounded,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Editar Información Personal',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.accentColor(context),
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Mantén tus datos actualizados para una mejor experiencia',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey.shade600,
+                              height: 1.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
-                // --- Campos del Formulario ---
-                _buildTextField(
-                  controller: _firstNameController,
-                  labelText: 'Nombres',
-                  hintText: 'Tus nombres',
-                  icon: Icons.person_outline_rounded,
+              // Formulario con mejor espaciado y diseño
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.06),
+                                blurRadius: 20,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              final isWide = constraints.maxWidth > 600;
+                              return isWide
+                                  ? _buildWideLayout()
+                                  : _buildCompactLayout();
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+
+                        // Botón de guardar con mejor diseño
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: 52, // Altura estándar para el botón
+                            child: PrimaryButton(
+                              text: 'Guardar Cambios',
+                              onPressed: _handleSave,
+                              isLoading: _isLoading,
+                              backgroundColor: AppColors.accentColor(context),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                      ],
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 24),
-                _buildTextField(
-                  controller: _lastNameController,
-                  labelText: 'Apellidos',
-                  hintText: 'Tus apellidos',
-                  icon: Icons.person_outline_rounded,
-                ),
-                const SizedBox(height: 24),
-                _buildTextField(
-                  controller: _idNumberController,
-                  labelText: 'Cédula de Identidad',
-                  hintText: 'Tu número de cédula',
-                  icon: Icons.badge_outlined,
-                ),
-                const SizedBox(height: 24),
-                _buildTextField(
-                  controller: _dobController,
-                  labelText: 'Fecha de Nacimiento',
-                  hintText: 'Selecciona tu fecha',
-                  icon: Icons.calendar_today_outlined,
-                  readOnly: true,
-                  onTap: () => _selectDate(context),
-                ),
-                const SizedBox(height: 24),
-                _buildTextField(
-                  controller: _phoneController,
-                  labelText: 'Teléfono',
-                  hintText: 'Tu número de teléfono',
-                  icon: Icons.phone_outlined,
-                  keyboardType: TextInputType.phone,
-                ),
-                const SizedBox(height: 24),
-                _buildTextField(
-                  controller: _addressController,
-                  labelText: 'Dirección',
-                  hintText: 'Tu dirección de domicilio',
-                  icon: Icons.location_on_outlined,
-                ),
-                const SizedBox(height: 40),
-                PrimaryButton(
-                  text: 'Guardar Cambios',
-                  onPressed: _handleSave,
-                  isLoading: _isLoading,
-                  backgroundColor: AppColors.accentColor(context),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  // Widget helper para no repetir el estilo de la tarjeta de info
-  Widget _buildInfoCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.accentColor(context).withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.edit_outlined,
-              size: 40,
-              color: AppColors.accentColor(context),
-            ),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Editar Datos Personales',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Mantén tu información personal y de contacto actualizada.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-          ),
-        ],
-      ),
+  Widget _buildCompactLayout() {
+    return Column(
+      children: [
+        _buildTextFieldEnhanced(
+          controller: _firstNameController,
+          labelText: 'Nombres',
+          hintText: 'Ingresa tus nombres',
+          icon: HugeIcons.strokeRoundedUser,
+          validator: (value) =>
+              AppValidators.validateGenericEmpty(value, 'Nombres'),
+        ),
+        const SizedBox(height: 20),
+        _buildTextFieldEnhanced(
+          controller: _lastNameController,
+          labelText: 'Apellidos',
+          hintText: 'Ingresa tus apellidos',
+          icon: HugeIcons.strokeRoundedUserCircle,
+          validator: (value) =>
+              AppValidators.validateGenericEmpty(value, 'Apellidos'),
+        ),
+        const SizedBox(height: 20),
+        _buildTextFieldEnhanced(
+          controller: _idNumberController,
+          labelText: 'Cédula de Identidad',
+          hintText: 'Número de cédula',
+          icon: HugeIcons.strokeRoundedPassport,
+          keyboardType: TextInputType.visiblePassword,
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(16),
+            CedulaInputFormatter(),
+          ],
+          validator: AppValidators.validateCedula,
+        ),
+        const SizedBox(height: 20),
+        _buildTextFieldEnhanced(
+          controller: _dobController,
+          labelText: 'Fecha de Nacimiento',
+          hintText: 'dd/MM/yyyy',
+          icon: HugeIcons.strokeRoundedCalendar02,
+          keyboardType: TextInputType.number,
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(10),
+            DateInputFormatter(),
+          ],
+          validator: AppValidators.validateBirthDate,
+        ),
+        const SizedBox(height: 20),
+        _buildTextFieldEnhanced(
+          controller: _phoneController,
+          labelText: 'Teléfono',
+          hintText: 'Número de teléfono',
+          icon: HugeIcons.strokeRoundedFlipPhone,
+          inputFormatters: [PhoneInputFormatter()],
+          keyboardType: TextInputType.phone,
+          validator: AppValidators.validatePhone,
+        ),
+        const SizedBox(height: 20),
+        _buildTextFieldEnhanced(
+          controller: _addressController,
+          labelText: 'Dirección',
+          hintText: 'Dirección de domicilio',
+          icon: HugeIcons.strokeRoundedLocation03,
+          minLines: 1,
+          maxLines: 3,
+          validator: (value) =>
+              AppValidators.validateGenericEmpty(value, 'La dirección'),
+        ),
+      ],
     );
   }
 
-  // Widget helper para no repetir el estilo de los campos de texto
-  Widget _buildTextField({
+  Widget _buildWideLayout() {
+    return Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  _buildTextFieldEnhanced(
+                    controller: _firstNameController,
+                    labelText: 'Nombres',
+                    hintText: 'Ingresa tus nombres',
+                    icon: Icons.person_outline_rounded,
+                    validator: (value) =>
+                        AppValidators.validateGenericEmpty(value, 'Nombres'),
+                  ),
+                  const SizedBox(height: 20),
+                  _buildTextFieldEnhanced(
+                    controller: _idNumberController,
+                    labelText: 'Cédula de Identidad',
+                    hintText: 'Número de cédula',
+                    icon: Icons.badge_outlined,
+                    keyboardType: TextInputType.visiblePassword,
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(16),
+                      CedulaInputFormatter(),
+                    ],
+                    validator: AppValidators.validateCedula,
+                  ),
+                  const SizedBox(height: 20),
+                  _buildTextFieldEnhanced(
+                    controller: _phoneController,
+                    labelText: 'Teléfono',
+                    hintText: 'Número de teléfono',
+                    icon: Icons.phone_outlined,
+                    inputFormatters: [PhoneInputFormatter()],
+                    keyboardType: TextInputType.phone,
+                    validator: AppValidators.validatePhone,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                children: [
+                  _buildTextFieldEnhanced(
+                    controller: _lastNameController,
+                    labelText: 'Apellidos',
+                    hintText: 'Ingresa tus apellidos',
+                    icon: Icons.person_outline_rounded,
+                    validator: (value) =>
+                        AppValidators.validateGenericEmpty(value, 'Apellidos'),
+                  ),
+                  const SizedBox(height: 20),
+                  _buildTextFieldEnhanced(
+                    controller: _dobController,
+                    labelText: 'Fecha de Nacimiento',
+                    hintText: 'dd/MM/yyyy',
+                    icon: Icons.calendar_today_outlined,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(10),
+                      DateInputFormatter(),
+                    ],
+                    validator: AppValidators.validateBirthDate,
+                  ),
+                  const SizedBox(height: 20),
+                  _buildTextFieldEnhanced(
+                    controller: _addressController,
+                    labelText: 'Dirección',
+                    hintText: 'Dirección de domicilio',
+                    icon: Icons.location_on_outlined,
+                    minLines: 1,
+                    maxLines: 3,
+                    validator: (value) => AppValidators.validateGenericEmpty(
+                      value,
+                      'La dirección',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextFieldEnhanced({
     required TextEditingController controller,
     required String labelText,
     required String hintText,
@@ -269,18 +481,83 @@ class _EditPersonalInfoScreenState extends State<EditPersonalInfoScreen> {
     bool readOnly = false,
     TextInputType? keyboardType,
     VoidCallback? onTap,
+    String? Function(String?)? validator,
+    List<TextInputFormatter>? inputFormatters,
+    int? minLines,
+    int? maxLines = 1,
   }) {
-    return CustomTextField(
-      controller: controller,
-      labelText: labelText,
-      hintText: hintText,
-      icon: icon,
-      validator: (value) {
-        if (value == null || value.trim().isEmpty) {
-          return 'Este campo no puede estar vacío.';
-        }
-        return null;
-      },
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TextFormField(
+        controller: controller,
+        readOnly: readOnly,
+        keyboardType: keyboardType,
+        onTap: onTap,
+        inputFormatters: inputFormatters,
+        minLines: minLines,
+        maxLines: maxLines,
+        style: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+          color: Colors.black87,
+        ),
+        decoration: InputDecoration(
+          labelText: labelText,
+          hintText: hintText,
+          hintStyle: TextStyle(
+            color: Colors.grey.shade500,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+          labelStyle: TextStyle(
+            color: AppColors.accentColor(context),
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.3,
+          ),
+          prefixIcon: Container(
+            margin: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.accentColor(context).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 20, color: AppColors.accentColor(context)),
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(
+              color: AppColors.accentColor(context),
+              width: 2,
+            ),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 18,
+          ),
+        ),
+        validator: validator,
+      ),
     );
   }
 }

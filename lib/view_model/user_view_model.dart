@@ -156,6 +156,85 @@ Future<bool> updateEmergencyContact(String name, String phone) async {
     }
   }
 
+  Future<bool> changePassword(String currentPassword, String newPassword) async {
+  final user = _auth.currentUser;
+  if (user == null || user.email == null) return false;
+
+  try {
+    _isLoading = true;
+    notifyListeners();
+    final credential = EmailAuthProvider.credential(
+      email: user.email!,
+      password: currentPassword,
+    );
+    await user.reauthenticateWithCredential(credential);
+    await user.updatePassword(newPassword);
+
+    print("Contraseña actualizada correctamente.");
+    return true;
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'wrong-password') {
+      print('La contraseña actual es incorrecta.');
+    } else if (e.code == 'requires-recent-login') {
+      print('El usuario debe iniciar sesión nuevamente antes de cambiar la contraseña.');
+    } else {
+      print('Error de FirebaseAuth al cambiar contraseña: ${e.code}');
+    }
+    return false;
+  } catch (e) {
+    print("Error al cambiar la contraseña: $e");
+    return false;
+  } finally {
+    _isLoading = false;
+    notifyListeners();
+  }
+}
+
+
+  Future<bool> deleteAccount() async {
+  final user = _auth.currentUser;
+  if (user == null) return false;
+
+  try {
+    _isLoading = true;
+    notifyListeners();
+    await _firestore.collection('usuarios_movil').doc(user.uid).update({
+      'cuenta_eliminada': true,
+    });
+    await user.delete();
+    clearUser();
+
+    return true;
+  } on FirebaseAuthException catch (e) {
+    print('Error de autenticación al eliminar cuenta: $e');
+    return false;
+  } catch (e) {
+    print('Error al eliminar cuenta: $e');
+    return false;
+  } finally {
+    _isLoading = false;
+    notifyListeners();
+  }
+}
+
+
+Future<bool> reauthenticate(String email, String password) async {
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return false;
+
+    final credential = EmailAuthProvider.credential(email: email, password: password);
+    await user.reauthenticateWithCredential(credential);
+
+    print('Usuario reautenticado correctamente');
+    return true;
+  } catch (e) {
+    print('Error al reautenticar: $e');
+    return false;
+  }
+}
+
+
   void clearUser() {
     _currentUser = null;
     _activeProfile = null;

@@ -9,6 +9,7 @@ class CustomTextField extends StatefulWidget {
   final String hintText;
   final IconData icon;
   final bool isPassword;
+  final bool obscureText; // ✅ Nuevo parámetro opcional
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
   final List<TextInputFormatter>? inputFormatters;
@@ -17,7 +18,6 @@ class CustomTextField extends StatefulWidget {
   final Color? iconColor;
   final Color? focusedBorderColor;
   final ValueChanged<String>? onChanged;
-  // 🔥 1. AÑADIDO EL NUEVO PARÁMETRO OPCIONAL (NULLABLE)
   final Widget? suffixIcon;
 
   const CustomTextField({
@@ -28,6 +28,7 @@ class CustomTextField extends StatefulWidget {
     required this.hintText,
     required this.icon,
     this.isPassword = false,
+    this.obscureText = false, // ✅ Valor por defecto
     this.keyboardType = TextInputType.text,
     this.validator,
     this.inputFormatters,
@@ -36,7 +37,6 @@ class CustomTextField extends StatefulWidget {
     this.iconColor,
     this.focusedBorderColor,
     this.onChanged,
-    // 🔥 2. AÑADIDO AL CONSTRUCTOR
     this.suffixIcon,
   });
 
@@ -70,6 +70,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   TextCapitalization _getTextCapitalization() {
     if (widget.isPassword ||
+        widget.obscureText ||
         widget.keyboardType == TextInputType.emailAddress ||
         widget.keyboardType == TextInputType.visiblePassword ||
         widget.keyboardType == TextInputType.url) {
@@ -80,20 +81,30 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isObscureMode = widget.isPassword || widget.obscureText;
+
+    // 📱 Escalado responsivo según ancho de pantalla
+    final screenWidth = MediaQuery.of(context).size.width;
+    final scale = screenWidth < 400
+        ? 1.0
+        : screenWidth < 600
+            ? 1.1
+            : 1.2; // 🔹 ligeramente más grande que antes
+
     return TextFormField(
       focusNode: widget.focusNode,
       autofocus: false,
       controller: widget.controller,
-      obscureText: widget.isPassword && _isObscured,
+      obscureText: isObscureMode && _isObscured,
       keyboardType: widget.keyboardType,
       textCapitalization: _getTextCapitalization(),
       validator: widget.validator,
       inputFormatters: widget.inputFormatters,
-      minLines: widget.isPassword ? 1 : 1,
-      maxLines: widget.isPassword ? 1 : widget.maxLines,
+      minLines: isObscureMode ? 1 : widget.minLines ?? 1,
+      maxLines: isObscureMode ? 1 : widget.maxLines,
       onChanged: widget.onChanged,
       style: TextStyle(
-        fontSize: 16,
+        fontSize: 16 * scale,
         fontWeight: FontWeight.w500,
         color: AppColors.textColor(context),
       ),
@@ -102,26 +113,23 @@ class _CustomTextFieldState extends State<CustomTextField> {
         labelStyle: TextStyle(
           color: _hasFocus ? Colors.grey[700] : Colors.grey[600],
           fontWeight: FontWeight.w600,
-          fontSize: 17,
+          fontSize: 17 * scale,
         ),
         hintText: widget.hintText,
-        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 16),
+        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 16 * scale),
         prefixIcon: Icon(
           widget.icon,
           color: widget.iconColor ?? AppColors.primaryColor(context),
-          size: 22,
+          size: 22 * scale,
         ),
-        // 🔥 3. LÓGICA ACTUALIZADA PARA EL SUFFIXICON
-        // Prioridad 1: Si se pasa un suffixIcon personalizado, úsalo.
-        // Prioridad 2: Si no, y es un campo de contraseña, usa el botón de visibilidad.
-        // Prioridad 3: Si no es ninguna de las anteriores, no muestres nada (null).
-        suffixIcon: widget.suffixIcon != null
-            ? widget.suffixIcon
-            : widget.isPassword
+        suffixIcon: widget.suffixIcon ??
+            (isObscureMode
                 ? IconButton(
                     icon: Icon(
                       _isObscured ? Icons.visibility_off : Icons.visibility,
-                      color: widget.iconColor ?? AppColors.primaryColor(context),
+                      color:
+                          widget.iconColor ?? AppColors.primaryColor(context),
+                      size: 22 * scale,
                     ),
                     onPressed: () {
                       setState(() {
@@ -129,17 +137,17 @@ class _CustomTextFieldState extends State<CustomTextField> {
                       });
                     },
                   )
-                : null,
+                : null),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12 * scale),
           borderSide: const BorderSide(color: Colors.transparent, width: 0.6),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14 * scale),
           borderSide: BorderSide(color: Colors.grey.shade400, width: 0.4),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14 * scale),
           borderSide: BorderSide(
             color: widget.focusedBorderColor ?? AppColors.primaryColor(context),
             width: 1.8,
@@ -147,9 +155,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
         ),
         filled: true,
         fillColor: Colors.white.withAlpha(180),
-        contentPadding: const EdgeInsets.symmetric(
-          vertical: 16,
-          horizontal: 16,
+        contentPadding: EdgeInsets.symmetric(
+          vertical: 16 * scale,
+          horizontal: 16 * scale,
         ),
         floatingLabelBehavior: FloatingLabelBehavior.auto,
       ),
