@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 
@@ -33,7 +34,7 @@ class LoginHeader extends StatelessWidget {
         ),
         const SizedBox(height: 30),
         Text(
-          '¡Bienvenido/a!',
+          'bienvenido'.tr(),
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 32,
@@ -44,7 +45,7 @@ class LoginHeader extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Accede a tu cuenta para continuar',
+          'accede_a_tu_cuenta_para_continuar'.tr(),
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 16,

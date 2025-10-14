@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -13,9 +14,9 @@ class PermissionService {
 
       await _showPermissionDialog(
         context,
-        title: 'Permiso Requerido',
+        title: 'permiso_requerido'.tr(),
         content:
-            'El acceso a la cámara ha sido denegado permanentemente. Por favor, actívalo desde la configuración de tu teléfono.',
+            'el_acceso_a_la_cmara_ha_sido_denegado_permanentemente_por_fa'.tr(),
         buttonText: 'Abrir Configuración',
         onPressed: openAppSettings,
       );
@@ -28,9 +29,9 @@ class PermissionService {
       bool granted = false;
       await _showPermissionDialog(
         context,
-        title: 'Acceso a la Cámara',
+        title: 'acceso_a_la_cmara'.tr(),
         content:
-            'MedicalHand necesita acceso a tu cámara para tomar fotos de tus documentos y verificar tu identidad.',
+            'medicalhand_necesita_acceso_a_tu_cmara_para_tomar_fotos_de_t'.tr(),
         buttonText: 'Permitir',
         onPressed: () async {
           Navigator.of(context).pop();
@@ -65,7 +66,7 @@ class PermissionService {
           content: Text(content),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancelar'),
+              child: Text('cancelar'.tr()),
               onPressed: () {
                 Navigator.of(context).pop();
               },

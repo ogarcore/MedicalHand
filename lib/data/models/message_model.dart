@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:p_hn25/data/network/encryption_service.dart';
 
 class Message {
   String text;
@@ -7,18 +8,32 @@ class Message {
 
   Message({required this.text, required this.role, required this.timestamp});
 
-  // Factory para crear un Message desde un documento de Firestore
+  // --- MODIFICADO: Desencripta el texto al leerlo de Firestore ---
   factory Message.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data() as Map<String, dynamic>;
+    final encryptionService = EncryptionService();
+    
+    // Desencripta el texto antes de crear el objeto
+    final decryptedText = encryptionService.decrypt(data['text'] ?? '');
+
     return Message(
-      text: data['text'] ?? '',
+      text: decryptedText, // Usa el texto ya desencriptado
       role: data['role'] ?? 'user',
       timestamp: data['timestamp'] ?? Timestamp.now(),
     );
   }
 
-  // Método para convertir un Message a un Map para Firestore
+  // --- MODIFICADO: Encripta el texto al guardarlo en Firestore ---
   Map<String, dynamic> toFirestore() {
-    return {'text': text, 'role': role, 'timestamp': timestamp};
+    final encryptionService = EncryptionService();
+    
+    // Encripta el texto antes de enviarlo a la base de datos
+    final encryptedText = encryptionService.encrypt(text);
+
+    return {
+      'text': encryptedText, // Guarda el texto ya encriptado
+      'role': role,
+      'timestamp': timestamp,
+    };
   }
 }

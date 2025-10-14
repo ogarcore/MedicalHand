@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/profile/settings/notification_preferences_screen.dart
 import 'package:flutter/material.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -23,7 +24,7 @@ class NotificationPreferencesScreen extends StatelessWidget {
         return Scaffold(
           backgroundColor: AppColors.backgroundColor(context),
           appBar: AppBar(
-            title: const Text('Notificaciones'),
+            title: Text('notificaciones'.tr()),
             backgroundColor: AppColors.backgroundColor(context),
             elevation: 0,
             surfaceTintColor: Colors.transparent,
@@ -40,9 +41,9 @@ class NotificationPreferencesScreen extends StatelessWidget {
               child: Column(
                 children: [
                   _SwitchRow(
-                    title: 'Solicitudes Enviadas',
+                    title: 'solicitudes_enviadas'.tr(),
                     subtitle:
-                        'Recibe una confirmación cuando enviamos tu solicitud de cita.',
+                        'recibe_una_confirmacin_cuando_enviamos_tu_solicitud_de_cita'.tr(),
                     value: prefs['requests'] ?? true,
                     onChanged: (newValue) {
                       userViewModel.updateNotificationPreference(
@@ -52,8 +53,8 @@ class NotificationPreferencesScreen extends StatelessWidget {
                     },
                   ),
                   _SwitchRow(
-                    title: 'Recordatorios de Cita',
-                    subtitle: 'Recibe alertas 24 y 48 horas antes de tu cita.',
+                    title: 'recordatorios_de_cita'.tr(),
+                    subtitle: 'recibe_alertas_24_y_48_horas_antes_de_tu_cita'.tr(),
                     value: prefs['reminders'] ?? true,
                     onChanged: (newValue) {
                       userViewModel.updateNotificationPreference(
@@ -63,9 +64,9 @@ class NotificationPreferencesScreen extends StatelessWidget {
                     },
                   ),
                   _SwitchRow(
-                    title: 'Confirmaciones y Cambios',
+                    title: 'confirmaciones_y_cambios'.tr(),
                     subtitle:
-                        'Entérate cuando tu cita sea confirmada, cancelada o reprogramada.',
+                        'entrate_cuando_tu_cita_sea_confirmada_cancelada_o_reprograma'.tr(),
                     value: prefs['changes'] ?? true,
                     onChanged: (newValue) {
                       userViewModel.updateNotificationPreference(
@@ -75,8 +76,8 @@ class NotificationPreferencesScreen extends StatelessWidget {
                     },
                   ),
                   _SwitchRow(
-                    title: 'Novedades y Anuncios',
-                    subtitle: 'Comunicaciones del sistema de salud.',
+                    title: 'novedades_y_anuncios'.tr(),
+                    subtitle: 'comunicaciones_del_sistema_de_salud'.tr(),
                     value: prefs['news'] ?? true,
                     onChanged: (newValue) {
                       userViewModel.updateNotificationPreference(

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -50,7 +51,7 @@ class EmergencyContactRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Contacto de Emergencia',
+                  'contacto_de_emergencia'.tr(),
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -60,19 +61,19 @@ class EmergencyContactRow extends StatelessWidget {
                 const SizedBox(height: 4),
                 if (hasContact) ...[
                   Text(
-                    contact['name'] ?? 'Nombre no disponible',
+                    contact['name'] ?? 'nombre_no_disponible'.tr(),
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   Text(
-                    contact['phone'] ?? 'Teléfono no disponible',
+                    contact['phone'] ?? 'telfono_no_disponible'.tr(),
                     style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                   ),
                 ] else ...[
                   Text(
-                    'No configurado',
+                    'no_configurado'.tr(),
                     style: TextStyle(
                       fontSize: 13,
                       color: Colors.grey.shade500,
@@ -80,7 +81,7 @@ class EmergencyContactRow extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Toca para agregar',
+                    'toca_para_agregar'.tr(),
                     style: TextStyle(
                       fontSize: 11,
                       color: primaryColor.withAlpha(150),

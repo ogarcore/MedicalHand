@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -35,8 +36,8 @@ class _PreCheckInInstructionsScreenState
         Navigator.of(context).pop();
         _showCustomSnackBar(
           context,
-          message:
-              '¡Asistencia confirmada! Ya puedes escanear el QR al llegar.',
+          message: 'asistencia_confirmada_ya_puedes_escanear_el_qr_al_llegar'
+              .tr(),
           isSuccess: true,
         );
       } else {
@@ -57,7 +58,9 @@ class _PreCheckInInstructionsScreenState
     required String message,
     required bool isSuccess,
   }) {
-    final color = isSuccess ? AppColors.successColor(context): AppColors.warningColor(context);
+    final color = isSuccess
+        ? AppColors.successColor(context)
+        : AppColors.warningColor(context);
     final icon = isSuccess ? Icons.check_circle_rounded : Icons.error_rounded;
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -133,7 +136,7 @@ class _PreCheckInInstructionsScreenState
     return Scaffold(
       backgroundColor: AppColors.backgroundColor(context),
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Preparación para Check-In',
           style: TextStyle(
             fontWeight: FontWeight.w700,
@@ -197,7 +200,7 @@ class _PreCheckInInstructionsScreenState
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           '¡Todo listo para tu Check-In!',
                           style: TextStyle(
                             fontSize: 18,
@@ -209,7 +212,7 @@ class _PreCheckInInstructionsScreenState
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Sigue estos pasos para una experiencia fluida',
+                          'sigue_estos_pasos_para_una_experiencia_fluida'.tr(),
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.white.withAlpha(200),
@@ -292,8 +295,8 @@ class _PreCheckInInstructionsScreenState
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Text(
-                  'Prepara tu visita',
+                Text(
+                  'prepara_tu_visita'.tr(),
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -312,21 +315,21 @@ class _PreCheckInInstructionsScreenState
               children: [
                 _EnhancedStepRow(
                   icon: HugeIcons.strokeRoundedPinLocation01,
-                  title: 'Dirígete al Hospital',
+                  title: 'dirgete_al_hospital'.tr(),
                   description:
                       'Hospital ${widget.appointment.hospital} - ${widget.appointment.specialty ?? 'Consulta Externa'}',
                 ),
                 const SizedBox(height: 12),
                 _EnhancedStepRow(
                   icon: HugeIcons.strokeRoundedClock02,
-                  title: 'Llega con anticipación',
+                  title: 'llega_con_anticipacin'.tr(),
                   description:
                       'Te recomendamos estar 45 minutos antes de tu cita programada',
                 ),
                 const SizedBox(height: 12),
                 _EnhancedStepRow(
                   icon: HugeIcons.strokeRoundedQrCode,
-                  title: 'Busca el QR de llegada',
+                  title: 'busca_el_qr_de_llegada'.tr(),
                   description:
                       'Los códigos QR se encuentran en las salas de espera de cada área de especialidad',
                 ),
@@ -400,12 +403,12 @@ class _PreCheckInInstructionsScreenState
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Proceso de Escaneo QR',
+                        'proceso_de_escaneo_qr'.tr(),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -415,7 +418,7 @@ class _PreCheckInInstructionsScreenState
                       ),
                       SizedBox(height: 2),
                       Text(
-                        'Sigue estos pasos para registrar tu llegada',
+                        'sigue_estos_pasos_para_registrar_tu_llegada'.tr(),
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.black54,
@@ -455,7 +458,8 @@ class _PreCheckInInstructionsScreenState
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Encuentra los QR en las salas de espera de cada especialidad',
+                          'encuentra_los_qr_en_las_salas_de_espera_de_cada_especialidad'
+                              .tr(),
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey.shade700,
@@ -473,7 +477,7 @@ class _PreCheckInInstructionsScreenState
                 _EnhancedQRStep(
                   number: 1,
                   icon: HugeIcons.strokeRoundedPhoneArrowDown,
-                  title: 'Abre el escáner QR',
+                  title: 'abre_el_escner_qr'.tr(),
                   description:
                       'Desde la app, toca el botón "Escanear QR" para activar la cámara',
                   accentColor: accentColor,
@@ -482,7 +486,7 @@ class _PreCheckInInstructionsScreenState
                 _EnhancedQRStep(
                   number: 2,
                   icon: HugeIcons.strokeRoundedTarget01,
-                  title: 'Enfoca el código',
+                  title: 'enfoca_el_cdigo'.tr(),
                   description:
                       'Apunta la cámara hacia el QR ubicado en la sala de espera',
                   accentColor: accentColor,
@@ -491,7 +495,7 @@ class _PreCheckInInstructionsScreenState
                 _EnhancedQRStep(
                   number: 3,
                   icon: HugeIcons.strokeRoundedCheckList,
-                  title: 'Confirmación automática',
+                  title: 'confirmacin_automtica'.tr(),
                   description:
                       'Tu llegada se registrará instantáneamente en el sistema',
                   accentColor: accentColor,
@@ -569,7 +573,7 @@ class _PreCheckInInstructionsScreenState
                     ),
                   const SizedBox(width: 10),
                   Text(
-                    _isLoading ? 'Confirmando...' : 'Confirmar Asistencia',
+                    _isLoading ? 'Confirmando...' : 'confirmar_asistencia'.tr(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 15,
@@ -691,7 +695,8 @@ class _EnhancedQRStep extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                '$number',
+
+                'key'.tr(namedArgs: {"number": number.toString()}),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 13,

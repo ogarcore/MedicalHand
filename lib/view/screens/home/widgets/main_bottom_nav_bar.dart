@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -41,14 +42,14 @@ class MainBottomNavBar extends StatelessWidget {
                 _buildNavItem(
                   context,
                   HugeIcons.strokeRoundedCalendarUser,
-                  "Mis Citas",
+                  "citas".tr(),
                   0,
                 ),
                 const SizedBox(width: 40), // espacio FAB
                 _buildNavItem(
                   context,
                   HugeIcons.strokeRoundedTransactionHistory,
-                  "Historial",
+                  "historial".tr(),
                   2,
                 ),
               ],
@@ -69,7 +70,7 @@ class MainBottomNavBar extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Inicio',
+            'inicio'.tr(),
             style: TextStyle(
               color: isSelected ? AppColors.primaryColor(context) : Colors.grey,
               fontSize: 12,

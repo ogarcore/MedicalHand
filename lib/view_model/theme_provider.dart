@@ -8,52 +8,75 @@ class ThemeProvider extends ChangeNotifier {
   ThemeData _currentTheme = AppThemes.mentaTheme;
   ThemeData get currentTheme => _currentTheme;
 
-  String _currentThemeName = 'Menta Fresca';
-  String get currentThemeName => _currentThemeName;
+  String _currentThemeKey = 'menta_fresca';
+  String get currentThemeKey => _currentThemeKey;
+
+  /// Devuelve el nombre traducido del tema actual (ya listo para mostrar)
+  String get currentThemeTranslatedName =>
+      AppThemes.themes.firstWhere(
+        (t) => t.keyName == _currentThemeKey,
+        orElse: () => AppThemes.themes.first,
+      ).getTranslatedName();
 
   ThemeProvider() {
-    // CAMBIO CLAVE: Se vuelve a llamar la función de carga aquí.
-    // Esto asegura que al abrir la app, siempre se intente cargar el tema del usuario.
+    // Al inicializar, cargamos el tema guardado del usuario
     loadUserTheme();
   }
 
-  void setTheme(AppTheme theme) async {
+  /// Cambia el tema actual y lo guarda en preferencias (por usuario)
+  Future<void> setTheme(AppTheme theme) async {
     if (_currentTheme != theme.data) {
       _currentTheme = theme.data;
-      _currentThemeName = theme.name;
+      _currentThemeKey = theme.keyName;
       notifyListeners();
 
       final prefs = await SharedPreferences.getInstance();
       final userId = FirebaseAuth.instance.currentUser?.uid;
+
       if (userId != null) {
-        await prefs.setString('theme_$userId', theme.name);
+        await prefs.setString('theme_$userId', theme.keyName);
+      } else {
+        await prefs.setString('theme_default', theme.keyName);
       }
     }
   }
 
+  /// Carga el tema guardado del usuario (o el predeterminado si no hay)
   Future<void> loadUserTheme() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = FirebaseAuth.instance.currentUser?.uid;
-    String themeName = 'Menta Fresca'; // Valor por defecto si no hay usuario
 
-    if (userId != null) {
-      // Si hay un usuario, busca su tema guardado
-      themeName = prefs.getString('theme_$userId') ?? 'Menta Fresca';
+    String savedThemeKey =
+        (userId != null) ? prefs.getString('theme_$userId') ?? '' : prefs.getString('theme_default') ?? '';
+
+    // Si no hay tema guardado, usa el predeterminado
+    if (savedThemeKey.isEmpty) {
+      savedThemeKey = 'menta_fresca';
     }
 
+    // Buscar el tema que coincida con la clave guardada
     final theme = AppThemes.themes.firstWhere(
-      (t) => t.name == themeName,
+      (t) => t.keyName == savedThemeKey,
       orElse: () => AppThemes.themes.first,
     );
 
     _currentTheme = theme.data;
-    _currentThemeName = theme.name;
+    _currentThemeKey = theme.keyName;
     notifyListeners();
   }
 
-  void resetToDefault() {
+  /// Restaura el tema por defecto (menta fresca)
+  Future<void> resetToDefault() async {
     _currentTheme = AppThemes.mentaTheme;
-    _currentThemeName = 'Menta Fresca';
+    _currentThemeKey = 'menta_fresca';
     notifyListeners();
+
+    final prefs = await SharedPreferences.getInstance();
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId != null) {
+      await prefs.setString('theme_$userId', _currentThemeKey);
+    } else {
+      await prefs.setString('theme_default', _currentThemeKey);
+    }
   }
 }

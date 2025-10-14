@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -41,7 +42,7 @@ class ChatDisclaimerBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Para tu bienestar',
+                  'para_tu_bienestar'.tr(),
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     color: primaryColor,
@@ -50,7 +51,7 @@ class ChatDisclaimerBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Asistente para consejos de bienestar general. Consulta a un médico para diagnósticos.',
+                  'asistente_para_consejos_de_bienestar_general_consulta_a_un_m'.tr(),
                   style: TextStyle(
                     color: AppColors.textLightColor(context),
                     fontSize: 12,

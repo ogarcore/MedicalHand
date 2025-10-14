@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/login/widgets/login_form.dart
 import 'package:flutter/material.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -32,8 +33,8 @@ class LoginForm extends StatelessWidget {
         children: [
           CustomTextField(
             controller: emailController,
-            labelText: 'Correo electrónico',
-            hintText: 'Ingresa tu correo',
+            labelText: 'correo_electrnico'.tr(),
+            hintText: 'ingresa_tu_correo'.tr(),
             keyboardType: TextInputType.emailAddress,
             icon: Icons.email_outlined,
             validator: AppValidators.validateEmail,
@@ -41,8 +42,8 @@ class LoginForm extends StatelessWidget {
           const SizedBox(height: 25),
           CustomTextField(
             controller: passwordController,
-            labelText: 'Contraseña',
-            hintText: 'Ingresa tu contraseña',
+            labelText: 'contrasea'.tr(),
+            hintText: 'ingresa_tu_contrasea'.tr(),
             isPassword: true,
             icon: Icons.lock_outline,
             validator: (value) =>
@@ -54,7 +55,7 @@ class LoginForm extends StatelessWidget {
             child: TextButton(
               onPressed: onForgotPasswordPressed,
               child: Text(
-                '¿Olvidaste tu contraseña?',
+                'olvidaste_tu_contraseña'.tr(),
                 style: TextStyle(
                   color: AppColors.primaryColor(context),
                   fontWeight: FontWeight.w600,
@@ -65,7 +66,7 @@ class LoginForm extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           PrimaryButton(
-            text: 'Iniciar Sesión',
+            text: 'iniciar_sesin'.tr(),
             isLoading: isLoading,
             onPressed: onLoginPressed,
           ),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:p_hn25/view/screens/splash/splash_screen.dart';
 import 'package:p_hn25/view/widgets/gradient_background.dart';
@@ -55,7 +56,7 @@ class _RegistrationStep5ScreenState extends State<RegistrationStep5Screen> {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                "Información Médica",
+                                'informacin_mdica'.tr(),
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -68,7 +69,7 @@ class _RegistrationStep5ScreenState extends State<RegistrationStep5Screen> {
                           const RegistrationProgressIndicator(currentStep: 5),
                           const SizedBox(height: 32),
                           Text(
-                            'Por último, algunos datos básicos',
+                            'por_ltimo_algunos_datos_bsicos'.tr(),
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
@@ -78,7 +79,7 @@ class _RegistrationStep5ScreenState extends State<RegistrationStep5Screen> {
                           const SizedBox(height: 24),
                           CustomTextField(
                             controller: authViewModel.bloodTypeController,
-                            labelText: 'Tipo de Sangre',
+                            labelText: 'tipo_de_sangre'.tr(),
                             hintText: 'Ej: O+, AB-, B+',
                             keyboardType: TextInputType.text,
                             icon: Icons.bloodtype_outlined,
@@ -87,8 +88,8 @@ class _RegistrationStep5ScreenState extends State<RegistrationStep5Screen> {
                           const SizedBox(height: 20),
                           CustomTextField(
                             controller: authViewModel.allergiesController,
-                            labelText: 'Alergias Conocidas',
-                            hintText: 'Ej: Penicilina, Maní, etc.',
+                            labelText: 'alergias_conocidas'.tr(),
+                            hintText: 'ej_penicilina_man_etc'.tr(),
                             icon: Icons.warning_amber_rounded,
                             // No necesita validador por ser texto libre
                           ),
@@ -127,7 +128,7 @@ class _RegistrationStep5ScreenState extends State<RegistrationStep5Screen> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
-                                    'Si no tienes conocimientos de estos datos, puedes finalizar el registro y actualizarlos después en tu perfil.',
+                                    'si_no_tienes_conocimientos_de_estos_datos_puedes_finalizar_e'.tr(),
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: AppColors.textColor(
@@ -142,7 +143,7 @@ class _RegistrationStep5ScreenState extends State<RegistrationStep5Screen> {
                           ),
                           const SizedBox(height: 24),
                           PrimaryButton(
-                            text: 'Finalizar Registro',
+                            text: 'finalizar_registro'.tr(),
                             isLoading: authViewModel.isLoading,
                             // PASO 4: Lógica de validación en el botón
                             onPressed: () async {

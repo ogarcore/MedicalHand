@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -18,8 +19,8 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor(context),
       appBar: AppBar(
-        title: const Text(
-          'Mi Perfil',
+        title: Text(
+          'mi_perfil'.tr(),
           style: TextStyle(
             fontWeight: FontWeight.w800,
             fontSize: 24,

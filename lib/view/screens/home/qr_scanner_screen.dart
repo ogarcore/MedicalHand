@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -153,7 +154,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Encuadra el código QR en el marco',
+            'encuadra_el_cdigo_qr_en_el_marco'.tr(),
             style: TextStyle(
               color: Colors.white.withAlpha(200),
               fontSize: 16,
@@ -162,7 +163,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'El escaneo es automático',
+            'el_escaneo_es_automtico'.tr(),
             style: TextStyle(
               color: Colors.white.withAlpha(150),
               fontSize: 14,

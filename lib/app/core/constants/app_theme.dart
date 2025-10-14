@@ -1,14 +1,20 @@
+// lib/app/core/constants/app_theme.dart
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'custom_theme_colors.dart';
 
 class AppTheme {
-  final String name;
+  final String keyName; // Clave de traducción (ej. 'menta_fresca')
   final ThemeData data;
-  const AppTheme(this.name, this.data);
+
+  const AppTheme(this.keyName, this.data);
+
+  /// Devuelve el nombre traducido según el idioma actual
+  String getTranslatedName() => keyName.tr();
 }
 
 class AppThemes {
-  // 1. TEMA MENTA (Tu tema original)
+  // 🌿 TEMA MENTA
   static final ThemeData mentaTheme = ThemeData(
     brightness: Brightness.light,
     extensions: const <ThemeExtension<dynamic>>[
@@ -26,7 +32,7 @@ class AppThemes {
     ],
   );
 
-  // 2. TEMA SERENO (Nueva paleta azul)
+  // 🌊 TEMA SERENO
   static final ThemeData serenoTheme = ThemeData(
     brightness: Brightness.light,
     extensions: const <ThemeExtension<dynamic>>[
@@ -44,29 +50,28 @@ class AppThemes {
     ],
   );
 
-  // 3. LAVANDA  (Nueva paleta terracota)
+  // 💜 LAVANDA
   static final ThemeData lavandaTheme = ThemeData(
     brightness: Brightness.light,
     extensions: const <ThemeExtension<dynamic>>[
       CustomThemeColors(
-        primaryColor: Color(0xFF7E57C2), // Lavanda/Púrpura suave (principal)
-        backgroundColor: Color(0xFFF3F2F8), // Gris muy claro con tono lavanda
-        accentColor: Color(0xFF00897B), // Turquesa oscuro (detalles vibrantes)
-        secondaryColor: Color(0xFF90A4AE), // Gris azulado (apoyo neutro)
-        warningColor: Color(0xFFFF8A65), // Coral/Naranja suave (alertas)
-        successColor: Color(0xFF4DB6AC), // Turquesa claro (éxito)
-        textColor: Color(0xFF37474F), // Gris oscuro azulado (texto principal)
-        textLightColor: Color(
-          0xFF78909C,
-        ), // Gris azulado medio (texto secundario)
-        graceColor: Color(0xFFFFD54F), // Ámbar/Dorado (gracia)
+        primaryColor: Color(0xFF7E57C2),
+        backgroundColor: Color(0xFFF3F2F8),
+        accentColor: Color(0xFF00897B),
+        secondaryColor: Color(0xFF90A4AE),
+        warningColor: Color(0xFFFF8A65),
+        successColor: Color(0xFF4DB6AC),
+        textColor: Color(0xFF37474F),
+        textLightColor: Color(0xFF78909C),
+        graceColor: Color(0xFFFFD54F),
       ),
     ],
   );
 
+  /// Lista de temas disponibles
   static final List<AppTheme> themes = [
-    AppTheme('Menta Fresca', mentaTheme),
-    AppTheme('Azul Sereno', serenoTheme),
-    AppTheme('Lavanda Suave', lavandaTheme),
+    AppTheme('menta_fresca', mentaTheme),
+    AppTheme('azul_sereno', serenoTheme),
+    AppTheme('lavanda_suave', lavandaTheme),
   ];
 }

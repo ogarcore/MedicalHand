@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 
@@ -97,7 +98,7 @@ class NotificationFooter extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Marcar leídas',
+                          'marcar_ledas'.tr(),
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             color: canMarkAsRead 
@@ -162,8 +163,8 @@ class NotificationFooter extends StatelessWidget {
                           color: Colors.white,
                         ),
                         const SizedBox(width: 8),
-                        const Text(
-                          'Limpiar todo',
+                        Text(
+                          'limpiar_todo'.tr(),
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             color: Colors.white,

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -62,7 +63,7 @@ class AppointmentNavigationBar extends StatelessWidget {
               Expanded(
                 flex: 1,
                 child: SecondaryButton(
-                  text: "Atrás",
+                  text: 'atrs'.tr(),
                   onPressed: onPreviousPressed,
                   height: 45,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -91,7 +92,7 @@ class AppointmentNavigationBar extends StatelessWidget {
             Expanded(
               flex: currentStep == 0 ? 1 : 2,
               child: PrimaryButton(
-                text: currentStep < 2 ? "Continuar" : "Revisar datos",
+                text: currentStep < 2 ? "continuar".tr() : "revisar_datos".tr(),
                 onPressed: onNextPressed,
                 height: 45,
                 padding: const EdgeInsets.symmetric(horizontal: 16),

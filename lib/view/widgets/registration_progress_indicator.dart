@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../app/core/constants/app_colors.dart';
 
@@ -17,7 +18,10 @@ class RegistrationProgressIndicator extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Paso $currentStep de $totalSteps',
+          'paso_de'.tr(namedArgs: {
+            "currentStep": currentStep.toString(),
+            "totalSteps": totalSteps.toString()
+          }),
           style: TextStyle(
             color: AppColors.textColor(context).withAlpha(150),
             fontWeight: FontWeight.w600,

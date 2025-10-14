@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/home/widgets/profile_button.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -60,7 +61,7 @@ class ProfileButton extends StatelessWidget {
                 if (userViewModel.isLoading &&
                     userViewModel.activeProfile == null) {
                   return Text(
-                    '...',
+                    'key'.tr(),
                     style: TextStyle(
                       color: AppColors.textColor(context),
                       fontSize: 16,

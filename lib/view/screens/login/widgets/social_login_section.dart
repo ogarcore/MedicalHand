@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/login/widgets/social_login_section.dart
 import 'package:flutter/material.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -22,7 +23,7 @@ class SocialLoginSection extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Text(
-                'O ingresa con',
+                'o_ingresa_con'.tr(),
                 style: TextStyle(
                   color: Colors.grey[600],
                   fontSize: 14,
@@ -63,7 +64,7 @@ class SocialLoginSection extends StatelessWidget {
                         ),
                         SizedBox(width: 12),
                         Text(
-                          'Cargando...',
+                          'cargando'.tr(),
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -87,7 +88,7 @@ class SocialLoginSection extends StatelessWidget {
                       ),
                     ),
                     label: Text(
-                      'Iniciar sesión con Google',
+                      'iniciar_sesin_con_google'.tr(),
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,

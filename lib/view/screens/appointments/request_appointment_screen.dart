@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -82,19 +83,19 @@ Future<void> _loadDepartments() async {
     switch (_currentStep) {
       case 0:
         isValid = _selectedDepartament != null;
-        errorMessage = 'Por favor, selecciona tu departamento';
+        errorMessage = 'por_favor_selecciona_tu_departamento'.tr();
         break;
       case 1:
         isValid = _selectedHospital != null;
-        errorMessage = 'Por favor, selecciona un hospital';
+        errorMessage = 'por_favor_selecciona_un_hospital'.tr();
         break;
       case 2:
         isValid =
             _reasonController.text.isNotEmpty &&
             _reasonController.text.length >= 10;
         errorMessage = _reasonController.text.isEmpty
-            ? 'Por favor, describe el motivo de tu consulta'
-            : 'Por favor, proporciona más detalles (mínimo 10 caracteres)';
+            ? 'por_favor_describe_el_motivo_de_tu_consulta'.tr()
+            : 'por_favor_proporciona_más_detalles'.tr();
         break;
     }
 
@@ -147,19 +148,19 @@ Future<void> _loadDepartments() async {
       builder: (BuildContext dialogContext) {
         return CustomModal(
           icon: HugeIcons.strokeRoundedUserWarning01,
-          title: '¿Salir del formulario?',
-          content: const Text(
-            'Si sales ahora, se perderán los datos que has ingresado.',
+          title: 'salir_del_formulario'.tr(),
+          content: Text(
+            'si_sales_ahora_se_perdern_los_datos_que_has_ingresado'.tr(),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, height: 1.5),
           ),
           actions: <Widget>[
             ModalButton(
-              text: 'Cancelar',
+              text: 'cancelar'.tr(),
               onPressed: () => Navigator.of(dialogContext).pop(false),
             ),
             ModalButton(
-              text: 'Salir',
+              text: 'salir'.tr(),
               isWarning: true,
               onPressed: () => Navigator.of(dialogContext).pop(true),
             ),
@@ -212,8 +213,8 @@ Future<void> _loadDepartments() async {
         child: Scaffold(
           backgroundColor: AppColors.backgroundColor(context),
           appBar: AppBar(
-            title: const Text(
-              'Solicitar Cita Médica',
+            title: Text(
+              'solicitar_cita_mdica'.tr(),
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -260,14 +261,14 @@ Future<void> _loadDepartments() async {
                           children: [
                             AppointmentStepLayout(
                               icon: HugeIcons.strokeRoundedLocation04,
-                              title: '¿En qué departamento te encuentras?',
+                              title: 'en_qué_departamento_te_encuentras'.tr(),
                               subtitle:
-                                  'Selecciona tu ubicación para mostrarte los hospital de tu zona',
+                                  'selecciona_tu_ubicacin_para_mostrarte_los_hospital_de_tu_zon'.tr(),
                               iconColor: AppColors.primaryColor(context),
                               content: AppStyledDropdown(
                                 value: _selectedDepartament,
                                 items: _departmentsList,
-                                hintText: 'Selecciona tú departamento',
+                                hintText: 'selecciona_t_departamento'.tr(),
                                 prefixIcon: HugeIcons.strokeRoundedLocation04,
                                 iconColor: AppColors.accentColor(context),
                                 iconBackgroundColor: AppColors.accentColor(
@@ -285,22 +286,22 @@ Future<void> _loadDepartments() async {
                             ),
                             AppointmentStepLayout(
                               icon: HugeIcons.strokeRoundedHospital01,
-                              title: 'Elige tu centro médico',
+                              title: 'elige_tu_centro_mdico'.tr(),
                               subtitle:
-                                  'Elige el centro médico donde deseas agendar tu cita',
+                                  'elige_el_centro_mdico_donde_deseas_agendar_tu_cita'.tr(),
                               content: _buildHospitalsDropdown(),
                             ),
                             AppointmentStepLayout(
                               icon: HugeIcons.strokeRoundedNote,
-                              title: 'Cuéntanos sobre tu consulta',
+                              title: 'cuntanos_sobre_tu_consulta'.tr(),
                               subtitle:
-                                  'Describe brevemente el motivo de tu visita médica',
+                                  'describe_brevemente_el_motivo_de_tu_visita_mdica'.tr(),
                               content: CustomTextField(
                                 controller: _reasonController,
                                 focusNode: _reasonFocusNode,
-                                labelText: 'Motivo de la consulta',
+                                labelText: 'motivo_de_la_consulta'.tr(),
                                 hintText:
-                                    'Ej: Dolor de cabeza, chequeo general, molestias...',
+                                    'ej_dolor_de_cabeza_chequeo_general_molestias'.tr(),
                                 icon: HugeIcons.strokeRoundedNote,
                                 maxLines: 5,
                                 iconColor: AppColors.accentColor(context),
@@ -329,7 +330,7 @@ Future<void> _loadDepartments() async {
     if (_selectedDepartament == null) {
       return AppStyledDropdown(
         items: const [],
-        hintText: 'Selecciona un departamento primero',
+        hintText: 'selecciona_un_departamento_primero'.tr(),
         onChanged: (value) {},
         value: null,
         prefixIcon: HugeIcons.strokeRoundedHospital01,
@@ -341,7 +342,7 @@ Future<void> _loadDepartments() async {
     if (_hospitalsList.isEmpty) {
       return AppStyledDropdown(
         items: const [],
-        hintText: 'No se encontraron Hospitales',
+        hintText: 'no_se_encontraron_hospitales'.tr(),
         onChanged: (value) {},
         value: null,
         prefixIcon: HugeIcons.strokeRoundedHospital01,
@@ -351,7 +352,7 @@ Future<void> _loadDepartments() async {
     return AppStyledDropdown(
       value: _selectedHospital?.name,
       items: _hospitalsList.map((hospital) => hospital.name).toList(),
-      hintText: 'Selecciona un hospital',
+      hintText: 'selecciona_un_hospital'.tr(),
       prefixIcon: HugeIcons.strokeRoundedHospital01,
       onChanged: (selectedName) {
         setState(() {

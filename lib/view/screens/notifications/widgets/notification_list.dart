@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/notifications/widgets/notification_list.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -63,7 +64,7 @@ class NotificationList extends StatelessWidget {
             ),
             SizedBox(height: 16),
             Text(
-              'Todo está en calma',
+              'todo_est_en_calma'.tr(),
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -72,7 +73,7 @@ class NotificationList extends StatelessWidget {
             ),
             SizedBox(height: 4),
             Text(
-              'No tienes notificaciones nuevas.',
+              'no_tienes_notificaciones_nuevas'.tr(),
               style: TextStyle(color: AppColors.textLightColor(context)),
             ),
           ],

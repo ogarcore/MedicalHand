@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 
@@ -22,7 +23,7 @@ class ProfileLoadingIndicator extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Cargando perfil...',
+            'cargando_perfil'.tr(),
             style: TextStyle(
               color: AppColors.textColor(context),
               fontSize: 16,

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -31,7 +32,7 @@ class EmptyFamilyView extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Administra los perfiles de tu familia',
+              'administra_los_perfiles_de_tu_familia'.tr(),
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
@@ -42,7 +43,7 @@ class EmptyFamilyView extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Añade a tus familiares para gestionar sus perfiles médicos, historial clínico y citas de manera centralizada.',
+              'aade_a_tus_familiares_para_gestionar_sus_perfiles_mdicos_his'.tr(),
               style: TextStyle(
                 fontSize: 14,
                 color: AppColors.textLightColor(context),
@@ -54,19 +55,19 @@ class EmptyFamilyView extends StatelessWidget {
             _buildFeatureRow(
               context: context,
               icon: HugeIcons.strokeRoundedClinic,
-              text: 'Historial médico compartido',
+              text: 'historial_mdico_compartido'.tr(),
             ),
             const SizedBox(height: 10),
             _buildFeatureRow(
               context: context,
               icon: HugeIcons.strokeRoundedCalendarLock02,
-              text: 'Gestión de citas familiar',
+              text: 'gestin_de_citas_familiar'.tr(),
             ),
             const SizedBox(height: 10),
             _buildFeatureRow(
               context: context,
               icon: HugeIcons.strokeRoundedSquareLockPassword,
-              text: 'Acceso seguro y controlado',
+              text: 'acceso_seguro_y_controlado'.tr(),
             ),
             const SizedBox(height: 32),
             if (isTutorViewing)
@@ -85,7 +86,7 @@ class EmptyFamilyView extends StatelessWidget {
                     HugeIcons.strokeRoundedAddCircleHalfDot,
                     size: 18,
                   ),
-                  label: const Text(
+                  label: Text(
                     'Comenzar - Añadir Primer Familiar',
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),

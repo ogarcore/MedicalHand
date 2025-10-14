@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
@@ -33,7 +34,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
     showDialog(
       context: context,
       builder: (ctx) => CustomModal(
-        title: 'Detalles de la Cita',
+        title: 'detalles_de_la_cita'.tr(),
         icon: HugeIcons.strokeRoundedDocumentValidation,
         content: SingleChildScrollView(
           // Para asegurar que no haya overflow si el texto es largo
@@ -76,7 +77,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
         ),
         actions: [
           ModalButton(
-            text: 'Cerrar',
+            text: 'cerrar'.tr(),
             onPressed: () => Navigator.of(ctx).pop(),
             isPrimary: true,
           ),
@@ -157,16 +158,19 @@ class _AppointmentCardState extends State<AppointmentCard> {
     showDialog(
       context: context,
       builder: (ctx) => CustomModal(
-        title: 'Confirmar Cancelación',
+        title: 'confirmar_cancelacin'.tr(),
         icon: HugeIcons.strokeRoundedCancelCircleHalfDot,
-        content: const Text(
+        content: Text(
           '¿Estás seguro de que deseas cancelar esta cita?',
           textAlign: TextAlign.center,
         ),
         actions: [
-          ModalButton(text: 'Volver', onPressed: () => Navigator.of(ctx).pop()),
           ModalButton(
-            text: 'Sí, cancelar',
+            text: 'volver'.tr(),
+            onPressed: () => Navigator.of(ctx).pop(),
+          ),
+          ModalButton(
+            text: 's_cancelar'.tr(),
             onPressed: () {
               Navigator.of(ctx).pop();
               viewModel.updateAppointmentStatus(
@@ -191,28 +195,28 @@ class _AppointmentCardState extends State<AppointmentCard> {
       context: context,
       builder: (ctx) {
         return CustomModal(
-          title: 'Reprogramación',
+          title: 'reprogramacin'.tr(),
           subtitle:
               'Tu cita volverá al estado "Pendiente" para que el hospital te asigne una nueva fecha.',
           icon: HugeIcons.strokeRoundedRepeat,
           content: Form(
             key: formKey,
             child: CustomTextField(
-              labelText: "Motivo de la reprogramación",
+              labelText: 'motivo_de_la_reprogramacin'.tr(),
               icon: HugeIcons.strokeRoundedAlertDiamond,
               controller: reasonController,
-              hintText: 'Explica brevemente por qué necesitas el cambio...',
+              hintText: 'explica_brevemente_por_qu_necesitas_el_cambio'.tr(),
               maxLines: 3,
               validator: AppValidators.validateRescheduleReason,
             ),
           ),
           actions: [
             ModalButton(
-              text: 'Cancelar',
+              text: 'cancelar'.tr(),
               onPressed: () => Navigator.of(ctx).pop(),
             ),
             ModalButton(
-              text: 'Aceptar',
+              text: 'aceptar'.tr(),
               onPressed: () {
                 if (formKey.currentState!.validate()) {
                   Navigator.of(ctx).pop();
@@ -241,7 +245,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
     }
     if (widget.appointment.assignedDate != null) {
       return DateFormat(
-        'd MMM, y - hh:mm a',
+        widget.isUpcoming ? 'd MMM, y - hh:mm a' : 'd MMMM \'de\' y',
         'es_ES',
       ).format(widget.appointment.assignedDate!);
     }
@@ -273,7 +277,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
           primaryColor,
           Color.lerp(primaryColor, Colors.blue.shade700, 0.3)!,
         ];
-        case 'asistencia_confirmada':
+      case 'asistencia_confirmada':
         final primaryColor = AppColors.primaryColor(context);
         headerGradientColors = [
           primaryColor,
@@ -383,7 +387,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        cita.specialty ?? 'Consulta Externa',
+                        cita.specialty ?? 'consulta_externa'.tr(),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -527,8 +531,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
           child: TextButton.icon(
             onPressed: _showDetailsDialog,
             // Ícono más pequeño
-            label: const Text(
-              'Ver Detalles',
+            label: Text(
+              'ver_detalles'.tr(),
               style: TextStyle(
                 fontWeight: FontWeight.w700, // Cambiado a w600 en lugar de bold
                 fontSize: 13.5, // Texto más pequeño
@@ -598,7 +602,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        "Opciones de la cita",
+                        'opciones_de_la_cita'.tr(),
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -653,8 +657,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
                                 context,
                               ).withAlpha(100),
                             ),
-                            child: const Text(
-                              "Reprogramar",
+                            child: Text(
+                              'reprogramar'.tr(),
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13,
@@ -679,8 +683,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
                               ),
                               elevation: 0,
                             ),
-                            child: const Text(
-                              "Cancelar",
+                            child: Text(
+                              'cancelar'.tr(),
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13,

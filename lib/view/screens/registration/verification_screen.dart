@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../app/core/constants/app_colors.dart';
 import '../login/login_screen.dart';
@@ -55,7 +56,7 @@ class VerificationScreen extends StatelessWidget {
 
                       // Título principal
                       Text(
-                        'Revisa tu correo',
+                        'revisa_tu_correo'.tr(),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 32,
@@ -73,7 +74,7 @@ class VerificationScreen extends StatelessWidget {
                           horizontal: size.width * 0.05,
                         ),
                         child: Text(
-                          'Hemos enviado un enlace de verificación a tu dirección de correo electrónico',
+                          'hemos_enviado_un_enlace_de_verificacin_a_tu_direccin_de_corr'.tr(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,
@@ -114,7 +115,7 @@ class VerificationScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 12),
                             Text(
-                              'El enlace expirará en 24 horas',
+                              'el_enlace_expirar_en_24_horas'.tr(),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 14,
@@ -137,13 +138,13 @@ class VerificationScreen extends StatelessWidget {
                           _buildStepIndicator(
                             context: context,
                             icon: Icons.inbox_outlined,
-                            text: 'Bandeja de entrada',
+                            text: 'bandeja_de_entrada'.tr(),
                           ),
                           SizedBox(width: 24),
                           _buildStepIndicator(
                             context: context,
                             icon: Icons.folder_outlined,
-                            text: 'Carpeta spam',
+                            text: 'carpeta_spam'.tr(),
                           ),
                         ],
                       ),
@@ -188,7 +189,7 @@ class VerificationScreen extends StatelessWidget {
                     elevation: 0,
                   ),
                   child: Text(
-                    'Volver al Inicio de Sesión',
+                    'volver_al_inicio_de_sesin'.tr(),
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w600,

@@ -61,6 +61,32 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
+  /// **Función Agregada**
+  /// Actualiza el perfil de un miembro de la familia específico usando su ID.
+  Future<bool> updateFamilyMemberProfile(String memberId, Map<String, dynamic> updatedData) async {
+    // Se necesita un usuario autenticado para realizar la acción.
+    if (_auth.currentUser == null) {
+      print("Error: No hay un usuario autenticado para realizar esta acción.");
+      return false;
+    }
+
+    try {
+      await _firestore
+          .collection('usuarios_movil')
+          .doc(memberId) // Usa el memberId para apuntar al documento correcto
+          .update(updatedData);
+      
+      // Refresca los datos del usuario principal, lo cual puede ser necesario si
+      // la UI depende de datos anidados que hayan cambiado.
+      await fetchCurrentUser(); 
+      return true;
+    } catch (e) {
+      print("Error al actualizar el perfil del familiar: $e");
+      return false;
+    }
+  }
+
+
   Future<void> changeActiveProfileById(String profileId) async {
     // Si el perfil solicitado ya es el activo, no hacemos nada.
     if (_activeProfile?.uid == profileId) return;

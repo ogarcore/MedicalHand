@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -32,7 +33,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   late TabController _tabController;
 
   int _selectedFilterIndex = 0;
-  final List<String> _filters = ['Todas', 'No leídas'];
+  final List<String> _filters = ['todas'.tr(), 'no_leídas'.tr()];
 
   @override
   void initState() {
@@ -68,7 +69,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       backgroundColor: AppColors.backgroundColor(context),
       appBar: AppBar(
         title: Text(
-          'Bandeja de Entrada',
+          'bandeja_de_entrada'.tr(),
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -106,7 +107,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text('Notificaciones'),
+                          Text('notificaciones'.tr()),
                           if (viewModel.unreadCount > 0) ...[
                             const SizedBox(width: 8),
                             Container(
@@ -147,7 +148,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                     },
                   ),
                 ),
-                const Tab(text: 'Referencias'),
+                Tab(text: 'referencias'.tr()),
               ],
             ),
           ),
@@ -213,7 +214,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     if (exampleReferrals.isEmpty) {
       return Center(
         child: Text(
-          "No tienes referencias.",
+          'no_tienes_referencias'.tr(),
           style: TextStyle(color: Colors.grey[600]),
         ),
       );

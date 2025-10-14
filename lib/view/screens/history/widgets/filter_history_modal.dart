@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -129,8 +130,8 @@ class _FilterHistoryModalState extends State<FilterHistoryModal> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Filtrar Historial', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textColor(context))),
-                    Text('Selecciona los criterios de búsqueda', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                    Text('filtrar_historial'.tr(), style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textColor(context))),
+                    Text('selecciona_los_criterios_de_bsqueda'.tr(), style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
                   ],
                 ),
               ),
@@ -164,7 +165,7 @@ class _FilterHistoryModalState extends State<FilterHistoryModal> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     side: BorderSide(color: AppColors.warningColor(context)),
                   ),
-                  child: Text('Limpiar Filtros', style: TextStyle(color: AppColors.warningColor(context), fontWeight: FontWeight.w600)),
+                  child: Text('limpiar_filtros'.tr(), style: TextStyle(color: AppColors.warningColor(context), fontWeight: FontWeight.w600)),
                 ),
               ),
               const SizedBox(width: 12),
@@ -176,7 +177,7 @@ class _FilterHistoryModalState extends State<FilterHistoryModal> {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: const Text('Aplicar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                  child: Text('aplicar'.tr(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
                 ),
               ),
             ],
@@ -190,7 +191,7 @@ class _FilterHistoryModalState extends State<FilterHistoryModal> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Especialidad', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+        Text('especialidad'.tr(), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
           initialValue: _selectedSpecialty,
@@ -210,7 +211,7 @@ class _FilterHistoryModalState extends State<FilterHistoryModal> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Fecha', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+        Text('fecha'.tr(), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
         const SizedBox(height: 8),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,

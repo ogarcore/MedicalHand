@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 
@@ -6,9 +7,9 @@ class DashboardHeader extends StatelessWidget {
 
   // Función para obtener saludo según la hora
   String _getGreeting(int hour) {
-    if (hour < 12) return 'Buenos días';
-    if (hour < 18) return 'Buenas tardes';
-    return 'Buenas noches';
+    if (hour < 12) return 'Buenos días'.tr();
+    if (hour < 18) return 'Buenas tardes'.tr();
+    return 'Buenas noches'.tr(); 
   }
 
   @override
@@ -36,7 +37,7 @@ class DashboardHeader extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          '¿Cómo te podemos ayudar hoy?',
+          'Cómo te podemos ayudar hoy'.tr(), 
           style: TextStyle(
             fontSize: 16, 
             color: AppColors.textLightColor(context)

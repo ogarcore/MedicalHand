@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/login/login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -37,23 +38,23 @@ class _LoginScreenState extends State<LoginScreen> {
       builder: (context) {
         return CustomModal(
           icon: HugeIcons.strokeRoundedSquareLockPassword,
-          title: 'Recuperar Contraseña',
+          title: 'recuperar_contrasea'.tr(),
           subtitle:
-              'Introduce el correo electrónico asociado a tu cuenta para enviarte un enlace de recuperación.',
+              'introduce_el_correo_electrnico_asociado_a_tu_cuenta_para_env'.tr(),
           content: CustomTextField(
             controller: resetEmailController,
-            labelText: 'Correo Electrónico',
-            hintText: 'Ingresa el correo de tu cuenta',
+            labelText: 'correo_electrnico'.tr(),
+            hintText: 'ingresa_el_correo_de_tu_cuenta'.tr(),
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
           ),
           actions: [
             ModalButton(
-              text: 'Cancelar',
+              text: 'cancelar'.tr(),
               onPressed: () => Navigator.pop(context),
             ),
             ModalButton(
-              text: 'Enviar Enlace',
+              text: 'enviar_enlace'.tr(),
               isPrimary: true,
               onPressed: () async {
                 if (resetEmailController.text.isEmpty) return;
@@ -66,11 +67,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 navigator.pop(); // Cierra el modal
                 if (error == null) {
                   messenger.showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text(
-                        'Enlace de recuperación enviado a tu correo.',
+                        'enlace_de_recuperacin_enviado_a_tu_correo'.tr(),
                       ),
-                      backgroundColor: Colors.green,
+                      backgroundColor: AppColors.successColor(context),
                     ),
                   );
                 } else {

@@ -198,7 +198,7 @@ Future<CitaModel?> getAppointmentById(String appointmentId) async {
           'status',
           whereIn: ['finalizada', 'cancelada', 'reprogramada', 'no_asistio'],
         )
-        .orderBy('requestTimestamp', descending: true)
+        .orderBy('assignedDate', descending: true)
         .snapshots()
         .map((snapshot) {
           return snapshot.docs
@@ -373,6 +373,53 @@ Stream<DocumentSnapshot> getVirtualQueueStream(String queueDocId) {
       .doc(queueDocId)
       .snapshots();
 }
+Stream<DocumentSnapshot> getManagedQueueStream(String queueDocId, String userId) {
+    late StreamSubscription patientSubscription;
+    late StreamSubscription queueSubscription;
+    final controller = StreamController<DocumentSnapshot>();
+
+    controller.onListen = () {
+      // 1. Escuchar el estado del paciente
+      patientSubscription = getPatientQueueStream(queueDocId, userId).listen(
+        (patientSnap) {
+          if (patientSnap.exists) {
+            final data = patientSnap.data() as Map<String, dynamic>;
+            // 2. Si el estado es 'llamado', se cancelan ambas suscripciones y se cierra el stream
+            if (data['patientStatus'] == 'llamado') {
+              queueSubscription.cancel();
+              patientSubscription.cancel();
+              controller.close();
+            }
+          } else {
+            // Si el documento del paciente es borrado, también se detiene.
+            queueSubscription.cancel();
+            patientSubscription.cancel();
+            controller.close();
+          }
+        },
+        onError: (e) => controller.addError(e),
+      );
+
+      // 3. Escuchar la fila principal para obtener el 'currentTurn'
+      queueSubscription = getVirtualQueueStream(queueDocId).listen(
+        (queueSnap) {
+          // 4. Pasar los datos de la fila a través del controlador
+          if (!controller.isClosed) {
+            controller.add(queueSnap);
+          }
+        },
+        onError: (e) => controller.addError(e),
+      );
+    };
+
+    // 5. Asegurarse de limpiar todo si el que escucha se desconecta
+    controller.onCancel = () {
+      patientSubscription.cancel();
+      queueSubscription.cancel();
+    };
+
+    return controller.stream;
+  }
 
 Stream<DocumentSnapshot> getPatientQueueStream(String queueDocId, String userId) {
   return FirebaseFirestore.instance

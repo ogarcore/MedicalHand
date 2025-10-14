@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -79,8 +80,8 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       backgroundColor: isDark ? Colors.grey.shade900 : const Color(0xFFF8FAFD),
       appBar: AppBar(
-  title: const Text(
-    'Asistente Virtual',
+  title: Text(
+    'asistente_virtual'.tr(),
     style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18, letterSpacing: -0.3),
   ),
   backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
@@ -191,12 +192,12 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           const SizedBox(height: 20),
           Text(
-            'Tu asistente de salud',
+            'tu_asistente_de_salud'.tr(),
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textColor(context)),
           ),
           const SizedBox(height: 8),
           Text(
-            'Haz tu primera consulta de bienestar',
+            'haz_tu_primera_consulta_de_bienestar'.tr(),
             style: TextStyle(fontSize: 14, color: AppColors.textLightColor(context)),
           ),
         ],

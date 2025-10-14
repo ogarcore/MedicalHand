@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -77,7 +78,7 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
   void _showFilterDialog() {
     if (_allHistoryEntries.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No hay historial para filtrar.')),
+        SnackBar(content: Text('no_hay_historial_para_filtrar'.tr())),
       );
       return;
     }
@@ -188,7 +189,7 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
-                                  'Sin Resultados',
+                                  'sin_resultados'.tr(),
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -197,7 +198,7 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'No se encontraron registros que coincidan con los filtros seleccionados.',
+                                  'no_se_encontraron_registros_que_coincidan_con_los_filtros_se'.tr(),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: AppColors.textLightColor(context),
@@ -266,7 +267,7 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
         children: [
           const SizedBox(height: 6),
           Text(
-            'Mi Historial Clínico',
+            'mi_historial_clnico'.tr(),
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -275,7 +276,7 @@ class _ClinicalHistoryScreenState extends State<ClinicalHistoryScreen> {
           ),
           const SizedBox(height: 2),
           Text(
-            'Consulta tus antecedentes médicos.',
+            'consulta_tus_antecedentes_mdicos'.tr(),
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.normal,

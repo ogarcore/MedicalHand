@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -20,36 +21,39 @@ class VirtualTicketCard extends StatelessWidget {
   }
 
   @override
-Widget build(BuildContext context) {
-  final appointmentViewModel = context.read<AppointmentViewModel>();
-  final queueDocId = _getQueueDocId();
-  final userId = appointment.uid;
+  Widget build(BuildContext context) {
+    final appointmentViewModel = context.read<AppointmentViewModel>();
+    final queueDocId = _getQueueDocId();
+    final userId = appointment.uid;
 
-  return StreamBuilder<DocumentSnapshot>(
-    stream: appointmentViewModel.getVirtualQueueStream(queueDocId),
-    builder: (context, snapshot) {
-      if (!snapshot.hasData || !snapshot.data!.exists) {
-        return const Center(child: CircularProgressIndicator());
-      }
+    return StreamBuilder<DocumentSnapshot>(
+      stream: appointmentViewModel.getManagedQueueStream(queueDocId, userId),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || !snapshot.data!.exists) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-      final queueData = snapshot.data!.data() as Map<String, dynamic>;
-      final currentTurn = queueData['currentTurn'] as int? ?? 0;
+        final queueData = snapshot.data!.data() as Map<String, dynamic>;
+        final currentTurn = queueData['currentTurn'] as int? ?? 0;
 
-      return StreamBuilder<DocumentSnapshot>(
-        stream: appointmentViewModel.getPatientQueueStream(queueDocId, userId),
-        builder: (context, patientSnapshot) {
-          if (!patientSnapshot.hasData || !patientSnapshot.data!.exists) {
-            return const Center(child: CircularProgressIndicator());
-          }
+        return StreamBuilder<DocumentSnapshot>(
+          stream: appointmentViewModel.getPatientQueueStream(
+            queueDocId,
+            userId,
+          ),
+          builder: (context, patientSnapshot) {
+            if (!patientSnapshot.hasData || !patientSnapshot.data!.exists) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          final patientData =
-              patientSnapshot.data!.data() as Map<String, dynamic>;
-          final yourTurn = patientData['turnNumber'] as int? ?? 0;
-          final turnsLeft = yourTurn - currentTurn;
-          final progressValue = yourTurn > 0 ? currentTurn / yourTurn : 0;
+            final patientData =
+                patientSnapshot.data!.data() as Map<String, dynamic>;
+            final yourTurn = patientData['turnNumber'] as int? ?? 0;
+            final turnsLeft = yourTurn - currentTurn;
+            final progressValue = yourTurn > 0 ? currentTurn / yourTurn : 0;
 
-          // VERIFICAR SI ES EL TURNO
-          final bool isYourTurn = turnsLeft <= 0;
+            // VERIFICAR SI ES EL TURNO
+            final bool isYourTurn = turnsLeft <= 0;
 
             return Container(
               decoration: BoxDecoration(
@@ -73,7 +77,11 @@ Widget build(BuildContext context) {
                       gradient: LinearGradient(
                         colors: [
                           AppColors.primaryColor(context),
-                          Color.lerp(AppColors.primaryColor(context), Colors.white, 0.2)!,
+                          Color.lerp(
+                            AppColors.primaryColor(context),
+                            Colors.white,
+                            0.2,
+                          )!,
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -90,7 +98,7 @@ Widget build(BuildContext context) {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Fila Virtual',
+                                'fila_virtual'.tr(),
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,
@@ -98,8 +106,8 @@ Widget build(BuildContext context) {
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              const Text(
-                                'Seguimiento en tiempo real',
+                              Text(
+                                'seguimiento_en_tiempo_real'.tr(),
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.white,
@@ -111,7 +119,10 @@ Widget build(BuildContext context) {
                         ),
                         if (appointment.clinicOffice != null) ...[
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white.withAlpha(40),
                               borderRadius: BorderRadius.circular(12),
@@ -143,7 +154,7 @@ Widget build(BuildContext context) {
                       ],
                     ),
                   ),
-                  
+
                   // Contenido principal
                   Padding(
                     padding: const EdgeInsets.all(20),
@@ -155,10 +166,14 @@ Widget build(BuildContext context) {
                             width: double.infinity,
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: AppColors.warningColor(context).withAlpha(15),
+                              color: AppColors.warningColor(
+                                context,
+                              ).withAlpha(15),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: AppColors.warningColor(context).withAlpha(120),
+                                color: AppColors.warningColor(
+                                  context,
+                                ).withAlpha(120),
                                 width: 1,
                               ),
                             ),
@@ -172,14 +187,17 @@ Widget build(BuildContext context) {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '¡Es tu turno!',
+                                        'es_tu_turno'.tr(),
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700,
-                                          color: AppColors.warningColor(context),
+                                          color: AppColors.warningColor(
+                                            context,
+                                          ),
                                         ),
                                       ),
                                       const SizedBox(height: 4),
@@ -187,7 +205,9 @@ Widget build(BuildContext context) {
                                         'Acércate al consultorio ${appointment.clinicOffice ?? ''}',
                                         style: TextStyle(
                                           fontSize: 13,
-                                          color: AppColors.warningColor(context),
+                                          color: AppColors.warningColor(
+                                            context,
+                                          ),
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
@@ -199,14 +219,19 @@ Widget build(BuildContext context) {
                           ),
                           const SizedBox(height: 16),
                         ],
-                        
+
                         // Sección principal de turnos
                         Row(
                           children: [
                             // Turno actual
                             Expanded(
                               child: Container(
-                                padding: const EdgeInsets.fromLTRB(14,12,12,4),
+                                padding: const EdgeInsets.fromLTRB(
+                                  14,
+                                  12,
+                                  12,
+                                  4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.grey.shade50,
                                   borderRadius: BorderRadius.circular(12),
@@ -227,7 +252,7 @@ Widget build(BuildContext context) {
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
-                                          'TURNO ACTUAL',
+                                          'turno_actual'.tr(),
                                           style: TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w600,
@@ -237,7 +262,7 @@ Widget build(BuildContext context) {
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 4),
+                                    SizedBox(height: 4),
                                     Text(
                                       '$currentTurn',
                                       style: const TextStyle(
@@ -251,11 +276,16 @@ Widget build(BuildContext context) {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            
+
                             // Tu turno
                             Expanded(
                               child: Container(
-                                padding: const EdgeInsets.fromLTRB(14,12,12,4),
+                                padding: const EdgeInsets.fromLTRB(
+                                  14,
+                                  12,
+                                  12,
+                                  4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.grey.shade50,
                                   borderRadius: BorderRadius.circular(12),
@@ -272,27 +302,33 @@ Widget build(BuildContext context) {
                                         Icon(
                                           HugeIcons.strokeRoundedUserTime01,
                                           size: 14,
-                                          color: AppColors.secondaryColor(context),
+                                          color: AppColors.secondaryColor(
+                                            context,
+                                          ),
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
-                                          'TU TURNO',
+                                          'tu_turno'.tr(),
                                           style: TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w600,
-                                            color:AppColors.secondaryColor(context),
+                                            color: AppColors.secondaryColor(
+                                              context,
+                                            ),
                                             letterSpacing: 0.5,
                                           ),
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 6),
+                                    SizedBox(height: 6),
                                     Text(
                                       '$yourTurn',
                                       style: TextStyle(
                                         fontSize: 26,
                                         fontWeight: FontWeight.w600,
-                                        color: AppColors.secondaryColor(context),
+                                        color: AppColors.secondaryColor(
+                                          context,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -301,9 +337,9 @@ Widget build(BuildContext context) {
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 20),
-                        
+
                         // Barra de progreso MEJORADA - empieza desde izquierda
                         Column(
                           children: [
@@ -311,7 +347,7 @@ Widget build(BuildContext context) {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Progreso de fila',
+                                  'progreso_de_fila'.tr(),
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
@@ -350,11 +386,15 @@ Widget build(BuildContext context) {
                                   LayoutBuilder(
                                     builder: (context, constraints) {
                                       return Container(
-                                        width: constraints.maxWidth * progressValue,
+                                        width:
+                                            constraints.maxWidth *
+                                            progressValue,
                                         height: 6,
                                         decoration: BoxDecoration(
                                           color: Colors.green.shade400,
-                                          borderRadius: BorderRadius.circular(3),
+                                          borderRadius: BorderRadius.circular(
+                                            3,
+                                          ),
                                         ),
                                       );
                                     },
@@ -364,16 +404,21 @@ Widget build(BuildContext context) {
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 20),
-                        
+
                         // Información adicional en dos columnas
                         Row(
                           children: [
                             // Personas delante
                             Expanded(
                               child: Container(
-                                padding: const EdgeInsets.fromLTRB(12,10,12,6),
+                                padding: const EdgeInsets.fromLTRB(
+                                  12,
+                                  10,
+                                  12,
+                                  6,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.grey.shade50,
                                   borderRadius: BorderRadius.circular(12),
@@ -408,11 +453,16 @@ Widget build(BuildContext context) {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            
+
                             // Tiempo estimado
                             Expanded(
                               child: Container(
-                                padding: const EdgeInsets.fromLTRB(12,10,12,6),
+                                padding: const EdgeInsets.fromLTRB(
+                                  12,
+                                  10,
+                                  12,
+                                  6,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.grey.shade50,
                                   borderRadius: BorderRadius.circular(12),
@@ -448,14 +498,14 @@ Widget build(BuildContext context) {
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 14),
-                        
+
                         // Pie de la card
                         Container(
                           padding: const EdgeInsets.all(6),
                           child: Text(
-                            'La información se actualiza en tiempo real',
+                            'la_informacin_se_actualiza_en_tiempo_real'.tr(),
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 12,

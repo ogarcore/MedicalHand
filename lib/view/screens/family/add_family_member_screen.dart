@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/family/add_family_member_screen.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -47,8 +48,8 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor(context),
         appBar: AppBar(
-          title: const Text(
-            'Añadir Nuevo Familiar',
+          title: Text(
+            'aadir_nuevo_familiar'.tr(),
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
@@ -68,7 +69,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildSectionContainer(
-                  title: 'Información Esencial',
+                  title: 'informacin_esencial'.tr(),
                   icon: HugeIcons.strokeRoundedUserWarning01,
                   children: [
                     AppStyledDropdown(
@@ -83,7 +84,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                       ],
                       onChanged: (newValue) =>
                           familyViewModel.updateSelectedKinship(newValue),
-                      hintText: 'Parentesco',
+                      hintText: 'parentesco'.tr(),
                       prefixIcon: HugeIcons.strokeRoundedUserGroup,
                       validator: (value) =>
                           value == null ? 'Selecciona un parentesco' : null,
@@ -91,8 +92,8 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                     const SizedBox(height: 16),
                     CustomTextField(
                       controller: familyViewModel.firstNameController,
-                      labelText: 'Nombres',
-                      hintText: 'Nombres del familiar',
+                      labelText: 'nombres'.tr(),
+                      hintText: 'nombres_del_familiar'.tr(),
                       icon: HugeIcons.strokeRoundedUser,
                       validator: (value) => AppValidators.validateGenericEmpty(
                         value,
@@ -102,8 +103,8 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                     const SizedBox(height: 16),
                     CustomTextField(
                       controller: familyViewModel.lastNameController,
-                      labelText: 'Apellidos',
-                      hintText: 'Apellidos del familiar',
+                      labelText: 'apellidos'.tr(),
+                      hintText: 'apellidos_del_familiar'.tr(),
                       icon: HugeIcons.strokeRoundedUser,
                       validator: (value) => AppValidators.validateGenericEmpty(
                         value,
@@ -113,7 +114,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                     const SizedBox(height: 16),
                     CustomTextField(
                       controller: familyViewModel.birthDateController,
-                      labelText: 'Fecha de Nacimiento',
+                      labelText: 'fecha_de_nacimiento'.tr(),
                       hintText: 'DD/MM/AAAA',
                       icon: HugeIcons.strokeRoundedCalendar01,
                       keyboardType: TextInputType.number,
@@ -126,7 +127,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                 const SizedBox(height: 16),
 
                 _buildSectionContainer(
-                  title: 'Información de Contacto',
+                  title: 'informacin_de_contacto'.tr(),
                   icon: HugeIcons.strokeRoundedContactBook,
                   children: [
                     CustomTextField(
@@ -145,8 +146,8 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                     const SizedBox(height: 16),
                     CustomTextField(
                       controller: familyViewModel.addressController,
-                      labelText: 'Dirección',
-                      hintText: 'Dirección de domicilio',
+                      labelText: 'direccin'.tr(),
+                      hintText: 'direccin_de_domicilio'.tr(),
                       icon: HugeIcons.strokeRoundedLocation01,
                       validator: (value) => AppValidators.validateGenericEmpty(
                         value,
@@ -163,7 +164,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                   children: [
                     CustomTextField(
                       controller: familyViewModel.bloodTypeController,
-                      labelText: 'Tipo de Sangre',
+                      labelText: 'tipo_de_sangre'.tr(),
                       hintText: 'Ej: O+',
                       icon: HugeIcons.strokeRoundedBloodBag,
                       validator: AppValidators.validateOptionalBloodType,
@@ -171,8 +172,8 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                     const SizedBox(height: 16),
                     CustomTextField(
                       controller: familyViewModel.allergiesController,
-                      labelText: 'Alergias Conocidas',
-                      hintText: 'Ej: Penicilina',
+                      labelText: 'alergias_conocidas'.tr(),
+                      hintText: 'ej_penicilina'.tr(),
                       icon: HugeIcons.strokeRoundedMedicalMask,
                       maxLines: 3,
                     ),
@@ -181,7 +182,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
 
                 const SizedBox(height: 24),
                 PrimaryButton(
-                  text: 'Siguiente Paso',
+                  text: 'siguiente_paso'.tr(),
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       final currentAge =

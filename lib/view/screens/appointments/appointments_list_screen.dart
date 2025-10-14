@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -114,7 +115,7 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
         children: [
           const SizedBox(height: 2),
           Text(
-            'Mis Citas',
+            'mis_citas'.tr(),
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -123,7 +124,7 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
           ),
           const SizedBox(height: 2),
           Text(
-            'Tus citas organizadas en un solo lugar.',
+            'tus_citas_organizadas_en_un_solo_lugar'.tr(),
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.normal,
@@ -149,7 +150,7 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
               onPressed: () {
                 _filterBarKey.currentState?.showFilterBottomSheet();
               },
-              tooltip: 'Filtrar citas pasadas',
+              tooltip: 'filtrar_citas_pasadas'.tr(),
             ),
           ),
       ],
@@ -180,7 +181,7 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Text('Próximas'),
+              child: Text('prximas'.tr()),
             ),
           ),
           Tab(
@@ -189,7 +190,7 @@ class _AppointmentsListScreenState extends State<AppointmentsListScreen>
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Text('Pasadas'),
+              child: Text('pasadas'.tr()),
             ),
           ),
         ],
@@ -273,17 +274,17 @@ class _AppointmentTabPageState extends State<_AppointmentTabPage>
 
         if (allAppointments.isEmpty) {
           return widget.isUpcoming
-              ? const EmptyStateWidget(
+              ? EmptyStateWidget(
                   icon: HugeIcons.strokeRoundedCardiogram01,
-                  title: '¡Cuida tu salud!',
+                  title: 'cuida_tu_salud'.tr(),
                   message:
-                      'Aún no tienes citas programadas. Agendar una consulta es el primer paso para tu bienestar.',
+                      'an_no_tienes_citas_programadas_agendar_una_consulta_es_el_pr'.tr(),
                 )
-              : const EmptyStateWidget(
+              : EmptyStateWidget(
                   icon: HugeIcons.strokeRoundedMedicalFile,
-                  title: 'Sin Historial',
+                  title: 'sin_historial'.tr(),
                   message:
-                      'Aquí aparecerán tus citas una vez que hayan sido finalizadas o canceladas.',
+                      'aqu_aparecern_tus_citas_una_vez_que_hayan_sido_finalizadas_o'.tr(),
                 );
         }
 
@@ -304,11 +305,11 @@ class _AppointmentTabPageState extends State<_AppointmentTabPage>
                 },
               ),
             if (filteredAppointments.isEmpty && allAppointments.isNotEmpty)
-              const EmptyStateWidget(
+              EmptyStateWidget(
                 icon: HugeIcons.strokeRoundedSearch02,
-                title: 'Sin Resultados',
+                title: 'sin_resultados'.tr(),
                 message:
-                    'No se encontraron citas que coincidan con los filtros seleccionados.',
+                    'no_se_encontraron_citas_que_coincidan_con_los_filtros_selecc'.tr(),
               )
             else
               _buildAppointmentsList(

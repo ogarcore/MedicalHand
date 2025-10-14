@@ -1,4 +1,5 @@
 // lib/view/screens/appointments/widgets/appointment_progress_indicator.dart
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -15,7 +16,7 @@ class AppointmentProgressIndicator extends StatelessWidget {
   const AppointmentProgressIndicator({
     super.key,
     required this.currentStep,
-    this.stepTitles = const ['Ubicación', 'Hospital', 'Motivo'],
+    this.stepTitles = const ['ubicacion', 'hospital', 'motivo'],
     this.activeColor,
     this.inactiveColor,
     this.showStepNumbers = true,
@@ -88,7 +89,7 @@ class AppointmentProgressIndicator extends StatelessWidget {
                       return ProgressStepWidget(
                         // 2. Usamos el widget refactorizado
                         stepNumber: index + 1,
-                        title: stepTitles[index],
+                        title: stepTitles[index].tr(),
                         isActive: index <= currentStep,
                         isCompleted: index < currentStep,
                         stepWidth: stepWidth,
@@ -122,7 +123,12 @@ class AppointmentProgressIndicator extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Paso ${currentStep + 1} de $totalSteps',
+                    'paso_de'.tr(
+                      namedArgs: {
+                        'currentStep': (currentStep + 1).toString(),
+                        'totalSteps': totalSteps.toString(),
+                      },
+                    ),
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,

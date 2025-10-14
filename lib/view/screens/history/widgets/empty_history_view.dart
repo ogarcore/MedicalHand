@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/history/widgets/empty_history_view.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -28,7 +29,7 @@ class EmptyHistoryView extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            'No hay historial clínico',
+            'no_hay_historial_clnico'.tr(),
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -37,7 +38,7 @@ class EmptyHistoryView extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Tu historial médico aparecerá aquí',
+            'tu_historial_mdico_aparecer_aqu'.tr(),
             style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
             textAlign: TextAlign.center,
           ),

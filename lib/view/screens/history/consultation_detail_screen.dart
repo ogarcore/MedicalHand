@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/history/consultation_detail_screen.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -43,8 +44,9 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
     const AndroidInitializationSettings androidInitSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const InitializationSettings initSettings =
-        InitializationSettings(android: androidInitSettings);
+    const InitializationSettings initSettings = InitializationSettings(
+      android: androidInitSettings,
+    );
 
     // Inicializar con callback para cuando el usuario toca la notificación
     await flutterLocalNotificationsPlugin.initialize(
@@ -58,19 +60,24 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
     );
   }
 
-  Future<void> _showDownloadNotification(String fileName, String filePath) async {
-    final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'downloads_channel',
-      'Descargas',
-      channelDescription: 'Notificaciones de descargas completadas',
-      importance: Importance.max,
-      priority: Priority.high,
-      showWhen: true,
-      // Si quieres que al tocar abra la app, payload es filePath
-    );
+  Future<void> _showDownloadNotification(
+    String fileName,
+    String filePath,
+  ) async {
+    final AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+          'downloads_channel',
+          'Descargas',
+          channelDescription: 'Notificaciones de descargas completadas',
+          importance: Importance.max,
+          priority: Priority.high,
+          showWhen: true,
+          // Si quieres que al tocar abra la app, payload es filePath
+        );
 
-    final NotificationDetails details =
-        NotificationDetails(android: androidDetails);
+    final NotificationDetails details = NotificationDetails(
+      android: androidDetails,
+    );
 
     await flutterLocalNotificationsPlugin.show(
       DateTime.now().millisecondsSinceEpoch ~/ 1000,
@@ -97,13 +104,10 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
           content: Text(content),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancelar'),
+              child: Text('cancelar'.tr()),
               onPressed: () => Navigator.of(dialogContext).pop(),
             ),
-            TextButton(
-              onPressed: onPressed,
-              child: Text(buttonText),
-            ),
+            TextButton(onPressed: onPressed, child: Text(buttonText)),
           ],
         );
       },
@@ -129,7 +133,9 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
       // Para Android 13 (SDK 33) y superior
       if (deviceInfo.version.sdkInt >= 33) {
         // Si es imagen, pide permiso de fotos. Si no, no se necesita permiso específico para la carpeta de Descargas.
-        status = isImage ? await Permission.photos.request() : PermissionStatus.granted;
+        status = isImage
+            ? await Permission.photos.request()
+            : PermissionStatus.granted;
       } else {
         // Para versiones antiguas, pide permiso de almacenamiento general.
         status = await Permission.storage.request();
@@ -145,9 +151,9 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
 
     if (status.isPermanentlyDenied) {
       await _showPermissionDialog(
-        title: 'Permiso Requerido',
-        content:
-            'El acceso ha sido denegado permanentemente. Para descargar, por favor, activa el permiso desde la configuración de tu teléfono.',
+        title: 'permiso_requerido'.tr(),
+        content: 'el_acceso_ha_sido_denegado_permanentemente_para_descargar_po'
+            .tr(),
         buttonText: 'Abrir Configuración',
         onPressed: () {
           Navigator.of(context).pop();
@@ -167,7 +173,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
         // Si no existe, intentamos mostrar un mensaje
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('El archivo ya no está disponible.')),
+            SnackBar(content: Text('el_archivo_ya_no_est_disponible'.tr())),
           );
         }
         return;
@@ -176,7 +182,11 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No se pudo abrir el archivo: $e')),
+          SnackBar(
+            content: Text(
+              'no_se_pudo_abrir_el_archivo'.tr(namedArgs: {"e": e.toString()}),
+            ),
+          ),
         );
       }
     }
@@ -221,7 +231,9 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
     if (!hasPermission) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Permiso denegado. No se puede descargar.')),
+          SnackBar(
+            content: Text('permiso_denegado_no_se_puede_descargar'.tr()),
+          ),
         );
       }
       return;
@@ -254,23 +266,26 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
         final tempDir = await getTemporaryDirectory();
         // CAMBIO 2: Crear una ruta de archivo VÁLIDA y REAL dentro del directorio temporal.
         final tempPath = p.join(tempDir.path, fileName);
-        
+
         // CAMBIO 3: Escribir los bytes de la imagen en este archivo temporal.
         await File(tempPath).writeAsBytes(fileBytes);
-        
+
         // CAMBIO 4: Pedir a la galería que guarde una copia del archivo temporal.
-        final result = await ImageGallerySaverPlus.saveFile(tempPath, name: fileName);
+        final result = await ImageGallerySaverPlus.saveFile(
+          tempPath,
+          name: fileName,
+        );
 
         // CAMBIO 5: La ruta que usaremos para abrir el archivo es la de nuestra copia temporal,
         // que sabemos que es una ruta de archivo real.
         savedPath = tempPath;
 
         if (result == null || !(result['isSuccess'] as bool? ?? false)) {
-            throw Exception("No se pudo guardar la imagen en la galería.");
+          throw Exception("No se pudo guardar la imagen en la galería.");
         }
       } else {
         // --- FIN DE LA MODIFICACIÓN ---
-        
+
         // La lógica para archivos que NO son imágenes permanece igual.
         final dir = await _getDownloadsDirectorySafe();
         if (dir == null) {
@@ -291,7 +306,11 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(isImage ? 'Guardado en la galería: $fileName' : 'Guardado en Descargas: $fileName'),
+            content: Text(
+              isImage
+                  ? 'Guardado en la galería: $fileName'
+                  : 'Guardado en Descargas: $fileName',
+            ),
             action: SnackBarAction(
               label: 'Abrir',
               onPressed: () {
@@ -329,30 +348,30 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: const Text('Confirmar Descarga'),
+          title: Text('confirmar_descarga'.tr()),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                const Text('Estás a punto de descargar el siguiente archivo:'),
+                Text('ests_a_punto_de_descargar_el_siguiente_archivo'.tr()),
                 const SizedBox(height: 10),
                 Text(
                   fileName,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
-                const Text('¿Deseas continuar?'),
+                Text('¿Deseas continuar?'),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancelar'),
+              child: Text('cancelar'.tr()),
               onPressed: () {
                 Navigator.of(dialogContext).pop();
               },
             ),
             FilledButton(
-              child: const Text('Descargar'),
+              child: Text('descargar'.tr()),
               onPressed: () {
                 Navigator.of(dialogContext).pop();
                 _downloadFile(url, fileName);
@@ -378,10 +397,12 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
         widget.consultationData['diagnostico'] ?? 'No disponible';
     final String tratamiento =
         widget.consultationData['tratamiento'] ?? 'No disponible';
-    
+
     final prescriptionsData = widget.consultationData['prescriptions'];
-    final List prescriptions = prescriptionsData is List ? prescriptionsData : [];
-    
+    final List prescriptions = prescriptionsData is List
+        ? prescriptionsData
+        : [];
+
     final examsData = widget.consultationData['examsRequested'];
     final List exams = examsData is List ? examsData : [];
 
@@ -389,7 +410,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
       backgroundColor: AppColors.backgroundColor(context),
       appBar: AppBar(
         title: Text(
-          "Detalles de Consulta",
+          'detalles_de_consulta'.tr(),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -414,7 +435,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                 _buildCompactSection(
                   context,
                   icon: HugeIcons.strokeRoundedQuestion,
-                  title: 'Motivo de la Consulta',
+                  title: 'motivo_de_la_consulta'.tr(),
                   content: motivoConsulta,
                   accentColor: Colors.blue,
                 ),
@@ -422,7 +443,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                 _buildCompactSection(
                   context,
                   icon: HugeIcons.strokeRoundedHealth,
-                  title: 'Diagnóstico',
+                  title: 'diagnstico'.tr(),
                   content: diagnostico,
                   accentColor: AppColors.primaryColor(context),
                 ),
@@ -430,7 +451,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                 _buildCompactSection(
                   context,
                   icon: HugeIcons.strokeRoundedGivePill,
-                  title: 'Tratamiento Indicado',
+                  title: 'tratamiento_indicado'.tr(),
                   content: tratamiento,
                   accentColor: AppColors.secondaryColor(context),
                 ),
@@ -439,7 +460,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                   _buildCompactListSection(
                     context,
                     icon: HugeIcons.strokeRoundedPinLocation01,
-                    title: 'Recetas Médicas',
+                    title: 'recetas_mdicas'.tr(),
                     items: prescriptions,
                     itemBuilder: (item) => Text(
                       '${item['nombre']} (${item['dosis']}) - ${item['frecuencia']}, por ${item['duracion']}.',
@@ -458,7 +479,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                   _buildCompactListSection(
                     context,
                     icon: HugeIcons.strokeRoundedMicroscope,
-                    title: 'Exámenes Solicitados',
+                    title: 'exmenes_solicitados'.tr(),
                     items: exams,
                     itemBuilder: (item) => _buildExamItem(context, item),
                     accentColor: AppColors.graceColor(context),
@@ -508,8 +529,10 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
 
               if (isCurrentlyDownloading) {
                 return Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -523,7 +546,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Descargando...',
+                        'descargando'.tr(),
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           color: AppColors.successColor(context),
@@ -542,9 +565,11 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                             _showDownloadConfirmationDialog(url, fileName);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
+                              SnackBar(
                                 content: Text(
-                                    'No se encontró un archivo válido para descargar.'),
+                                  'no_se_encontr_un_archivo_vlido_para_descargar'
+                                      .tr(),
+                                ),
                               ),
                             );
                           }
@@ -557,7 +582,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                         : AppColors.successColor(context),
                   ),
                   label: Text(
-                    'Descargar Resultados',
+                    'descargar_resultados'.tr(),
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       color: _isDownloading
@@ -572,10 +597,11 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                       vertical: 8,
                     ),
                     side: BorderSide(
-                      color: (_isDownloading
-                              ? Colors.grey
-                              : AppColors.successColor(context))
-                          .withOpacity(0.5),
+                      color:
+                          (_isDownloading
+                                  ? Colors.grey
+                                  : AppColors.successColor(context))
+                              .withOpacity(0.5),
                       width: 1.5,
                     ),
                     shape: RoundedRectangleBorder(
@@ -604,7 +630,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  'Resultados Pendientes',
+                  'resultados_pendientes'.tr(),
                   style: TextStyle(
                     color: AppColors.warningColor(context),
                     fontWeight: FontWeight.w600,
@@ -724,7 +750,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Centro Médico',
+                      'centro_mdico'.tr(),
                       style: TextStyle(
                         fontSize: 11,
                         color: AppColors.textColor(context).withAlpha(130),
@@ -743,7 +769,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                 child: _buildCompactDetailCard(
                   context,
                   icon: HugeIcons.strokeRoundedCalendar01,
-                  title: 'Fecha',
+                  title: 'fecha'.tr(),
                   value: date,
                   color: Colors.blue,
                 ),
@@ -753,7 +779,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                 child: _buildCompactDetailCard(
                   context,
                   icon: HugeIcons.strokeRoundedDoctor01,
-                  title: 'Médico',
+                  title: 'mdico'.tr(),
                   value: doctor,
                   color: Colors.green,
                 ),

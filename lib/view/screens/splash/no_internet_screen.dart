@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/splash/no_internet_screen.dart
 import 'package:flutter/material.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -48,8 +49,8 @@ class NoInternetScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 // Título principal - Perfectamente centrado
-                const Text(
-                  'Sin Conexión a Internet',
+                Text(
+                  'sin_conexin_a_internet'.tr(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 26,
@@ -60,10 +61,10 @@ class NoInternetScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 // Descripción - Mejor centrado y espaciado
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8.0),
                   child: Text(
-                    'Parece que no tienes conexión a internet.\nRevisa tu conexión e inténtalo de nuevo.',
+                    'parece_que_no_tienes_conexin_a_internetnrevisa_tu_conexin_e'.tr(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,
@@ -96,14 +97,14 @@ class NoInternetScreen extends StatelessWidget {
                       elevation: 4,
                       shadowColor: Colors.black.withAlpha(60),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.refresh_rounded, size: 20),
                         SizedBox(width: 8),
                         Text(
-                          'Reintentar Conexión',
+                          'reintentar_conexin'.tr(),
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,

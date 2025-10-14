@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -113,7 +114,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
               SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  '¡Solicitud enviada con éxito!',
+                  'solicitud_enviada_con_xito'.tr(),
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -172,7 +173,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
       backgroundColor: AppColors.backgroundColor(context),
       appBar: AppBar(
         title: Text(
-          'Resumen de Cita',
+          'resumen_de_cita'.tr(),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -218,7 +219,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      '¡Revisa tu solicitud!',
+                      'revisa_tu_solicitud'.tr(),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
@@ -229,7 +230,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20.0),
                       child: Text(
-                        'Confirma que los datos de tu cita son correctos',
+                        'confirma_que_los_datos_de_tu_cita_son_correctos'.tr(),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
@@ -259,7 +260,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
                   children: [
                     _buildSummaryRow(
                       icon: HugeIcons.strokeRoundedLocation04,
-                      label: 'Departamento',
+                      label: 'departamento'.tr(),
                       value: widget.departament,
                     ),
                     const SizedBox(height: 16),
@@ -267,7 +268,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
                     const SizedBox(height: 16),
                     _buildSummaryRow(
                       icon: HugeIcons.strokeRoundedHospital01,
-                      label: 'Centro Médico',
+                      label: 'centro_mdico'.tr(),
                       value: widget.hospitalName,
                     ),
 
@@ -278,7 +279,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
                       const SizedBox(height: 16),
                       _buildSummaryRow(
                         icon: HugeIcons.strokeRoundedStethoscope,
-                        label: 'Especialidad Solicitada',
+                        label: 'especialidad_solicitada'.tr(),
                         value: widget.specialty!,
                       ),
                     ],
@@ -288,7 +289,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
                     const SizedBox(height: 16),
                     _buildSummaryRow(
                       icon: HugeIcons.strokeRoundedNote,
-                      label: 'Motivo de Consulta',
+                      label: 'motivo_de_consulta'.tr(),
                       value: widget.reason,
                       isMultiline: true,
                     ),
@@ -306,7 +307,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
               SizedBox(
                 width: double.infinity,
                 child: PrimaryButton(
-                  text: 'Confirmar Solicitud',
+                  text: 'confirmar_solicitud'.tr(),
                   isLoading:
                       _isSubmitting, // El botón mostrará un loader si está enviando
                   onPressed: _submitAppointment, // Llama a la función de envío
@@ -343,7 +344,7 @@ class _AppointmentSummaryScreenState extends State<AppointmentSummaryScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Foto de Referencia Adjunta',
+                'foto_de_referencia_adjunta'.tr(),
                 style: TextStyle(
                   color: AppColors.textLightColor(context),
                   fontSize: 13,

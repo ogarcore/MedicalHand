@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/appointments/appointment_options.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -42,8 +43,8 @@ class AppointmentOptionsScreen extends StatelessWidget {
               ],
             ),
             child: AppBar(
-              title: const Text(
-                'Tipo de Cita',
+              title: Text(
+                'tipo_de_cita'.tr(),
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
@@ -95,7 +96,7 @@ class AppointmentOptionsScreen extends StatelessWidget {
                         ),
                         SizedBox(height: isSmallScreen ? 8 : 12),
                         Text(
-                          '¿Qué tipo de cita necesitas?',
+                          'qué_tipo_de_cita_necesitas'.tr(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 18,
@@ -107,7 +108,7 @@ class AppointmentOptionsScreen extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 8.0),
                           child: Text(
-                            'Selecciona la opción según tu necesidad médica',
+                            'selecciona_la_opcin_segn_tu_necesidad_mdica'.tr(),
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 13,
@@ -128,10 +129,10 @@ class AppointmentOptionsScreen extends StatelessWidget {
                     context: context,
                     icon: HugeIcons.strokeRoundedDoctor03,
                     iconColor: AppColors.primaryColor(context),
-                    title: 'Consulta General',
+                    title: 'consulta_general'.tr(),
                     description:
-                        'Solicita una cita para consulta externa o atención general',
-                    buttonText: 'Seleccionar',
+                        'solicita_una_cita_para_consulta_externa'.tr(),
+                    buttonText: 'seleccionar'.tr(),
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -157,7 +158,7 @@ class AppointmentOptionsScreen extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Text(
-                          'O',
+                          'o'.tr(),
                           style: TextStyle(
                             color: AppColors.textLightColor(
                               context,
@@ -184,13 +185,13 @@ class AppointmentOptionsScreen extends StatelessWidget {
                     context: context,
                     icon: HugeIcons.strokeRoundedHospital02,
                     iconColor: AppColors.accentColor(context),
-                    title: 'Referencia Externa',
-                    description: 'Para usuarios con referencia médica',
-                    details: const [
-                      'Referencia en papel de centros de salud',
+                    title: 'referencia_externa'.tr(),
+                    description: 'para_usuarios_con_referencia_médica'.tr(),
+                    details: [
+                      'referencia_en_apel_de_centros_de_salud'.tr(),
                       'Hoja de Referencia Digital en app',
                     ],
-                    buttonText: 'Seleccionar',
+                    buttonText: 'seleccionar'.tr(),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -211,7 +212,7 @@ class AppointmentOptionsScreen extends StatelessWidget {
                     padding: EdgeInsets.only(bottom: isSmallScreen ? 8 : 12),
                     child: Center(
                       child: Text(
-                        'Selecciona una opción para continuar',
+                        'selecciona_una_opcin_para_continuar'.tr(),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 12,

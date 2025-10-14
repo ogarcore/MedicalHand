@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -46,7 +47,7 @@ class ChatInfoDialog extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'Acerca del Asistente',
+                  'acerca_del_asistente'.tr(),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -59,7 +60,7 @@ class ChatInfoDialog extends StatelessWidget {
             _buildInfoItem(
               context: context,
               icon: Icons.memory_rounded,
-              title: 'Memoria Limitada',
+              title: 'memoria_limitada'.tr(),
               description:
                   'El asistente solo mantiene contexto de los últimos mensajes de la conversación actual.',
               color: primaryColor,
@@ -68,7 +69,7 @@ class ChatInfoDialog extends StatelessWidget {
             _buildInfoItem(
               context: context,
               icon: HugeIcons.strokeRoundedShieldKey,
-              title: 'Privacidad',
+              title: 'privacidad'.tr(),
               description:
                   'Tus conversaciones son seguras y se procesan de forma anónima.',
               color: AppColors.accentColor(context).withAlpha(180),
@@ -77,7 +78,7 @@ class ChatInfoDialog extends StatelessWidget {
             _buildInfoItem(
               context: context,
               icon: Icons.medical_information_rounded,
-              title: 'Propósito',
+              title: 'propsito'.tr(),
               description:
                   'Este es un asistente para consejos de bienestar general, no para diagnósticos médicos.',
               color: AppColors.graceColor(context).withAlpha(170),
@@ -96,8 +97,8 @@ class ChatInfoDialog extends StatelessWidget {
                   ),
                   elevation: 0,
                 ),
-                child: const Text(
-                  'Entendido',
+                child: Text(
+                  'entendido'.tr(),
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 16,

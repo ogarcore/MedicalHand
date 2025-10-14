@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import '../../../app/core/constants/app_colors.dart';
@@ -29,7 +30,7 @@ class WelcomeScreen extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  "Sin conexión a internet",
+                  'sin_conexin_a_internet'.tr(),
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -192,7 +193,7 @@ class WelcomeScreen extends StatelessWidget {
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: 'Medical',
+                              text: 'medical'.tr(),
                               style: TextStyle(
                                 fontSize: 42,
                                 fontWeight: FontWeight.w800,
@@ -201,7 +202,7 @@ class WelcomeScreen extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
-                              text: 'Hand',
+                              text: 'hand'.tr(),
                               style: TextStyle(
                                 fontSize: 42,
                                 fontWeight: FontWeight.w800,
@@ -215,7 +216,7 @@ class WelcomeScreen extends StatelessWidget {
                       const SizedBox(height: 12),
 
                       Text(
-                        'El poder de gestionar tu bienestar, \nen la palma de tu mano.',
+                        'el_poder_de_gestionar_tu_bienestar_nen_la_palma_de_tu_mano'.tr(),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 17,
@@ -234,14 +235,14 @@ class WelcomeScreen extends StatelessWidget {
                         child: Column(
                           children: [
                             SecondaryButton(
-                              text: 'Registrarse',
+                              text: 'registrarse'.tr(),
                               width: double
                                   .infinity, // 🔹 para que ocupe todo el ancho disponible dentro del padding
                               onPressed: () => _handleRegister(context),
                             ),
                             const SizedBox(height: 18),
                             PrimaryButton(
-                              text: 'Iniciar Sesión',
+                              text: 'iniciar_sesin'.tr(),
                               width:
                                   double.infinity, // 🔹 igual que el anterior
                               onPressed: () => _handleLogin(context),

@@ -17,9 +17,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:p_hn25/view_model/theme_provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:p_hn25/view_model/chat_view_model.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await EasyLocalization.ensureInitialized();
 
   await initializeDateFormatting('es_ES', null);
 
@@ -39,7 +42,14 @@ void main() async {
     appleProvider: AppleProvider.appAttest,
   );
 
-  runApp(const MyApp());
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [Locale('es'), Locale('en'), Locale('miq')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('es'),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -62,6 +72,12 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
           return MaterialApp(
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale.languageCode == 'miq'
+                ? const Locale('es')
+                : context.locale,
+
             title: 'MedicalHand',
             debugShowCheckedModeBanner: false,
             theme: themeProvider.currentTheme.copyWith(

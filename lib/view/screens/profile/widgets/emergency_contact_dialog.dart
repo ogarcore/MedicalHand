@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -52,7 +53,7 @@ class _EmergencyContactDialogState extends State<EmergencyContactDialog> {
 
     if (success) {
       scaffoldMessenger.showSnackBar(
-        const SnackBar(content: Text('Contacto de emergencia guardado')),
+        SnackBar(content: Text('contacto_de_emergencia_guardado'.tr())),
       );
     } else {
       scaffoldMessenger.showSnackBar(
@@ -100,8 +101,8 @@ class _EmergencyContactDialogState extends State<EmergencyContactDialog> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Contacto de Emergencia', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
-                          Text('En caso de emergencia contactaremos a esta persona', style: TextStyle(fontSize: 11, color: Colors.white.withAlpha(200))),
+                          Text('contacto_de_emergencia'.tr(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
+                          Text('en_caso_de_emergencia_contactaremos_a_esta_persona'.tr(), style: TextStyle(fontSize: 11, color: Colors.white.withAlpha(200))),
                         ],
                       ),
                     ),
@@ -134,7 +135,7 @@ class _EmergencyContactDialogState extends State<EmergencyContactDialog> {
                             child: OutlinedButton(
                               onPressed: () => Navigator.pop(context),
                               style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                              child: Text('Cancelar', style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.w600)),
+                              child: Text('cancelar'.tr(), style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.w600)),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -142,7 +143,7 @@ class _EmergencyContactDialogState extends State<EmergencyContactDialog> {
                             child: ElevatedButton(
                               onPressed: _saveContact,
                               style: ElevatedButton.styleFrom(backgroundColor: primaryColor, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                              child: const Text('Guardar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                              child: Text('guardar'.tr(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
                             ),
                           ),
                         ],

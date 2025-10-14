@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:p_hn25/view/widgets/gradient_background.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +21,7 @@ class RegistrationStep1Screen extends StatefulWidget {
 class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
   final _formKey = GlobalKey<FormState>();
 
-  bool _isCheckingEmail = false; // loader solo para "Siguiente"
+  bool _isCheckingEmail = false; // loader solo para 'siguiente'.tr()
   bool _isGoogleLoading = false; // loader exclusivo de Google
 
   void _clearFieldsAndNavigateBack() {
@@ -69,7 +70,7 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            "Crear cuenta",
+                            'crear_cuenta'.tr(),
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -82,7 +83,7 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                       const RegistrationProgressIndicator(currentStep: 1),
                       const SizedBox(height: 32),
                       Text(
-                        'Primero, tus datos de acceso',
+                        'primero_tus_datos_de_acceso'.tr(),
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -92,8 +93,8 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                       const SizedBox(height: 24),
                       CustomTextField(
                         controller: authViewModel.emailController,
-                        labelText: 'Correo Electrónico',
-                        hintText: 'Ingresa tu correo',
+                        labelText: 'correo_electrnico'.tr(),
+                        hintText: 'ingresa_tu_correo'.tr(),
                         icon: Icons.alternate_email,
                         keyboardType: TextInputType.emailAddress,
                         validator: AppValidators.validateEmail,
@@ -101,8 +102,8 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                       const SizedBox(height: 20),
                       CustomTextField(
                         controller: authViewModel.passwordController,
-                        labelText: 'Crea una contraseña',
-                        hintText: 'Mínimo 8 caracteres',
+                        labelText: 'crea_una_contrasea'.tr(),
+                        hintText: 'mnimo_8_caracteres'.tr(),
                         isPassword: true,
                         icon: Icons.lock_outline,
                         keyboardType: TextInputType.visiblePassword,
@@ -111,8 +112,8 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                       const SizedBox(height: 20),
                       CustomTextField(
                         controller: authViewModel.confirmPasswordController,
-                        labelText: 'Confirmar contraseña',
-                        hintText: 'Repite tu contraseña',
+                        labelText: 'confirmar_contrasea'.tr(),
+                        hintText: 'repite_tu_contrasea'.tr(),
                         keyboardType: TextInputType.visiblePassword,
                         isPassword: true,
                         icon: Icons.lock_outline,
@@ -123,6 +124,60 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                             ),
                       ),
                       const SizedBox(height: 32),
+                      Consumer<AuthViewModel>(
+                        builder: (context, viewModel, child) {
+                          return PrimaryButton(
+                            text: 'siguiente'.tr(),
+                            isLoading: _isCheckingEmail,
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                FocusScope.of(context).unfocus();
+
+                                setState(() {
+                                  _isCheckingEmail = true;
+                                });
+
+                                // Guardamos referencias ANTES del await
+                                final scaffoldMessenger = ScaffoldMessenger.of(
+                                  context,
+                                );
+                                final navigator = Navigator.of(context);
+
+                                final emailExists = await viewModel
+                                    .checkEmailExists();
+
+                                if (!mounted) return;
+
+                                setState(() {
+                                  _isCheckingEmail = false;
+                                });
+
+                                if (emailExists) {
+                                  scaffoldMessenger.showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        viewModel.errorMessage ??
+                                            'Error desconocido.',
+                                      ),
+                                      backgroundColor: AppColors.warningColor(
+                                        context,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  navigator.push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const RegistrationStep2Screen(),
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 20),
                       Row(
                         children: [
                           Expanded(
@@ -136,7 +191,7 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                               horizontal: 12.0,
                             ),
                             child: Text(
-                              'O regístrate con',
+                              'o_regstrate_con'.tr(),
                               style: TextStyle(
                                 color: Colors.grey[600],
                                 fontSize: 14,
@@ -188,7 +243,7 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                                           ),
                                           const SizedBox(width: 12),
                                           Text(
-                                            'Cargando...',
+                                            'cargando'.tr(),
                                             style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.w600,
@@ -242,8 +297,8 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                                                   AppColors.accentColor(
                                                     context,
                                                   ).withAlpha(200),
-                                              content: const Text(
-                                                'Esta cuenta ya está registrada. Por favor, inicia sesión.',
+                                              content: Text(
+                                                'esta_cuenta_ya_est_registrada_por_favor_inicia_sesin'.tr(),
                                               ),
                                             ),
                                           );
@@ -271,7 +326,7 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                                         ),
                                       ),
                                       label: Text(
-                                        'Registrarse con Google',
+                                        'registrarse_con_google'.tr(),
                                         style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600,
@@ -300,60 +355,6 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                         },
                       ),
                       const SizedBox(height: 50),
-                      Consumer<AuthViewModel>(
-                        builder: (context, viewModel, child) {
-                          return PrimaryButton(
-                            text: 'Siguiente',
-                            isLoading: _isCheckingEmail,
-                            onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
-                                FocusScope.of(context).unfocus();
-
-                                setState(() {
-                                  _isCheckingEmail = true;
-                                });
-
-                                // Guardamos referencias ANTES del await
-                                final scaffoldMessenger = ScaffoldMessenger.of(
-                                  context,
-                                );
-                                final navigator = Navigator.of(context);
-
-                                final emailExists = await viewModel
-                                    .checkEmailExists();
-
-                                if (!mounted) return;
-
-                                setState(() {
-                                  _isCheckingEmail = false;
-                                });
-
-                                if (emailExists) {
-                                  scaffoldMessenger.showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        viewModel.errorMessage ??
-                                            'Error desconocido.',
-                                      ),
-                                      backgroundColor: AppColors.warningColor(
-                                        context,
-                                      ),
-                                    ),
-                                  );
-                                } else {
-                                  navigator.push(
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const RegistrationStep2Screen(),
-                                    ),
-                                  );
-                                }
-                              }
-                            },
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 20),
                     ],
                   ),
                 ),

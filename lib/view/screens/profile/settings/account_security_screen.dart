@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/profile/settings/account_security_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -63,7 +64,7 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content:
-                const Text('Autenticación fallida. No se eliminó la cuenta.'),
+                Text('autenticacin_fallida_no_se_elimin_la_cuenta'.tr()),
             backgroundColor: AppColors.warningColor(context),
             behavior: SnackBarBehavior.floating,
           ),
@@ -85,7 +86,7 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Ocurrió un error al eliminar la cuenta.'),
+          content: Text('Ocurrió un error al eliminar la cuenta.'),
           backgroundColor: AppColors.warningColor(context),
           behavior: SnackBarBehavior.floating,
         ),
@@ -128,13 +129,13 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
         child: AlertDialog(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Text('Confirmar Identidad'),
+          title: Text('confirmar_identidad'.tr()),
           content: Form(
             key: formKey,
             child: CustomTextField(
               controller: passwordController,
-              labelText: "Contraseña",
-              hintText: "Ingresa tu contraseña actual",
+              labelText: 'contrasea'.tr(),
+              hintText: 'ingresa_tu_contrasea_actual'.tr(),
               icon: HugeIcons.strokeRoundedLockPassword,
               obscureText: true,
               validator: (value) =>
@@ -144,7 +145,7 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(null),
-              child: const Text('Cancelar'),
+              child: Text('cancelar'.tr()),
             ),
             FilledButton(
               onPressed: () {
@@ -152,7 +153,7 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
                   Navigator.of(context).pop(passwordController.text);
                 }
               },
-              child: const Text('Confirmar'),
+              child: Text('confirmar'.tr()),
             ),
           ],
         ),
@@ -171,15 +172,14 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
         onTap: () => FocusScope.of(context).unfocus(),
         child: CustomModal(
           icon: HugeIcons.strokeRoundedSad01,
-          title: 'Lamentamos que te vayas',
+          title: 'lamentamos_que_te_vayas'.tr(),
           content: Form(
             key: formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Tu opinión es muy importante para nosotros. '
-                  'Si tienes un momento, cuéntanos por qué quieres eliminar tu cuenta.',
+                  'tu_opinin_es_muy_importante_para_nosotros'.tr(),
                   style: TextStyle(
                     color: AppColors.textLightColor(context),
                     fontSize: 15,
@@ -188,10 +188,10 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
                 ),
                 const SizedBox(height: 20),
                 CustomTextField(
-                  labelText: "Motivo de la eliminación",
+                  labelText: 'motivo_de_la_eliminacin'.tr(),
                   icon: HugeIcons.strokeRoundedAlertDiamond,
                   controller: reasonController,
-                  hintText: 'Explícanos por qué deseas cerrar la cuenta...',
+                  hintText: 'explcanos_por_qu_deseas_cerrar_la_cuenta'.tr(),
                   maxLines: 3,
                   validator: AppValidators.validateRescheduleReason,
                 ),
@@ -200,11 +200,11 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
           ),
           actions: [
             ModalButton(
-              text: 'Cancelar',
+              text: 'cancelar'.tr(),
               onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             ModalButton(
-              text: 'Siguiente',
+              text: 'siguiente'.tr(),
               isPrimary: true,
               onPressed: () {
                 if (formKey.currentState!.validate()) {
@@ -238,7 +238,7 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Esta acción es permanente. Todos tus datos serán eliminados definitivamente.',
+                      'esta_accin_es_permanente_todos_tus_datos_sern_eliminados_def'.tr(),
                       style: TextStyle(
                         color: AppColors.textLightColor(context),
                         fontSize: 15,
@@ -247,7 +247,7 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      'Para confirmar, escribe la palabra "ELIMINAR" en el campo de abajo',
+                      'para_confirmar_escribe_la_palabra'.tr(),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.textColor(context),
@@ -255,10 +255,10 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
                     ),
                     const SizedBox(height: 8),
                     CustomTextField(
-                      labelText: "Escribelo aquí",
+                      labelText: 'escribelo_aqu'.tr(),
                       icon: HugeIcons.strokeRoundedAlertDiamond,
                       controller: _confirmController,
-                      hintText: 'ELIMINAR',
+                      hintText: 'eliminar'.tr(),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(RegExp("[a-zA-Z]")),
                         TextInputFormatter.withFunction(
@@ -269,7 +269,7 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
                       ],
                       onChanged: (value) {
                         setDialogState(() {
-                          _isDeleteButtonEnabled = (value == 'ELIMINAR');
+                          _isDeleteButtonEnabled = (value == 'eliminar'.tr());
                         });
                       },
                     ),
@@ -277,11 +277,11 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
                 ),
                 actions: [
                   ModalButton(
-                    text: 'Cancelar',
+                    text: 'cancelar'.tr(),
                     onPressed: () => Navigator.of(dialogContext).pop(),
                   ),
                   ModalButton(
-                    text: 'Sí, eliminar',
+                    text: 's_eliminar'.tr(),
                     isWarning: true,
                     // ✅ FIX: Se corrige el tipo de la función onPressed.
                     // En lugar de `null`, se pasa una función vacía si está deshabilitado.
@@ -322,7 +322,7 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor(context),
         appBar: AppBar(
-          title: const Text('Cuenta y Seguridad'),
+          title: Text('cuenta_y_seguridad'.tr()),
           backgroundColor: AppColors.backgroundColor(context),
           elevation: 0,
           surfaceTintColor: Colors.transparent,
@@ -343,7 +343,7 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
                       children: [
                         if (showChangePassword) ...[
                           _SettingsOptionRow(
-                            title: 'Cambiar Contraseña',
+                            title: 'cambiar_contrasea'.tr(),
                             onTap: () => _showChangePasswordDialog(context),
                           ),
                           Divider(
@@ -352,7 +352,7 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
                               indent: 16),
                         ],
                         _SettingsOptionRow(
-                          title: 'Eliminar Cuenta',
+                          title: 'eliminar_cuenta'.tr(),
                           onTap: () => _showDeleteAccountFlow(context),
                           textColor: AppColors.warningColor(context),
                         ),
@@ -452,7 +452,7 @@ class __ChangePasswordDialogState extends State<_ChangePasswordDialog> {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Contraseña actualizada con éxito.'),
+          content: Text('contrasea_actualizada_con_xito'.tr()),
           backgroundColor: AppColors.secondaryColor(context),
           behavior: SnackBarBehavior.floating,
         ),
@@ -460,7 +460,7 @@ class __ChangePasswordDialogState extends State<_ChangePasswordDialog> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Error: La contraseña actual es incorrecta.'),
+          content: Text('Error: La contraseña actual es incorrecta.'),
           backgroundColor: AppColors.warningColor(context),
           behavior: SnackBarBehavior.floating,
         ),
@@ -475,20 +475,20 @@ class __ChangePasswordDialogState extends State<_ChangePasswordDialog> {
       child: CustomModal(
         isLoading: _isLoading,
         icon: HugeIcons.strokeRoundedShield01,
-        title: 'Cambiar Contraseña',
+        title: 'cambiar_contrasea'.tr(),
         content: Form(
           key: _formKey,
           child: Column(
             children: [
               Text(
-                'Para proteger tu cuenta, ingresa tu contraseña actual antes de elegir una nueva.',
+                'para_proteger_tu_cuenta_ingresa_tu_contrasea_actual_antes_de'.tr(),
                 style: TextStyle(color: AppColors.textLightColor(context)),
               ),
               const SizedBox(height: 24),
               CustomTextField(
                 controller: _currentPasswordController,
-                labelText: 'Contraseña Actual',
-                hintText: 'Ingresa tu contraseña actual',
+                labelText: 'contrasea_actual'.tr(),
+                hintText: 'ingresa_tu_contrasea_actual'.tr(),
                 icon: HugeIcons.strokeRoundedCirclePassword,
                 obscureText: _isCurrentPasswordObscured,
                 validator: (value) => AppValidators.validateGenericEmpty(
@@ -506,8 +506,8 @@ class __ChangePasswordDialogState extends State<_ChangePasswordDialog> {
               const SizedBox(height: 16),
               CustomTextField(
                 controller: _newPasswordController,
-                labelText: 'Nueva Contraseña',
-                hintText: 'Mínimo 8 caracteres',
+                labelText: 'nueva_contrasea'.tr(),
+                hintText: 'mnimo_8_caracteres'.tr(),
                 icon: HugeIcons.strokeRoundedLockPassword,
                 obscureText: _isNewPasswordObscured,
                 validator: AppValidators.validatePassword,
@@ -524,8 +524,8 @@ class __ChangePasswordDialogState extends State<_ChangePasswordDialog> {
               const SizedBox(height: 16),
               CustomTextField(
                 controller: _confirmPasswordController,
-                labelText: 'Confirmar Contraseña',
-                hintText: 'Repite la nueva contraseña',
+                labelText: 'confirmar_contrasea'.tr(),
+                hintText: 'repite_la_nueva_contrasea'.tr(),
                 icon: HugeIcons.strokeRoundedResetPassword,
                 obscureText: _isConfirmPasswordObscured,
                 validator: (value) {
@@ -552,11 +552,11 @@ class __ChangePasswordDialogState extends State<_ChangePasswordDialog> {
         ),
         actions: [
           ModalButton(
-            text: 'Cancelar',
+            text: 'cancelar'.tr(),
             onPressed: () => Navigator.of(context).pop(),
           ),
           ModalButton(
-            text: 'Guardar',
+            text: 'guardar'.tr(),
             isPrimary: true,
             onPressed: _handleChangePassword,
           ),

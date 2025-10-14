@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/support/support_screen.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -39,8 +40,8 @@ class SupportScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor(context),
       appBar: AppBar(
-        title: const Text(
-          'Soporte y Ayuda',
+        title: Text(
+          'soporte_y_ayuda'.tr(),
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
@@ -62,8 +63,8 @@ class SupportScreen extends StatelessWidget {
           _buildContactOption(
             context: context,
             icon: HugeIcons.strokeRoundedMail01,
-            title: 'Enviar un Correo',
-            subtitle: 'Recibe respuesta en aproximadamente 24 horas',
+            title: 'enviar_un_correo'.tr(),
+            subtitle: 'recibe_respuesta_en_aproximadamente_24_horas'.tr(),
             color: const Color(0xFF2979FF),
             onTap: () {
               // Lógica para abrir el cliente de correo
@@ -142,7 +143,7 @@ class SupportScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Estamos aquí para asistirte con cualquier duda o problema que tengas.',
+                  'estamos_aqu_para_asistirte_con_cualquier_duda_o_problema_que'.tr(),
                   style: TextStyle(
                     fontSize: 14,
                     color: AppColors.textLightColor(context),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -115,7 +116,7 @@ class DashboardActionButtons extends StatelessWidget {
 
                 // Texto principal
                 Text(
-                  'Procesando código QR',
+                  'procesando_cdigo_qr'.tr(),
                   style: TextStyle(
                     color: AppColors.primaryColor(context),
                     fontSize: 20,
@@ -127,7 +128,7 @@ class DashboardActionButtons extends StatelessWidget {
 
                 // Texto secundario
                 Text(
-                  'Estamos asignando tu lugar en la fila virtual',
+                  'estamos_asignando_tu_lugar_en_la_fila_virtual'.tr(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.grey.shade600,
@@ -154,7 +155,7 @@ class DashboardActionButtons extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      'Asignando turno...',
+                      'asignando_turno'.tr(),
                       style: TextStyle(
                         color: Colors.grey.shade700,
                         fontSize: 14,
@@ -168,7 +169,7 @@ class DashboardActionButtons extends StatelessWidget {
 
                 // Mensaje adicional pequeño
                 Text(
-                  'Esto puede tomar unos segundos',
+                  'esto_puede_tomar_unos_segundos'.tr(),
                   style: TextStyle(
                     color: Colors.grey.shade400,
                     fontSize: 12,
@@ -245,8 +246,8 @@ class DashboardActionButtons extends StatelessWidget {
                     key: const ValueKey('escanearQR'),
                     child: _buildCompactGlamorousButton(
                       context: context,
-                      title: 'Escanear QR',
-                      subtitle: 'Recibir turno',
+                      title: 'escanear_qr'.tr(),
+                      subtitle: 'recibir_turno'.tr(),
                       icon: HugeIcons.strokeRoundedQrCode01,
                       primaryColor: warningColor,
                       onPressed: () => _handleScanQRPressed(context),
@@ -256,8 +257,8 @@ class DashboardActionButtons extends StatelessWidget {
                     key: const ValueKey('confirmarAsistencia'),
                     child: _buildCompactGlamorousButton(
                       context: context,
-                      title: 'Confirmar asistencia',
-                      subtitle: 'Registra de asistencia',
+                      title: 'confirmar_asistencia'.tr(),
+                      subtitle: 'registra_de_asistencia'.tr(),
                       icon: HugeIcons.strokeRoundedTickDouble04,
                       primaryColor: graceColor,
                       onPressed: () {
@@ -276,8 +277,8 @@ class DashboardActionButtons extends StatelessWidget {
         if (canCheckIn) const SizedBox(height: 12),
         _buildCompactGlamorousButton(
           context: context,
-          title: 'Agendar cita',
-          subtitle: 'Nueva consulta',
+          title: 'agendar_cita'.tr(),
+          subtitle: 'nueva_consulta'.tr(),
           icon: HugeIcons.strokeRoundedLayerAdd,
           primaryColor: accentColor,
           onPressed: () => Navigator.push(

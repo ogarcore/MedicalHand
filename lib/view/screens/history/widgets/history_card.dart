@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/history/widgets/history_card.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -104,7 +105,7 @@ class _HistoryCardState extends State<HistoryCard> {
                 _buildInfoRow(
                   icon: HugeIcons.strokeRoundedBloodBottle,
                   text: widget.diagnostico, // Mostramos el diagnóstico
-                  subtitle: 'Diagnóstico',
+                  subtitle: 'diagnstico'.tr(),
                 ),
                 const SizedBox(height: 8),
                 Row(
@@ -128,8 +129,8 @@ class _HistoryCardState extends State<HistoryCard> {
                         mainAxisSize:
                             MainAxisSize.min, // ocupa solo lo necesario
                         children: [
-                          const Text(
-                            'Ver Detalles',
+                          Text(
+                            'ver_detalles'.tr(),
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 14,

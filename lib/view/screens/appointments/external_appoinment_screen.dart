@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/appointments/external_appointment_screen.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -181,8 +182,8 @@ class _ExternalAppoinmentScreenState extends State<ExternalAppoinmentScreen> {
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor(context),
         appBar: AppBar(
-          title: const Text(
-            'Referencia Externa',
+          title: Text(
+            'referencia_externa'.tr(),
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
@@ -227,8 +228,8 @@ class _ExternalAppoinmentScreenState extends State<ExternalAppoinmentScreen> {
                   AppointmentStepLayout(
                     icon: HugeIcons.strokeRoundedDocumentValidation,
                     iconColor: AppColors.accentColor(context),
-                    title: 'Adjunta tu Referencia',
-                    subtitle: 'Selecciona una referencia digital',
+                    title: 'adjunta_tu_referencia'.tr(),
+                    subtitle: 'selecciona_una_referencia_digital'.tr(),
                     content: Column(
                       children: [
                         // Si no se ha elegido nada, muestra las dos opciones
@@ -244,7 +245,7 @@ class _ExternalAppoinmentScreenState extends State<ExternalAppoinmentScreen> {
                           AppStyledDropdown(
                             value: _selectedSpecialty,
                             items: _specialties,
-                            hintText: 'Selecciona la especialidad',
+                            hintText: 'selecciona_la_especialidad'.tr(),
                             prefixIcon: HugeIcons.strokeRoundedStethoscope,
                             onChanged: (value) =>
                                 setState(() => _selectedSpecialty = value),
@@ -259,11 +260,11 @@ class _ExternalAppoinmentScreenState extends State<ExternalAppoinmentScreen> {
                     iconColor: AppColors.accentColor(context),
                     title: '¿En qué departamento te encuentras?',
                     subtitle:
-                        'Selecciona tu ubicación para mostrarte los hospitales',
+                        'selecciona_tu_ubicacin_para_mostrarte_los_hospitales'.tr(),
                     content: AppStyledDropdown(
                       value: _selectedDepartment,
                       items: _departments,
-                      hintText: 'Selecciona tu departamento',
+                      hintText: 'selecciona_tu_departamento'.tr(),
                       prefixIcon: HugeIcons.strokeRoundedLocation04,
                       onChanged: (value) =>
                           setState(() => _selectedDepartment = value),
@@ -273,16 +274,16 @@ class _ExternalAppoinmentScreenState extends State<ExternalAppoinmentScreen> {
                   AppointmentStepLayout(
                     icon: HugeIcons.strokeRoundedHospital01,
                     iconColor: AppColors.accentColor(context),
-                    title: 'Confirma el centro médico',
+                    title: 'confirma_el_centro_mdico'.tr(),
                     subtitle:
-                        'Verifica el hospital de destino que indica tu referencia',
+                        'verifica_el_hospital_de_destino_que_indica_tu_referencia'.tr(),
                     content: AppStyledDropdown(
                       value: _selectedHospital?.name,
                       // Mapeamos nuestra lista de objetos a una lista de Strings para mostrar
                       items: _hospitalsList
                           .map((hospital) => hospital.name)
                           .toList(),
-                      hintText: 'Selecciona un hospital',
+                      hintText: 'selecciona_un_hospital'.tr(),
                       prefixIcon: HugeIcons.strokeRoundedHospital01,
                       onChanged: (selectedName) {
                         setState(() {
@@ -324,16 +325,16 @@ class _ExternalAppoinmentScreenState extends State<ExternalAppoinmentScreen> {
         // Botón para subir foto
         _buildOptionCard(
           icon: HugeIcons.strokeRoundedCamera01,
-          title: "Subir foto de referencia",
-          subtitle: "Toma o selecciona una foto de tu galería",
+          title: 'subir_foto_de_referencia'.tr(),
+          subtitle: 'toma_o_selecciona_una_foto_de_tu_galera'.tr(),
           onTap: _pickImage,
         ),
         const SizedBox(height: 12),
         // Botón para referencia digital
         _buildOptionCard(
           icon: HugeIcons.strokeRoundedInbox,
-          title: "Referencia digital",
-          subtitle: "Selecciona de tu bandeja de entrada",
+          title: 'referencia_digital'.tr(),
+          subtitle: 'selecciona_de_tu_bandeja_de_entrada'.tr(),
           onTap: _selectDigitalReferral,
         ),
       ],
@@ -385,7 +386,7 @@ class _ExternalAppoinmentScreenState extends State<ExternalAppoinmentScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isImage ? "Foto cargada" : "Referencia digital",
+                  isImage ? "Foto cargada" : 'referencia_digital'.tr(),
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     color: AppColors.textColor(context),
@@ -396,7 +397,7 @@ class _ExternalAppoinmentScreenState extends State<ExternalAppoinmentScreen> {
                 Text(
                   isImage
                       ? "Referencia adjuntada correctamente"
-                      : "Seleccionada de tu bandeja",
+                      : 'seleccionada_de_tu_bandeja'.tr(),
                   style: TextStyle(
                     color: AppColors.textLightColor(context),
                     fontSize: 12,

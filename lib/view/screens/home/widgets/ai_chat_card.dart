@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/home/widgets/ai_chat_card.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -51,8 +52,8 @@ class AiChatCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  '¿Tienes una consulta rápida?',
+                Text(
+                  'Tienes una consulta rápida'.tr(),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -67,14 +68,14 @@ class AiChatCard extends StatelessWidget {
                       fontSize: 13,
                       height: 1.4,
                     ),
-                    children: const [
+                    children: [
                       TextSpan(
                         text:
-                            'Usa nuestro asistente para obtener información general. ',
+                            'usa_nuestro_asistente_para_obtener_informacin_general'.tr(),
                       ),
                       TextSpan(
                         text:
-                            'Nuestro asistente no reemplaza una consulta médica.',
+                            'nuestro_asistente_no_reemplaza_una_consulta_mdica'.tr(),
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -105,8 +106,8 @@ class AiChatCard extends StatelessWidget {
                           vertical: 8,
                         ),
                       ),
-                      child: const Text(
-                        'Preguntar ahora',
+                      child: Text(
+                        'preguntar_ahora'.tr(),
                         style: TextStyle(fontWeight: FontWeight.w700),
                       ),
                     ),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/login/widgets/registration_link.dart
 import 'package:flutter/material.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -12,7 +13,7 @@ class RegistrationLink extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          '¿No tienes una cuenta?',
+          'no_tienes_una_cuenta'.tr(),
           style: TextStyle(color: Colors.grey[700], fontSize: 15),
         ),
         TextButton(
@@ -28,7 +29,7 @@ class RegistrationLink extends StatelessWidget {
             foregroundColor: AppColors.primaryColor(context),
           ),
           child: Text(
-            'Regístrate',
+            'regstrate'.tr(),
             style: TextStyle(
               color: AppColors.primaryColor(context),
               fontWeight: FontWeight.bold,

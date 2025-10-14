@@ -5,27 +5,26 @@ import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
-// Asumo que estos archivos existen en tu proyecto
 import 'package:p_hn25/app/core/utils/input_formatters.dart';
 import 'package:p_hn25/app/core/utils/validators.dart';
 import 'package:p_hn25/data/models/user_model.dart';
-
 import 'package:p_hn25/view/widgets/primary_button.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
 
-class EditPersonalInfoScreen extends StatefulWidget {
-  final UserModel user;
-  const EditPersonalInfoScreen({super.key, required this.user});
+class EditFamilyMemberInfoScreen extends StatefulWidget {
+  // Se recibe un 'member' en lugar de 'user' para mayor claridad
+  final UserModel member;
+  const EditFamilyMemberInfoScreen({super.key, required this.member});
 
   @override
-  State<EditPersonalInfoScreen> createState() => _EditPersonalInfoScreenState();
+  State<EditFamilyMemberInfoScreen> createState() => _EditFamilyMemberInfoScreenState();
 }
 
-class _EditPersonalInfoScreenState extends State<EditPersonalInfoScreen> {
+class _EditFamilyMemberInfoScreenState extends State<EditFamilyMemberInfoScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // --- Controladores para todos los campos editables ---
+  // Controladores para todos los campos editables
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
   late TextEditingController _idNumberController;
@@ -35,9 +34,9 @@ class _EditPersonalInfoScreenState extends State<EditPersonalInfoScreen> {
 
   bool _isLoading = false;
 
-  // ✅ FIX: Se crean funciones helper para formatear los valores iniciales.
+  // Funciones helper para formatear los valores iniciales
   String _formatInitialCedula(String rawText) {
-    if (rawText.length != 14) return rawText; // Devuelve el original si no tiene la longitud esperada
+    if (rawText.length != 14) return rawText;
     final buffer = StringBuffer();
     for (int i = 0; i < rawText.length; i++) {
       buffer.write(rawText[i]);
@@ -49,29 +48,26 @@ class _EditPersonalInfoScreenState extends State<EditPersonalInfoScreen> {
   }
 
   String _formatInitialPhone(String rawText) {
-    if (rawText.length != 8) return rawText; // Devuelve el original si no tiene la longitud esperada
+    if (rawText.length != 8) return rawText;
     return '${rawText.substring(0, 4)}-${rawText.substring(4)}';
   }
-
 
   @override
   void initState() {
     super.initState();
-    _firstNameController = TextEditingController(text: widget.user.firstName);
-    _lastNameController = TextEditingController(text: widget.user.lastName);
-    _addressController = TextEditingController(text: widget.user.address);
-
-    // ✅ FIX: Se aplican los formatos a los valores iniciales de cédula y teléfono.
-    _idNumberController = TextEditingController(text: _formatInitialCedula(widget.user.idNumber));
-    _phoneController = TextEditingController(text: _formatInitialPhone(widget.user.phoneNumber));
+    // Se inicializan los controladores con los datos del 'member'
+    _firstNameController = TextEditingController(text: widget.member.firstName);
+    _lastNameController = TextEditingController(text: widget.member.lastName);
+    _addressController = TextEditingController(text: widget.member.address);
+    _idNumberController = TextEditingController(text: _formatInitialCedula(widget.member.idNumber));
+    _phoneController = TextEditingController(text: _formatInitialPhone(widget.member.phoneNumber));
 
     try {
-      final date = widget.user.dateOfBirth.toDate();
+      final date = widget.member.dateOfBirth.toDate();
       _dobController = TextEditingController(
         text: DateFormat('dd/MM/yyyy').format(date),
       );
     } catch (e) {
-      // Si hay cualquier error al procesar la fecha, se inicializa vacío.
       _dobController = TextEditingController();
     }
   }
@@ -87,13 +83,12 @@ class _EditPersonalInfoScreenState extends State<EditPersonalInfoScreen> {
     super.dispose();
   }
 
-  // --- Lógica para guardar los datos actualizados ---
-Future<void> _handleSave() async {
+  // Lógica para guardar los datos actualizados del familiar
+  Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
     
-
     final Map<String, dynamic> updatedData = {
       'personalInfo.firstName': _firstNameController.text.trim(),
       'personalInfo.lastName': _lastNameController.text.trim(),
@@ -102,21 +97,19 @@ Future<void> _handleSave() async {
       'contactInfo.address': _addressController.text.trim(),
     };
 
-
     try {
       final dateText = _dobController.text.trim();
       if (dateText.isNotEmpty) {
         final parsedDate = DateFormat('dd/MM/yyyy').parseLoose(dateText);
-        updatedData['personalInfo.dateOfBirth'] = Timestamp.fromDate(
-          parsedDate,
-        );
+        updatedData['personalInfo.dateOfBirth'] = Timestamp.fromDate(parsedDate);
       }
     } catch (e) {
       print('Error al parsear la fecha: $e');
     }
 
     final viewModel = Provider.of<UserViewModel>(context, listen: false);
-    final success = await viewModel.updateUserProfile(updatedData);
+    // *** CAMBIO CLAVE: Se llama a la función para actualizar el familiar ***
+    final success = await viewModel.updateFamilyMemberProfile(widget.member.uid, updatedData);
 
     if (!mounted) return;
 
@@ -148,7 +141,8 @@ Future<void> _handleSave() async {
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor(context),
         appBar: AppBar(
-          title: Text('informacin_personal'.tr()),
+          // Título adaptado para el contexto de familiar
+          title: Text('editar_info_familiar'.tr()),
           backgroundColor: AppColors.accentColor(context),
           foregroundColor: Colors.white,
           elevation: 0,
@@ -171,7 +165,6 @@ Future<void> _handleSave() async {
         body: SafeArea(
           child: Column(
             children: [
-              // Header con mejor diseño
               Container(
                 width: double.infinity,
                 margin: const EdgeInsets.all(20),
@@ -227,7 +220,8 @@ Future<void> _handleSave() async {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'editar_informacin_personal'.tr(),
+                            // Texto del header adaptado
+                            'editar_datos_de'.tr(args: [widget.member.firstName]),
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
@@ -237,7 +231,7 @@ Future<void> _handleSave() async {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'mantn_tus_datos_actualizados_para_una_mejor_experiencia'.tr(),
+                            'mantn_sus_datos_actualizados'.tr(),
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.grey.shade600,
@@ -250,8 +244,6 @@ Future<void> _handleSave() async {
                   ],
                 ),
               ),
-
-              // Formulario con mejor espaciado y diseño
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(
@@ -285,13 +277,11 @@ Future<void> _handleSave() async {
                           ),
                         ),
                         const SizedBox(height: 32),
-
-                        // Botón de guardar con mejor diseño
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: SizedBox(
                             width: double.infinity,
-                            height: 52, // Altura estándar para el botón
+                            height: 52,
                             child: PrimaryButton(
                               text: 'guardar_cambios'.tr(),
                               onPressed: _handleSave,
@@ -319,7 +309,7 @@ Future<void> _handleSave() async {
         _buildTextFieldEnhanced(
           controller: _firstNameController,
           labelText: 'nombres'.tr(),
-          hintText: 'ingresa_tus_nombres'.tr(),
+          hintText: 'ingresa_sus_nombres'.tr(),
           icon: HugeIcons.strokeRoundedUser,
           validator: (value) =>
               AppValidators.validateGenericEmpty(value, 'nombres'.tr()),
@@ -328,7 +318,7 @@ Future<void> _handleSave() async {
         _buildTextFieldEnhanced(
           controller: _lastNameController,
           labelText: 'apellidos'.tr(),
-          hintText: 'ingresa_tus_apellidos'.tr(),
+          hintText: 'ingresa_sus_apellidos'.tr(),
           icon: HugeIcons.strokeRoundedUserCircle,
           validator: (value) =>
               AppValidators.validateGenericEmpty(value, 'apellidos'.tr()),
@@ -396,7 +386,7 @@ Future<void> _handleSave() async {
                   _buildTextFieldEnhanced(
                     controller: _firstNameController,
                     labelText: 'nombres'.tr(),
-                    hintText: 'ingresa_tus_nombres'.tr(),
+                    hintText: 'ingresa_sus_nombres'.tr(),
                     icon: Icons.person_outline_rounded,
                     validator: (value) =>
                         AppValidators.validateGenericEmpty(value, 'nombres'.tr()),
@@ -434,7 +424,7 @@ Future<void> _handleSave() async {
                   _buildTextFieldEnhanced(
                     controller: _lastNameController,
                     labelText: 'apellidos'.tr(),
-                    hintText: 'ingresa_tus_apellidos'.tr(),
+                    hintText: 'ingresa_sus_apellidos'.tr(),
                     icon: Icons.person_outline_rounded,
                     validator: (value) =>
                         AppValidators.validateGenericEmpty(value, 'apellidos'.tr()),

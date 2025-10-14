@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../app/core/constants/app_colors.dart';
 
@@ -31,7 +32,7 @@ class ChronicDiseasesList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Enfermedades Crónicas',
+          'enfermedades_crnicas'.tr(),
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -40,7 +41,7 @@ class ChronicDiseasesList extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Selecciona las que apliquen',
+          'selecciona_las_que_apliquen'.tr(),
           style: TextStyle(
             fontSize: 14,
             color: Colors.grey[600],

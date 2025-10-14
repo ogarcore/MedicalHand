@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -161,7 +162,7 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              "Verificación de Identidad",
+                              'verificacin_de_identidad'.tr(),
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
@@ -177,7 +178,7 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                         ),
                         const SizedBox(height: 32),
                         Text(
-                          'Protección de tu información',
+                          'proteccin_de_tu_informacin'.tr(),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -194,18 +195,18 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                               fontFamily: 'Poppins',
                             ),
                             children: [
-                              const TextSpan(
-                                text: 'Para garantizar la seguridad de tu expediente, ',
+                              TextSpan(
+                                text: 'para_garantizar_la_seguridad_de_tu_expediente'.tr(),
                               ),
                               TextSpan(
-                                text: 'verificamos tu identidad',
+                                text: 'verificamos_tu_identidad'.tr(),
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.textColor(context),
                                 ),
                               ),
-                              const TextSpan(
-                                text: ' para proteger tus datos médicos.',
+                              TextSpan(
+                                text: 'para_proteger_tus_datos_mdicos'.tr(),
                               ),
                             ],
                           ),
@@ -213,7 +214,7 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                         const SizedBox(height: 24),
                         CustomTextField(
                           controller: authViewModel.idController,
-                          labelText: 'Cédula de Identidad',
+                          labelText: 'cdula_de_identidad'.tr(),
                           hintText: '001-010101-0001A',
                           icon: HugeIcons.strokeRoundedId,
                           keyboardType: TextInputType.visiblePassword,
@@ -225,7 +226,7 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          'Documentación requerida',
+                          'documentacin_requerida'.tr(),
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -234,7 +235,7 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Toma fotos nítidas de ambos lados de tu cédula',
+                          'toma_fotos_ntidas_de_ambos_lados_de_tu_cdula'.tr(),
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.grey.shade600,
@@ -243,7 +244,7 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                         const SizedBox(height: 12),
                         _buildVerificationButton(
                           icon: HugeIcons.strokeRoundedCamera01,
-                          text: 'Frente de la Cédula',
+                          text: 'frente_de_la_cdula'.tr(),
                           description: 'Datos visibles y legibles',
                           onPressed: () =>
                               _handleImagePick(authViewModel.setIdFrontImage),
@@ -251,7 +252,7 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                         ),
                         _buildVerificationButton(
                           icon: HugeIcons.strokeRoundedCamera01,
-                          text: 'Reverso de la Cédula',
+                          text: 'reverso_de_la_cdula'.tr(),
                           description: 'Asegúrate que se vea bien',
                           onPressed: () =>
                               _handleImagePick(authViewModel.setIdBackImage),
@@ -259,7 +260,7 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                         ),
                         const SizedBox(height: 30),
                         PrimaryButton(
-                          text: 'Continuar',
+                          text: 'continuar'.tr(),
                           onPressed: () {
                             FocusScope.of(context).unfocus();
                             if (_formKey.currentState!.validate()) {
@@ -267,8 +268,8 @@ class _RegistrationStep3ScreenState extends State<RegistrationStep3Screen> {
                                   authViewModel.idBackImage == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: const Text(
-                                      'Por favor, sube las imágenes requeridas.',
+                                    content: Text(
+                                      'por_favor_sube_las_imgenes_requeridas'.tr(),
                                     ),
                                     backgroundColor: AppColors.warningColor(
                                       context,

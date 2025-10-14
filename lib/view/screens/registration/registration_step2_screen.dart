@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -99,18 +100,18 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
       builder: (context) => CustomModal(
         icon: HugeIcons.strokeRoundedAlert01,
         title: '¿Estás seguro?',
-        content: const Text(
-          'Si sales ahora, perderás todo el progreso del registro.',
+        content: Text(
+          'si_sales_ahora_perders_todo_el_progreso_del_registro'.tr(),
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 16, height: 1.5),
         ),
         actions: [
           ModalButton(
-            text: 'Cancelar',
+            text: 'cancelar'.tr(),
             onPressed: () => Navigator.of(context).pop(),
           ),
           ModalButton(
-            text: 'Salir',
+            text: 'salir'.tr(),
             isWarning: true,
             onPressed: () async {
               await authViewModel.cancelGoogleRegistration();
@@ -166,7 +167,7 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            "Datos Personales",
+                            'datos_personales'.tr(),
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -179,7 +180,7 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                       const RegistrationProgressIndicator(currentStep: 2),
                       const SizedBox(height: 32),
                       Text(
-                        'Ahora, cuéntanos sobre ti',
+                        'ahora_cuntanos_sobre_ti'.tr(),
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -189,18 +190,18 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                       const SizedBox(height: 24),
                       CustomTextField(
                         controller: authViewModel.nameController,
-                        labelText: 'Nombres',
-                        hintText: 'Ingresa tus nombres',
+                        labelText: 'nombres'.tr(),
+                        hintText: 'ingresa_tus_nombres'.tr(),
                         icon: Icons.person,
-                        validator: (value) => AppValidators.validateGenericEmpty(value, 'Nombres'),
+                        validator: (value) => AppValidators.validateGenericEmpty(value, 'nombres'.tr()),
                       ),
                       const SizedBox(height: 20),
                       CustomTextField(
                         controller: authViewModel.lastNameController,
-                        labelText: 'Apellidos',
-                        hintText: 'Ingresa tus apellidos',
+                        labelText: 'apellidos'.tr(),
+                        hintText: 'ingresa_tus_apellidos'.tr(),
                         icon: Icons.person_outline,
-                        validator: (value) => AppValidators.validateGenericEmpty(value, 'Apellidos'),
+                        validator: (value) => AppValidators.validateGenericEmpty(value, 'apellidos'.tr()),
                       ),
                       const SizedBox(height: 10),
                       Consumer<AuthViewModel>(
@@ -208,7 +209,7 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                           return AppStyledDropdown(
                             value: viewModel.selectedSex,
                             items: const ['Masculino', 'Femenino', 'Otro'],
-                            hintText: 'Selecciona tu sexo',
+                            hintText: 'selecciona_tu_sexo'.tr(),
                             prefixIcon: Icons.favorite_outline,
                             onChanged: (String? newValue) {
                               viewModel.updateSelectedSex(newValue);
@@ -220,7 +221,7 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
 
                       CustomTextField(
                         controller: authViewModel.birthDateController,
-                        labelText: 'Fecha de Nacimiento',
+                        labelText: 'fecha_de_nacimiento'.tr(),
                         hintText: 'DD/MM/AAAA',
                         icon: HugeIcons.strokeRoundedCalendar01, // Icono de prefijo
                         keyboardType: TextInputType.number,
@@ -238,12 +239,12 @@ class _RegistrationStep2ScreenState extends State<RegistrationStep2Screen> {
                       
                       const SizedBox(height: 50),
                       PrimaryButton(
-                        text: 'Siguiente',
+                        text: 'siguiente'.tr(),
                         onPressed: () {
                           if (authViewModel.selectedSex == null) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: const Text('Por favor, selecciona tu sexo.'),
+                                content: Text('por_favor_selecciona_tu_sexo'.tr()),
                                 backgroundColor: AppColors.warningColor(context),
                               ),
                             );

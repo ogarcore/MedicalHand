@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/home/widgets/home_app_bar_logic.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -105,8 +106,13 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
     }
 
     menuItems.add(
-      buildProfileMenuItem(currentUser, '${_getShortName(currentUser)} (Yo)'),
-    );
+  buildProfileMenuItem(
+    currentUser,
+    'nombre_con_parentesis_yo'.tr(
+      namedArgs: {'nombre': _getShortName(currentUser)}
+    ),
+  ),
+); 
 
     if (familyMembers.isNotEmpty) {
       for (var member in familyMembers) {
@@ -125,7 +131,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
       menuItems.add(
         _buildNavigationMenuItem(
           'profile',
-          'Mi Perfil',
+          'mi_perfil'.tr(),
           HugeIcons.strokeRoundedUser,
           AppColors.secondaryColor(context),
         ),
@@ -134,7 +140,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
     menuItems.add(
       _buildNavigationMenuItem(
         'family',
-        'Mis Familiares',
+        'mis_familiares'.tr(),
         HugeIcons.strokeRoundedUserGroup02,
         AppColors.accentColor(context),
       ),
@@ -142,7 +148,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
     menuItems.add(
       _buildNavigationMenuItem(
         'support',
-        'Soporte',
+        'soporte'.tr(),
         HugeIcons.strokeRoundedCustomerService01,
         AppColors.textColor(context),
       ),
@@ -151,7 +157,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
     menuItems.add(
       _buildNavigationMenuItem(
         'logout',
-        'Cerrar Sesión',
+        'cerrar_sesin'.tr(),
         HugeIcons.strokeRoundedLogout03,
         AppColors.warningColor(context),
       ),
@@ -231,19 +237,19 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
       builder: (BuildContext dialogContext) {
         return CustomModal(
           icon: HugeIcons.strokeRoundedLogout03,
-          title: 'Cerrar Sesión',
-          content: const Text(
+          title: 'cerrar_sesin'.tr(),
+          content: Text(
             '¿Estás seguro de que deseas cerrar sesión?',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, height: 1.5),
           ),
           actions: <Widget>[
             ModalButton(
-              text: 'Cancelar',
+              text: 'cancelar'.tr(),
               onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             ModalButton(
-              text: 'Aceptar',
+              text: 'aceptar'.tr(),
               isWarning: true,
               onPressed: () async {
                 final navigator = Navigator.of(context);
@@ -317,7 +323,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                               ),
                               const SizedBox(height: 24),
                               Text(
-                                'Cerrando sesión',
+                                'cerrando_sesin'.tr(),
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
@@ -327,7 +333,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Su sesión se está cerrando de forma segura',
+                                'su_sesin_se_est_cerrando_de_forma_segura'.tr(),
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,

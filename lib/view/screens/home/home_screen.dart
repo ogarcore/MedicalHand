@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -79,19 +80,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       context: context,
       builder: (context) => CustomModal(
         icon: HugeIcons.strokeRoundedLogout01,
-        title: 'Salir de MedicalHand',
-        content: const Text(
+        title: 'salir_de_medicalhand'.tr(),
+        content: Text(
           '¿Estás seguro de que quieres cerrar la aplicación?',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 16, height: 1.5),
         ),
         actions: [
           ModalButton(
-            text: 'Cancelar',
+            text: 'cancelar'.tr(),
             onPressed: () => Navigator.of(context).pop(false),
           ),
           ModalButton(
-            text: 'Salir',
+            text: 'salir'.tr(),
             isWarning: true,
             onPressed: () => Navigator.of(context).pop(true),
           ),

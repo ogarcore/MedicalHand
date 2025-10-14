@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 // lib/view/screens/family/family_members_screen.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -34,8 +35,8 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor(context),
       appBar: AppBar(
-        title: const Text(
-          'Gestión de Familiares',
+        title: Text(
+          'gestin_de_familiares'.tr(),
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
@@ -90,8 +91,8 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
                         ),
                       );
                     },
-                    label: const Text(
-                      'Añadir Familiar',
+                    label: Text(
+                      'aadir_familiar'.tr(),
                       style: TextStyle(fontWeight: FontWeight.w600),
                     ),
                     icon: const Icon(

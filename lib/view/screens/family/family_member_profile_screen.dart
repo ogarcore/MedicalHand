@@ -1,6 +1,9 @@
-// lib/view/screens/family/family_member_profile_screen.dart
+import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -8,24 +11,78 @@ import 'package:p_hn25/data/models/user_model.dart';
 import 'package:p_hn25/view/widgets/custom_modal.dart';
 import 'package:p_hn25/view_model/family_view_model.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FamilyMemberProfileScreen extends StatelessWidget {
+// --- IMPORTS AÑADIDOS PARA LA NAVEGACIÓN ---
+import 'edit_family_member_info_screen.dart';
+import 'edit_family_member_medical_info_screen.dart';
+
+// Widgets importados del perfil principal para reutilizar el diseño
+import '../profile/widgets/info_card.dart';
+import '../profile/widgets/info_row.dart';
+import '../profile/widgets/profile_divider.dart';
+import '../profile/widgets/profile_section_header.dart';
+
+class FamilyMemberProfileScreen extends StatefulWidget {
   final UserModel member;
   const FamilyMemberProfileScreen({super.key, required this.member});
 
+  @override
+  State<FamilyMemberProfileScreen> createState() =>
+      _FamilyMemberProfileScreenState();
+}
+
+class _FamilyMemberProfileScreenState extends State<FamilyMemberProfileScreen> {
+  late UserModel _currentMember;
+  
+  bool _isUploadingFront = false;
+  bool _isUploadingBack = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentMember = widget.member;
+  }
+
+  // --- FUNCIÓN AÑADIDA PARA NAVEGAR Y ACTUALIZAR DATOS AL REGRESAR ---
+  Future<void> _navigateToEditScreen(Widget screen) async {
+    // Navega a la pantalla de edición y espera a que se cierre.
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
+    );
+
+    // Cuando regresa, si la pantalla sigue existiendo, busca los datos actualizados.
+    if (mounted) {
+      final doc = await FirebaseFirestore.instance.collection('usuarios_movil').doc(_currentMember.uid).get();
+      if (doc.exists) {
+        // Actualiza el estado con los nuevos datos para refrescar la UI.
+        setState(() {
+          _currentMember = UserModel.fromFirestore(doc);
+        });
+      }
+    }
+  }
+
   String _formatDateOfBirth(UserModel user) {
     initializeDateFormatting('es_ES', null);
-    return DateFormat(
-      'd \'de\' MMMM, y',
-      'es_ES',
-    ).format(user.dateOfBirth.toDate());
+    try {
+      return DateFormat(
+        'd \'de\' MMMM, y',
+        'es_ES',
+      ).format(user.dateOfBirth.toDate());
+    } catch (e) {
+      return 'Fecha no disponible';
+    }
   }
 
   String _formatChronicDiseases(UserModel user) {
     final diseases = user.medicalInfo?['chronicDiseases'] as List?;
     if (diseases == null || diseases.isEmpty) {
-      return 'Ninguna reportada';
+      return 'ninguna_reportada'.tr();
     }
     return diseases.join(', ');
   }
@@ -38,31 +95,33 @@ class FamilyMemberProfileScreen extends StatelessWidget {
       context: context,
       builder: (BuildContext dialogContext) {
         return CustomModal(
-          title: 'Eliminar Perfil Familiar',
-          subtitle: 'Esta acción no se puede deshacer',
+          title: 'eliminar_perfil_familiar'.tr(),
+          subtitle: 'esta_accin_no_se_puede_deshacer'.tr(),
           icon: HugeIcons.strokeRoundedDelete02,
           content: Text(
-            '¿Estás seguro de que deseas eliminar a ${member.firstName} ${member.lastName} de tu lista de familiares?',
+            '¿Estás seguro de que deseas eliminar a ${_currentMember.firstName} ${_currentMember.lastName} de tu lista de familiares?',
+            textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 16, height: 1.5),
           ),
           actions: [
             ModalButton(
-              text: 'Cancelar',
+              text: 'cancelar'.tr(),
               onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             ModalButton(
-              text: 'Eliminar',
+              text: 'eliminar'.tr(),
               isWarning: true,
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
-                final success = await viewModel.deleteFamilyMember(member.uid);
+                final success =
+                    await viewModel.deleteFamilyMember(_currentMember.uid);
 
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
                         success
-                            ? '${member.firstName} eliminado.'
+                            ? '${_currentMember.firstName} eliminado.'
                             : 'Error al eliminar.',
                       ),
                       backgroundColor: success
@@ -82,6 +141,178 @@ class FamilyMemberProfileScreen extends StatelessWidget {
     );
   }
 
+  void _showImageDialog(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(10),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              InteractiveViewer(
+                panEnabled: true,
+                minScale: 0.5,
+                maxScale: 4,
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return const Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.black45,
+                      child: const Center(
+                        child: Icon(
+                          Icons.broken_image,
+                          color: Colors.white,
+                          size: 60,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Material(
+                  color: Colors.black.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(30),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(30),
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickAndUploadImage(String imageType) async {
+    final isFront = imageType == 'id_front';
+    if ((isFront && _isUploadingFront) || (!isFront && _isUploadingBack)) {
+      return;
+    }
+
+    var status = await Permission.photos.request();
+    if (status.isDenied || status.isPermanentlyDenied) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('se_necesita_permiso_para_acceder_a_la_galera'.tr()),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      if (status.isPermanentlyDenied) {
+        openAppSettings();
+      }
+      return;
+    }
+
+    setState(() {
+      if (isFront) {
+        _isUploadingFront = true;
+      } else {
+        _isUploadingBack = true;
+      }
+    });
+
+    try {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile == null) {
+        setState(() {
+          if (isFront) {
+            _isUploadingFront = false;
+          } else {
+            _isUploadingBack = false;
+          }
+        });
+        return;
+      }
+
+      File imageFile = File(pickedFile.path);
+
+      final storageRef = FirebaseStorage.instance.ref(
+        'user_identity_documents/${_currentMember.uid}/$imageType.jpg',
+      );
+
+      UploadTask uploadTask = storageRef.putFile(imageFile);
+      TaskSnapshot snapshot = await uploadTask;
+      String newDownloadUrl = await snapshot.ref.getDownloadURL();
+
+      String firestoreField =
+          isFront ? 'verification.idFrontUrl' : 'verification.idBackUrl';
+
+      final success = await Provider.of<UserViewModel>(
+        context,
+        listen: false,
+      ).updateFamilyMemberProfile(_currentMember.uid, {firestoreField: newDownloadUrl});
+
+      if (success && mounted) {
+        setState(() {
+          if (isFront) {
+            _currentMember.verification?['idFrontUrl'] = newDownloadUrl;
+          } else {
+            _currentMember.verification?['idBackUrl'] = newDownloadUrl;
+          }
+        });
+      }
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              success
+                  ? 'Imagen actualizada con éxito.'
+                  : 'Error al actualizar la imagen.',
+            ),
+            backgroundColor:
+                success ? Colors.green.shade700 : Colors.red.shade700,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Ocurrió un error. Inténtalo de nuevo.'),
+            backgroundColor: Colors.red.shade700,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          if (isFront) {
+            _isUploadingFront = false;
+          } else {
+            _isUploadingBack = false;
+          }
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final familyViewModel = Provider.of<FamilyViewModel>(
@@ -95,11 +326,14 @@ class FamilyMemberProfileScreen extends StatelessWidget {
 
     final bool isTutorViewing = currentUser?.uid == activeProfile?.uid;
 
+    final String? idFrontUrl = _currentMember.verification?['idFrontUrl'];
+    final String? idBackUrl = _currentMember.verification?['idBackUrl'];
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor(context),
       appBar: AppBar(
         title: Text(
-          'Perfil de ${member.firstName}',
+          'Perfil de ${_currentMember.firstName}',
           style: const TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 22,
@@ -112,223 +346,121 @@ class FamilyMemberProfileScreen extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
         child: Column(
           children: [
-            _buildSectionCard(
-              context: context,
-              title: 'Información Personal',
+            ProfileSectionHeader(
+              title: 'informacin_personal'.tr(),
               icon: HugeIcons.strokeRoundedUserCircle02,
-              showEditButton: isTutorViewing,
-              onEditPressed: () {},
+              // --- CAMBIO: Se añade la navegación al botón de editar ---
+              onEditPressed: isTutorViewing
+                  ? () => _navigateToEditScreen(
+                        EditFamilyMemberInfoScreen(member: _currentMember),
+                      )
+                  : null,
+            ),
+            InfoCard(
               children: [
-                _buildInfoRow(
-                  context,
-                  'Nombre Completo',
-                  '${member.firstName} ${member.lastName}',
+                InfoRow(
+                  label: 'nombre_completo'.tr(),
+                  value: '${_currentMember.firstName} ${_currentMember.lastName}',
+                  isFirst: true,
                 ),
-                _buildInfoRow(
-                  context,
-                  'Fecha de Nacimiento',
-                  _formatDateOfBirth(member),
+                const ProfileDivider(),
+                InfoRow(
+                  label: 'fecha_de_nacimiento'.tr(),
+                  value: _formatDateOfBirth(_currentMember),
                 ),
-                _buildInfoRow(context, 'Cédula', member.idNumber),
-                _buildInfoRow(context, 'Teléfono', member.phoneNumber),
-                _buildInfoRow(context, 'Dirección', member.address),
+                const ProfileDivider(),
+                Column(
+                  children: [
+                    InfoRow(
+                        label: 'cdula_de_identidad'.tr(),
+                        value: _currentMember.idNumber),
+                    if (idFrontUrl != null || idBackUrl != null)
+                      _buildIdImageViewer(context, idFrontUrl, idBackUrl),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const ProfileDivider(),
+                InfoRow(
+                  label: 'telfono'.tr(),
+                  value: _currentMember.phoneNumber,
+                ),
+                const ProfileDivider(),
+                InfoRow(
+                  label: 'direccin'.tr(),
+                  value: _currentMember.address,
+                  isLast: true,
+                ),
               ],
             ),
             const SizedBox(height: 16),
-            _buildSectionCard(
-              context: context,
-              title: 'Información Médica',
+            ProfileSectionHeader(
+              title: 'informacin_mdica'.tr(),
               icon: HugeIcons.strokeRoundedHealth,
-              showEditButton: isTutorViewing,
-              onEditPressed: () {},
+              // --- CAMBIO: Se añade la navegación al botón de editar ---
+              onEditPressed: isTutorViewing
+                  ? () => _navigateToEditScreen(
+                        EditFamilyMemberMedicalInfoScreen(member: _currentMember),
+                      )
+                  : null,
+            ),
+            InfoCard(
               children: [
-                _buildInfoRow(
-                  context,
-                  'Tipo de Sangre',
-                  member.medicalInfo?['bloodType'] ?? 'No especificado',
+                InfoRow(
+                  label: 'tipo_de_sangre'.tr(),
+                  value:
+                      _currentMember.medicalInfo?['bloodType'] ?? 'No especificado',
+                  isFirst: true,
                 ),
-                _buildInfoRow(
-                  context,
-                  'Alergias',
-                  member.medicalInfo?['knownAllergies'] ?? 'Ninguna reportada',
+                const ProfileDivider(),
+                InfoRow(
+                  label: 'alergias_conocidas'.tr(),
+                  value: _currentMember.medicalInfo?['knownAllergies'] ??
+                      'ninguna_reportada'.tr(),
                 ),
-                _buildInfoRow(
-                  context,
-                  'Padecimientos Crónicos',
-                  _formatChronicDiseases(member),
+                const ProfileDivider(),
+                InfoRow(
+                  label: 'padecimientos_crnicos'.tr(),
+                  value: _formatChronicDiseases(_currentMember),
+                  isLast: true,
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            // Sección de Configuración de Cuenta (con el mismo diseño)
-            if (isTutorViewing)
-              _buildSectionCard(
-                context: context,
-                title: 'Configuración de Cuenta',
+            if (isTutorViewing) ...[
+              const SizedBox(height: 16),
+              ProfileSectionHeader(
+                title: 'configuracin_de_cuenta'.tr(),
                 icon: HugeIcons.strokeRoundedSettings02,
-                showEditButton: false,
-                onEditPressed: () {},
+              ),
+              InfoCard(
                 children: [
-                  _buildActionRow(
-                    'Eliminar perfil familiar',
-                    HugeIcons.strokeRoundedDelete02,
-                    AppColors.warningColor(context),
-                    () => _showDeleteConfirmation(context, familyViewModel),
-                  ),
+                  _buildDeleteActionRow(context, familyViewModel),
                 ],
               ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSectionCard({
-    required BuildContext context,
-    required String title,
-    required IconData icon,
-    required List<Widget> children,
-    bool showEditButton = false,
-    VoidCallback? onEditPressed,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryColor(context).withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      icon,
-                      color: AppColors.primaryColor(context),
-                      size: 18,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textColor(context),
-                      letterSpacing: -0.3,
-                    ),
-                  ),
-                ],
-              ),
-              if (showEditButton)
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor(context).withOpacity(0.08),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      HugeIcons.strokeRoundedEdit01,
-                      size: 16,
-                      color: AppColors.primaryColor(context),
-                    ),
-                    onPressed: onEditPressed,
-                    padding: EdgeInsets.zero,
-                    tooltip: 'Editar',
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const Divider(height: 1, color: Color(0xFFF0F0F0)),
-          const SizedBox(height: 12),
-          ...children,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(BuildContext context, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value.isEmpty ? 'No especificado' : value,
-              style: TextStyle(
-                color: AppColors.textColor(context),
-                fontSize: 14.2,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionRow(
-    String title,
-    IconData icon,
-    Color color,
-    VoidCallback onTap,
-  ) {
+  Widget _buildDeleteActionRow(
+      BuildContext context, FamilyViewModel viewModel) {
+    final color = AppColors.warningColor(context);
     return InkWell(
-      onTap: onTap,
+      onTap: () => _showDeleteConfirmation(context, viewModel),
+      borderRadius: const BorderRadius.all(Radius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 16.0),
         child: Row(
           children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: color, size: 18),
-            ),
-            const SizedBox(width: 12),
+            Icon(HugeIcons.strokeRoundedDelete02, color: color, size: 22),
+            const SizedBox(width: 16),
             Expanded(
               child: Text(
-                title,
+                'eliminar_perfil_familiar'.tr(),
                 style: TextStyle(
                   color: color,
                   fontSize: 15,
@@ -337,13 +469,141 @@ class FamilyMemberProfileScreen extends StatelessWidget {
               ),
             ),
             Icon(
-              HugeIcons.strokeRoundedArrowRight01,
-              color: color.withOpacity(0.7),
-              size: 18,
+              Icons.arrow_forward_ios_rounded,
+              color: Colors.grey.shade400,
+              size: 16,
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildIdImageViewer(
+    BuildContext context,
+    String? frontUrl,
+    String? backUrl,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          if (frontUrl != null)
+            Expanded(
+              child: _buildImageContainer(
+                'frente_de_la_cdula'.tr(),
+                frontUrl,
+                context,
+                'id_front',
+                _isUploadingFront,
+              ),
+            ),
+          if (frontUrl != null && backUrl != null) const SizedBox(width: 16),
+          if (backUrl != null)
+            Expanded(
+              child: _buildImageContainer(
+                'reverso_de_la_cdula'.tr(),
+                backUrl,
+                context,
+                'id_back',
+                _isUploadingBack,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageContainer(
+    String label,
+    String url,
+    BuildContext context,
+    String imageType,
+    bool isLoading,
+  ) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            GestureDetector(
+              onTap: () => _showImageDialog(context, url),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  height: 100,
+                  width: double.infinity,
+                  color: Colors.grey.shade200,
+                  child: Image.network(
+                    url,
+                    key: ValueKey(url),
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          width: double.infinity,
+                          height: 100,
+                          color: Colors.white,
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(
+                        Icons.error_outline,
+                        color: AppColors.warningColor(context),
+                        size: 40,
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 4,
+              right: 4,
+              child: Material(
+                color: Colors.black.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(20),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: isLoading ? null : () => _pickAndUploadImage(imageType),
+                  child: const Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: Icon(Icons.edit, color: Colors.white, size: 18),
+                  ),
+                ),
+              ),
+            ),
+            if (isLoading)
+              Container(
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
     );
   }
 }

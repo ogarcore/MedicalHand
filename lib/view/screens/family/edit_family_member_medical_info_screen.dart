@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-// lib/view/screens/profile/edit_medical_info_screen.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -9,19 +8,19 @@ import 'package:p_hn25/view/widgets/primary_button.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
 
-class EditMedicalInfoScreen extends StatefulWidget {
-  final UserModel user;
-  const EditMedicalInfoScreen({super.key, required this.user});
+class EditFamilyMemberMedicalInfoScreen extends StatefulWidget {
+  // Se recibe un 'member' para diferenciarlo del usuario principal
+  final UserModel member;
+  const EditFamilyMemberMedicalInfoScreen({super.key, required this.member});
 
   @override
-  State<EditMedicalInfoScreen> createState() => _EditMedicalInfoScreenState();
+  State<EditFamilyMemberMedicalInfoScreen> createState() => _EditFamilyMemberMedicalInfoScreenState();
 }
 
-class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
+class _EditFamilyMemberMedicalInfoScreenState extends State<EditFamilyMemberMedicalInfoScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _bloodTypeController;
   late TextEditingController _allergiesController;
-  // ✅ FIX: Se añaden controladores y estado para los padecimientos crónicos.
   late TextEditingController _chronicDiseaseController;
   late List<String> _chronicDiseases;
   bool _isLoading = false;
@@ -29,17 +28,16 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
   @override
   void initState() {
     super.initState();
+    // Se inicializan los controladores con los datos del 'member'
     _bloodTypeController = TextEditingController(
-      text: widget.user.medicalInfo?['bloodType'] ?? '',
+      text: widget.member.medicalInfo?['bloodType'] ?? '',
     );
     _allergiesController = TextEditingController(
-      text: widget.user.medicalInfo?['knownAllergies'] ?? '',
+      text: widget.member.medicalInfo?['knownAllergies'] ?? '',
     );
     
-    // ✅ FIX: Se inicializa el controlador y la lista de padecimientos.
     _chronicDiseaseController = TextEditingController();
-    // Se convierte la lista de 'dynamic' a 'String' de forma segura.
-    final diseasesFromDB = widget.user.medicalInfo?['chronicDiseases'] as List?;
+    final diseasesFromDB = widget.member.medicalInfo?['chronicDiseases'] as List?;
     _chronicDiseases = diseasesFromDB?.map((e) => e.toString()).toList() ?? [];
   }
 
@@ -47,7 +45,7 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
   void dispose() {
     _bloodTypeController.dispose();
     _allergiesController.dispose();
-    _chronicDiseaseController.dispose(); // ✅ FIX: Se dispone el nuevo controlador.
+    _chronicDiseaseController.dispose();
     super.dispose();
   }
 
@@ -63,7 +61,8 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
     };
 
     final viewModel = Provider.of<UserViewModel>(context, listen: false);
-    final success = await viewModel.updateUserProfile(updatedData);
+    // *** CAMBIO CLAVE: Se usa la función para actualizar el perfil de un familiar ***
+    final success = await viewModel.updateFamilyMemberProfile(widget.member.uid, updatedData);
 
     if (!mounted) return;
 
@@ -98,7 +97,6 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
     }
   }
   
-  // ✅ FIX: Función para añadir un nuevo padecimiento a la lista.
   void _addChronicDisease() {
     final newDisease = _chronicDiseaseController.text.trim();
     if (newDisease.isNotEmpty && !_chronicDiseases.contains(newDisease)) {
@@ -116,7 +114,7 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor(context),
         appBar: AppBar(
-          title: Text('informacin_mdica'.tr()),
+          title: Text('info_medica_de'.tr(args: [widget.member.firstName])),
           backgroundColor: AppColors.accentColor(context),
           foregroundColor: Colors.white,
           elevation: 0,
@@ -139,7 +137,6 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
         body: SafeArea(
           child: Column(
             children: [
-              // Header con mejor diseño
               Container(
                 width: double.infinity,
                 margin: const EdgeInsets.all(20),
@@ -216,8 +213,6 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
                   ],
                 ),
               ),
-
-              // Formulario con mejor espaciado y diseño
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -257,14 +252,11 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
                                 minLines: 1,
                               ),
                               const SizedBox(height: 20),
-                              // ✅ FIX: Se añade la sección para padecimientos crónicos.
                               _buildChronicDiseasesSection(),
                             ],
                           ),
                         ),
                         const SizedBox(height: 32),
-
-                        // Botón de guardar con mejor diseño
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: SizedBox(
@@ -291,18 +283,15 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
     );
   }
   
-  // ✅ FIX: Nuevo widget para la sección de padecimientos crónicos.
   Widget _buildChronicDiseasesSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Campo para añadir nuevo padecimiento
         _buildTextFieldEnhanced(
           controller: _chronicDiseaseController,
           labelText: 'padecimientos_crnicos'.tr(),
           hintText: 'ej_hipertensin_diabetes'.tr(),
           icon: HugeIcons.strokeRoundedHealth,
-          // Se usa un `suffixIcon` para el botón de añadir
           suffixIcon: IconButton(
             icon: Icon(Icons.add_circle, color: AppColors.accentColor(context)),
             onPressed: _addChronicDisease,
@@ -310,10 +299,8 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
           onSubmitted: (_) => _addChronicDisease(),
         ),
         
-        // Espacio si hay padecimientos en la lista
         if (_chronicDiseases.isNotEmpty) const SizedBox(height: 12),
         
-        // Lista de padecimientos como "chips"
         Wrap(
           spacing: 8.0,
           runSpacing: 4.0,
@@ -349,8 +336,8 @@ class _EditMedicalInfoScreenState extends State<EditMedicalInfoScreen> {
     String? Function(String?)? validator,
     int? minLines,
     int? maxLines = 1,
-    Widget? suffixIcon, // Se añade para el botón de añadir
-    Function(String)? onSubmitted, // Se añade para el enter del teclado
+    Widget? suffixIcon,
+    Function(String)? onSubmitted,
   }) {
     return Container(
       decoration: BoxDecoration(

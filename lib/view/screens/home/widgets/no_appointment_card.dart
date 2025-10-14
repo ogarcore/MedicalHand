@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
@@ -67,7 +68,7 @@ class NoAppointmentCard extends StatelessWidget {
           
           // Texto principal
           Text(
-            'No tienes citas programadas',
+            'no_tienes_citas_programadas'.tr(),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
@@ -81,7 +82,7 @@ class NoAppointmentCard extends StatelessWidget {
           
           // Texto secundario compacto
           Text(
-            'Es un buen momento para programar tu próximo chequeo médico',
+            'es_un_buen_momento_para_programar_tu_prximo_chequeo_mdico'.tr(),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -148,8 +149,8 @@ class _ProfileContentViewState extends State<ProfileContentView> {
     if (status.isDenied || status.isPermanentlyDenied) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Se necesita permiso para acceder a la galería.'),
+          SnackBar(
+            content: Text('se_necesita_permiso_para_acceder_a_la_galera'.tr()),
             backgroundColor: Colors.orange,
           ),
         );
@@ -220,7 +221,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Ocurrió un error. Inténtalo de nuevo.'),
+            content: Text('Ocurrió un error. Inténtalo de nuevo.'),
             backgroundColor: Colors.red.shade700,
           ),
         );
@@ -259,7 +260,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
             child: ProfileHeader(user: widget.user),
           ),
           ProfileSectionHeader(
-            title: 'Información Personal',
+            title: 'informacin_personal'.tr(),
             icon: HugeIcons.strokeRoundedUserCircle02,
             onEditPressed: () {
               Navigator.push(
@@ -273,29 +274,29 @@ class _ProfileContentViewState extends State<ProfileContentView> {
           InfoCard(
             children: [
               InfoRow(
-                label: 'Nombre Completo',
+                label: 'nombre_completo'.tr(),
                 value: '${widget.user.firstName} ${widget.user.lastName}',
                 isFirst: true,
               ),
               const ProfileDivider(),
               InfoRow(
-                label: 'Fecha de Nacimiento',
+                label: 'fecha_de_nacimiento'.tr(),
                 value: _formatDateOfBirth(),
               ),
               const ProfileDivider(),
               Column(
                 children: [
-                  InfoRow(label: 'Cédula', value: widget.user.idNumber),
+                  InfoRow(label: 'cdula_de_identidad'.tr(), value: widget.user.idNumber),
                   if (idFrontUrl != null || idBackUrl != null)
                     _buildIdImageViewer(context, idFrontUrl, idBackUrl),
                 ],
               ),
               const SizedBox(height: 10),
               const ProfileDivider(),
-              InfoRow(label: 'Teléfono', value: widget.user.phoneNumber),
+              InfoRow(label: 'telfono'.tr(), value: widget.user.phoneNumber),
               const ProfileDivider(),
               InfoRow(
-                label: 'Dirección',
+                label: 'direccin'.tr(),
                 value: widget.user.address,
                 isLast: true,
               ),
@@ -303,7 +304,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
           ),
           const SizedBox(height: 16),
           ProfileSectionHeader(
-            title: 'Información Médica',
+            title: 'informacin_mdica'.tr(),
             icon: HugeIcons.strokeRoundedHealth,
             onEditPressed: () {
               Navigator.push(
@@ -317,21 +318,21 @@ class _ProfileContentViewState extends State<ProfileContentView> {
           InfoCard(
             children: [
               InfoRow(
-                label: 'Tipo de Sangre',
+                label: 'tipo_de_sangre'.tr(),
                 value:
                     widget.user.medicalInfo?['bloodType'] ?? 'No especificado',
                 isFirst: true,
               ),
               const ProfileDivider(),
               InfoRow(
-                label: 'Alergias',
+                label: 'alergias_conocidas'.tr(),
                 value:
                     widget.user.medicalInfo?['knownAllergies'] ??
-                    'Ninguna reportada',
+                    'ninguna_reportada'.tr(),
               ),
               const ProfileDivider(),
               InfoRow(
-                label: 'Padecimientos Crónicos',
+                label: 'padecimientos_crnicos'.tr(),
                 value: _formatChronicDiseases(),
                 isLast: true,
               ),
@@ -339,7 +340,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
           ),
           const SizedBox(height: 16),
           ProfileSectionHeader(
-            title: 'Contacto de Emergencia',
+            title: 'contacto_de_emergencia'.tr(),
             icon: HugeIcons.strokeRoundedContact02,
           ),
           InfoCard(
@@ -350,14 +351,14 @@ class _ProfileContentViewState extends State<ProfileContentView> {
             ],
           ),
           const SizedBox(height: 16),
-          const ProfileSectionHeader(
-            title: 'Ajustes y Preferencias',
+          ProfileSectionHeader(
+            title: 'ajustes_y_preferencias'.tr(),
             icon: HugeIcons.strokeRoundedSettings02,
           ),
           InfoCard(
             children: [
               SettingsRow(
-                title: 'Preferencias de la Aplicación',
+                title: 'preferencias_de_la_aplicacin'.tr(),
                 icon: HugeIcons.strokeRoundedPhoneArrowDown,
                 onTap: () => Navigator.push(
                   context,
@@ -369,7 +370,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
               ),
               const ProfileDivider(),
               SettingsRow(
-                title: 'Preferencias de Notificaciones',
+                title: 'preferencias_de_notificaciones'.tr(),
                 icon: HugeIcons.strokeRoundedNotification01,
                 onTap: () => Navigator.push(
                   context,
@@ -380,7 +381,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
               ),
               const ProfileDivider(),
               SettingsRow(
-                title: 'Gestión de la Cuenta y Seguridad',
+                title: 'gestin_de_la_cuenta_y_seguridad'.tr(),
                 icon: HugeIcons.strokeRoundedShield01,
                 onTap: () => Navigator.push(
                   context,
@@ -396,7 +397,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
           Container(
             padding: const EdgeInsets.all(12),
             child: Text(
-              'Tu información está segura con nosotros',
+              'tu_informacin_est_segura_con_nosotros'.tr(),
               style: TextStyle(
                 color: Colors.grey.shade500,
                 fontSize: 12,
@@ -487,7 +488,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Añadir Contacto',
+                    'aadir_contacto'.tr(),
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
@@ -496,7 +497,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Agrega a alguien para notificar en caso de emergencia',
+                    'agrega_a_alguien_para_notificar_en_caso_de_emergencia'.tr(),
                     style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                   ),
                 ],
@@ -526,7 +527,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
           if (frontUrl != null)
             Expanded(
               child: _buildImageContainer(
-                'Frente',
+                'frente_de_la_cdula'.tr(),
                 frontUrl,
                 context,
                 'id_front',
@@ -537,7 +538,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
           if (backUrl != null)
             Expanded(
               child: _buildImageContainer(
-                'Dorso',
+                'reverso_de_la_cdula'.tr(),
                 backUrl,
                 context,
                 'id_back',
@@ -709,14 +710,14 @@ class _EmergencyContactDialogState extends State<EmergencyContactDialog> {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Contacto de emergencia actualizado.'),
+          content: Text('contacto_de_emergencia_actualizado'.tr()),
           backgroundColor: AppColors.secondaryColor(context),
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Error al guardar el contacto.'),
+          content: Text('Error al guardar el contacto.'),
           backgroundColor: AppColors.warningColor(context),
         ),
       );
@@ -758,7 +759,7 @@ class _EmergencyContactDialogState extends State<EmergencyContactDialog> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Contacto de Emergencia',
+                            'contacto_de_emergencia'.tr(),
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
@@ -766,7 +767,7 @@ class _EmergencyContactDialogState extends State<EmergencyContactDialog> {
                             ),
                           ),
                           Text(
-                            'Persona a notificar en emergencias',
+                            'persona_a_notificar_en_emergencias'.tr(),
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.grey.shade600,
@@ -780,8 +781,8 @@ class _EmergencyContactDialogState extends State<EmergencyContactDialog> {
                 const SizedBox(height: 24),
                 _buildTextFieldEnhanced(
                   controller: _nameController,
-                  labelText: 'Nombre completo',
-                  hintText: 'Nombre del contacto',
+                  labelText: 'nombre_completo'.tr(),
+                  hintText: 'nombre_del_contacto'.tr(),
                   icon: HugeIcons.strokeRoundedUser,
                   validator: (value) =>
                       AppValidators.validateGenericEmpty(value, 'El nombre'),
@@ -789,7 +790,7 @@ class _EmergencyContactDialogState extends State<EmergencyContactDialog> {
                 const SizedBox(height: 16),
                 _buildTextFieldEnhanced(
                   controller: _phoneController,
-                  labelText: 'Teléfono',
+                  labelText: 'telfono'.tr(),
                   hintText: '0000-0000',
                   icon: HugeIcons.strokeRoundedFlipPhone,
                   keyboardType: TextInputType.phone,
@@ -811,7 +812,7 @@ class _EmergencyContactDialogState extends State<EmergencyContactDialog> {
                             side: BorderSide(color: Colors.grey.shade300),
                           ),
                           child: Text(
-                            'Cancelar',
+                            'cancelar'.tr(),
                             style: TextStyle(
                               color: Colors.grey.shade700,
                               fontWeight: FontWeight.w600,
@@ -825,7 +826,7 @@ class _EmergencyContactDialogState extends State<EmergencyContactDialog> {
                           height: 40,
                           child: Center(
                             child: PrimaryButton(
-                              text: 'Guardar',
+                              text: 'guardar'.tr(),
                               onPressed: _handleSave,
                               isLoading: _isLoading,
                               backgroundColor: AppColors.accentColor(context),

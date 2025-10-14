@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -229,7 +230,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Filtrar Citas Pasadas',
+                      'filtrar_citas_pasadas'.tr(),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -237,7 +238,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                       ),
                     ),
                     Text(
-                      'Selecciona los criterios',
+                      'selecciona_los_criterios'.tr(),
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,
@@ -295,7 +296,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                   ),
                   // 🔥 4. EL COLOR DEL TEXTO TAMBIÉN CAMBIA.
                   child: Text(
-                    'Limpiar',
+                    'limpiar'.tr(),
                     style: TextStyle(
                       color: hasActiveFilters
                           ? AppColors.warningColor(context)
@@ -317,8 +318,8 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                     ),
                     elevation: 2,
                   ),
-                  child: const Text(
-                    'Aplicar',
+                  child: Text(
+                    'aplicar'.tr(),
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -338,7 +339,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Fecha',
+          'fecha'.tr(),
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -445,7 +446,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Estado',
+          'estado'.tr(),
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -474,7 +475,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                   size: 18,
                 ),
               ),
-              hint: const Text('Seleccionar estado'),
+              hint: Text('seleccionar_estado'.tr()),
               icon: Icon(
                 Icons.arrow_drop_down,
                 color: Colors.grey.shade600,

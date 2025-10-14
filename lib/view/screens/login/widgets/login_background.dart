@@ -5,7 +5,7 @@ import 'package:p_hn25/app/core/constants/app_colors.dart';
 class LoginBackground extends StatelessWidget {
   const LoginBackground({super.key});
 
-  @override
+  @override 
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     return Stack(

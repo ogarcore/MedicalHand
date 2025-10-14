@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:intl/intl.dart';
@@ -98,7 +99,7 @@ class AppointmentDetailsModal extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                appointment.specialty ?? 'Consulta Externa',
+                                appointment.specialty ?? 'consulta_externa'.tr(),
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w800,
@@ -109,7 +110,7 @@ class AppointmentDetailsModal extends StatelessWidget {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'Detalles de tu cita médica',
+                                'detalles_de_tu_cita_mdica'.tr(),
                                 style: TextStyle(
                                   fontSize: 13.5,
                                   color: Colors.white.withAlpha(200),
@@ -238,8 +239,8 @@ class AppointmentDetailsModal extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'Fecha y Hora',
+                  Text(
+                    'fecha_y_hora'.tr(),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 15,
@@ -262,7 +263,7 @@ class AppointmentDetailsModal extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Fecha',
+                          'fecha'.tr(),
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -293,7 +294,7 @@ class AppointmentDetailsModal extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Hora',
+                          'hora'.tr(),
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -391,8 +392,8 @@ class AppointmentDetailsModal extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'Información Adicional',
+                  Text(
+                    'informacin_adicional'.tr(),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 15,
@@ -413,7 +414,7 @@ class AppointmentDetailsModal extends StatelessWidget {
                   _buildDetailItem(
                     context: context,
                     icon: HugeIcons.strokeRoundedHospital01,
-                    title: 'Hospital',
+                    title: 'hospital'.tr(),
                     subtitle: appointment.hospital,
                     color: colorScheme[1],
                   ),
@@ -421,7 +422,7 @@ class AppointmentDetailsModal extends StatelessWidget {
                   _buildDetailItem(
                     context: context,
                     icon: HugeIcons.strokeRoundedHospitalBed01,
-                    title: 'Consultorio',
+                    title: 'consultorio'.tr(),
                     subtitle: appointment.clinicOffice ?? 'No asignado',
                     color: colorScheme[2],
                   ),
@@ -429,7 +430,7 @@ class AppointmentDetailsModal extends StatelessWidget {
                   _buildDetailItem(
                     context: context,
                     icon: HugeIcons.strokeRoundedNote01,
-                    title: 'Razón de la consulta',
+                    title: 'razn_de_la_consulta'.tr(),
                     subtitle: appointment.reason,
                     color: colorScheme[3],
                   ),

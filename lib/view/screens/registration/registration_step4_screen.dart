@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:p_hn25/view/widgets/gradient_background.dart';
 import '../../../app/core/constants/app_colors.dart';
@@ -53,7 +54,7 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          "Datos de Contacto",
+                          'datos_de_contacto'.tr(),
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -66,7 +67,7 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                     const RegistrationProgressIndicator(currentStep: 4),
                     const SizedBox(height: 32),
                     Text(
-                      '¿Cómo podemos contactarte?',
+                      'como_podemos_contactarte'.tr(),
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -76,7 +77,7 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                     const SizedBox(height: 24),
                     CustomTextField(
                       controller: authViewModel.phoneController,
-                      labelText: 'Número de Teléfono',
+                      labelText: 'nmero_de_telfono'.tr(),
                       hintText: '0000-0000',
                       icon: Icons.phone_outlined,
                       inputFormatters: [PhoneInputFormatter()],
@@ -87,8 +88,8 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                     const SizedBox(height: 20),
                     CustomTextField(
                       controller: authViewModel.addressController,
-                      labelText: 'Dirección de Domicilio',
-                      hintText: 'Ingresa su dirección',
+                      labelText: 'direccin_de_domicilio'.tr(),
+                      hintText: 'ingresa_su_direccin'.tr(),
                       icon: Icons.home_outlined,
                       minLines: 1,
                       maxLines: 3,
@@ -101,7 +102,7 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                     Row(
                       children: [
                         Text(
-                          'Contacto de Emergencia',
+                          'contacto_de_emergencia'.tr(),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -123,15 +124,15 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                     const SizedBox(height: 16),
                     CustomTextField(
                       controller: authViewModel.emergencyNameController,
-                      labelText: 'Nombre del Contacto',
-                      hintText: 'Ingrese el nombre del contacto',
+                      labelText: 'nombre_del_contacto'.tr(),
+                      hintText: 'ingrese_el_nombre_del_contacto'.tr(),
                       icon: Icons.person_outline,
                       // No necesita validador, se revisará en el botón
                     ),
                     const SizedBox(height: 20),
                     CustomTextField(
                       controller: authViewModel.emergencyPhoneController,
-                      labelText: 'Número de Teléfono',
+                      labelText: 'nmero_de_telfono'.tr(),
                       hintText: '0000-0000',
                       icon: Icons.phone_outlined,
                       inputFormatters: [PhoneInputFormatter()],
@@ -141,7 +142,7 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                     ),
                     const SizedBox(height: 50),
                     PrimaryButton(
-                      text: 'Siguiente',
+                      text: 'siguiente'.tr(),
                       // PASO 4: Lógica de validación en el botón
                       onPressed: () {
                         // Ocultamos el teclado
@@ -161,7 +162,7 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  'Por favor, ingresa el teléfono del contacto de emergencia.',
+                                  'por_favor_ingresa_el_telfono_del_contacto_de_emergencia'.tr(),
                                 ),
                                 backgroundColor: AppColors.warningColor(
                                   context,
@@ -177,7 +178,7 @@ class _RegistrationStep4ScreenState extends State<RegistrationStep4Screen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  'Por favor, ingresa el nombre del contacto de emergencia.',
+                                  'por_favor_ingresa_el_nombre_del_contacto_de_emergencia'.tr(),
                                 ),
                                 backgroundColor: AppColors.warningColor(
                                   context,
