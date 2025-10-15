@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
-// lib/view/screens/support/support_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 
@@ -43,7 +43,7 @@ class SupportScreen extends StatelessWidget {
         title: Text(
           'soporte_y_ayuda'.tr(),
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 20.sp,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.5,
           ),
@@ -54,12 +54,12 @@ class SupportScreen extends StatelessWidget {
         centerTitle: false,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(20.0),
+        padding: EdgeInsets.all(20.w),
         children: [
           _buildSupportHeader(context),
-          const SizedBox(height: 32),
+          SizedBox(height: 32.h),
           _buildSectionTitle('Contacta con Nosotros', context),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           _buildContactOption(
             context: context,
             icon: HugeIcons.strokeRoundedMail01,
@@ -70,9 +70,9 @@ class SupportScreen extends StatelessWidget {
               // Lógica para abrir el cliente de correo
             },
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: 32.h),
           _buildSectionTitle('Preguntas Frecuentes', context),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           ...faqs.map(
             (faq) =>
                 FaqItem(question: faq['question']!, answer: faq['answer']!),
@@ -86,7 +86,7 @@ class SupportScreen extends StatelessWidget {
     return Text(
       title,
       style: TextStyle(
-        fontSize: 18,
+        fontSize: 18.sp,
         fontWeight: FontWeight.w700,
         color: AppColors.textColor(context),
         letterSpacing: -0.3,
@@ -96,7 +96,7 @@ class SupportScreen extends StatelessWidget {
 
   Widget _buildSupportHeader(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(24.r),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -106,28 +106,28 @@ class SupportScreen extends StatelessWidget {
             AppColors.primaryColor(context).withAlpha(30),
           ],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
           color: AppColors.primaryColor(context).withAlpha(30),
-          width: 1,
+          width: 1.w,
         ),
       ),
       child: Row(
         children: [
           Container(
-            width: 60,
-            height: 60,
+            width: 60.w,
+            height: 60.h,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: AppColors.primaryColor(context).withAlpha(30),
             ),
             child: Icon(
               HugeIcons.strokeRoundedCustomerService01,
-              size: 30,
+              size: 30.sp,
               color: AppColors.primaryColor(context),
             ),
           ),
-          const SizedBox(width: 20),
+          SizedBox(width: 20.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,17 +135,18 @@ class SupportScreen extends StatelessWidget {
                 Text(
                   '¿Necesitas ayuda?',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textColor(context),
                     letterSpacing: -0.3,
                   ),
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 6.h),
                 Text(
-                  'estamos_aqu_para_asistirte_con_cualquier_duda_o_problema_que'.tr(),
+                  'estamos_aqu_para_asistirte_con_cualquier_duda_o_problema_que'
+                      .tr(),
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 14.sp,
                     color: AppColors.textLightColor(context),
                     height: 1.4,
                   ),
@@ -167,34 +168,34 @@ class SupportScreen extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withAlpha(40), width: 1),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: Colors.grey.withAlpha(40), width: 1.w),
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16.r),
           splashColor: color.withAlpha(40),
           highlightColor: color.withAlpha(20),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16.r),
             child: Row(
               children: [
                 Container(
-                  width: 50,
-                  height: 50,
+                  width: 50.w,
+                  height: 50.h,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: color.withAlpha(30),
                   ),
-                  child: Icon(icon, color: color, size: 24),
+                  child: Icon(icon, color: color, size: 24.sp),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -202,26 +203,26 @@ class SupportScreen extends StatelessWidget {
                       Text(
                         title,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textColor(context),
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       Text(
                         subtitle,
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 13.sp,
                           color: AppColors.textLightColor(context),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12.w),
                 Icon(
                   Icons.arrow_forward_ios_rounded,
-                  size: 16,
+                  size: 16.sp,
                   color: AppColors.textLightColor(context),
                 ),
               ],
@@ -247,11 +248,11 @@ class _FaqItemState extends State<FaqItem> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withAlpha(40), width: 1),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: Colors.grey.withAlpha(40), width: 1.w),
       ),
       child: Theme(
         data: Theme.of(context).copyWith(
@@ -263,7 +264,7 @@ class _FaqItemState extends State<FaqItem> {
           title: Text(
             widget.question,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 14.sp,
               fontWeight: FontWeight.w600,
               color: AppColors.textColor(context),
             ),
@@ -282,15 +283,15 @@ class _FaqItemState extends State<FaqItem> {
               });
             }
           },
-          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          childrenPadding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 20.h),
+          tilePadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
           iconColor: AppColors.primaryColor(context),
           collapsedIconColor: AppColors.textLightColor(context),
           children: [
             Text(
               widget.answer,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 13.sp,
                 color: AppColors.textLightColor(context),
                 height: 1.5,
               ),

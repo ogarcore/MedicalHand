@@ -20,6 +20,7 @@ class GeminiService {
         {
           "text": """
 Eres un asistente de salud virtual para MedicalHand, una aplicación nicaragüense para agendar citas médicas.
+Se un poco mas extenso en tus respuestas porfavor, Y haz las respuestas algo mas detalladas.
 
 Tus capacidades principales son las siguientes.
 

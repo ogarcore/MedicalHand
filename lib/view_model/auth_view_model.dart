@@ -244,77 +244,65 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   Future<String?> finalizeRegistration(BuildContext context) async {
-    setLoading(true);
-    setErrorMessage(null);
+  setLoading(true);
+  setErrorMessage(null);
 
-    User? user = _authService.getCurrentUser();
-
-    // Esta parte se mantiene igual
-    if (user == null) {
-      if (passwordController.text != confirmPasswordController.text) {
-        setErrorMessage("Las contraseñas no coinciden.");
-        setLoading(false);
-        return null;
-      }
-      try {
-        user = await _authService.signUpWithEmailAndPassword(
-          emailController.text,
-          passwordController.text,
-        );
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'email-already-in-use') {
-          setErrorMessage(
-            'Este correo ya está registrado. Intenta iniciar sesión con Google.',
-          );
-        } else {
-          setErrorMessage('No se pudo crear la cuenta. Inténtalo de nuevo.');
-        }
-        setLoading(false);
-        return null;
-      }
+  User? user = _authService.getCurrentUser();
+  if (user == null) {
+    if (passwordController.text != confirmPasswordController.text) {
+      setErrorMessage("Las contraseñas no coinciden.");
+      setLoading(false);
+      return null;
     }
+    try {
+      user = await _authService.signUpWithEmailAndPassword(
+        emailController.text,
+        passwordController.text,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        setErrorMessage(
+          'Este correo ya está registrado. Intenta iniciar sesión con Google.',
+        );
+      } else {
+        setErrorMessage('No se pudo crear la cuenta. Inténtalo de nuevo.');
+      }
+      setLoading(false);
+      return null;
+    }
+  }
 
-    if (user != null) {
-      final Map<String, String> imageUrls = {};
-
-      try {
-        final List<Future<String>> uploadTasks = [];
-        final List<String> taskKeys = [];
-
-        if (idFrontImage != null) {
-          uploadTasks.add(
-            _storageService.uploadFile(
-              user.uid,
-              'id_front.jpg',
-              File(idFrontImage!.path),
-            ),
-          );
-          taskKeys.add('idFrontUrl');
-        }
-        if (idBackImage != null) {
-          uploadTasks.add(
-            _storageService.uploadFile(
-              user.uid,
-              'id_back.jpg',
-              File(idBackImage!.path),
-            ),
-          );
-          taskKeys.add('idBackUrl');
-        }
-
-        final List<String> uploadedUrls = await Future.wait(uploadTasks);
-        for (int i = 0; i < taskKeys.length; i++) {
-          imageUrls[taskKeys[i]] = uploadedUrls[i];
-        }
-      } finally {
-        if (idFrontImage != null) {
-          await File(idFrontImage!.path).delete();
-        }
-        if (idBackImage != null) {
-          await File(idBackImage!.path).delete();
-        }
+  if (user != null) {
+    try {
+      final imageUploadFutures = <Future<String?>>[];
+      if (idFrontImage != null) {
+        imageUploadFutures.add(
+          _storageService.uploadFile(
+            user.uid,
+            'id_front.jpg',
+            File(idFrontImage!.path),
+          ),
+        );
+      } else {
+        imageUploadFutures.add(Future.value(null));
+      }
+      if (idBackImage != null) {
+        imageUploadFutures.add(
+          _storageService.uploadFile(
+            user.uid,
+            'id_back.jpg',
+            File(idBackImage!.path),
+          ),
+        );
+      } else {
+        imageUploadFutures.add(Future.value(null));
       }
 
+      final uploadedUrls = await Future.wait(imageUploadFutures);
+      final idFrontUrl = uploadedUrls[0];
+      final idBackUrl = uploadedUrls[1];
+
+      // Construcción del modelo de usuario
       final dateParts = birthDateController.text.split('/');
       final dateOfBirth = Timestamp.fromDate(
         DateTime(
@@ -350,39 +338,61 @@ class AuthViewModel extends ChangeNotifier {
           'chronicDiseases': selectedDiseases.toList(),
         },
         verification: {
-          'idFrontUrl': imageUrls['idFrontUrl'] ?? '',
-          'idBackUrl': imageUrls['idBackUrl'] ?? '',
+          'idFrontUrl': idFrontUrl ?? '',
+          'idBackUrl': idBackUrl ?? '',
         },
         isTutor: true,
         managedBy: null,
       );
+      final finalizationTasks = <Future<void>>[];
+      
+      finalizationTasks.add(_authService.saveUserData(userModel));
+      
+      final providerId = user.providerData.any((p) => p.providerId == 'password')
+          ? 'password'
+          : 'google.com';
+      finalizationTasks.add(_authService.updateUserAuthProvider(user.uid, providerId));
 
-      await _authService.saveUserData(userModel);
+      await Future.wait(finalizationTasks);
 
       final userViewModel = Provider.of<UserViewModel>(context, listen: false);
       await userViewModel.fetchCurrentUser();
 
-      if (user.providerData.any((p) => p.providerId == 'password')) {
-        await _authService.updateUserAuthProvider(user.uid, 'password');
+      if (providerId == 'password') {
         await _authService.signOut();
         setLoading(false);
         return 'VERIFY';
       } else {
-        await _authService.updateUserAuthProvider(user.uid, 'google.com');
-
-        // Se añade el guardado de SharedPreferences aquí también
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('last_active_user_id', user.uid);
-
         setLoading(false);
         return 'SPLASH';
       }
-    } else {
-      setErrorMessage("No se pudo crear la cuenta. Inténtalo de nuevo.");
+
+    } catch (e) {
+      setErrorMessage("Ocurrió un error al finalizar el registro.");
       setLoading(false);
       return null;
+    } finally {
+      if (idFrontImage != null) {
+        try {
+          await File(idFrontImage!.path).delete();
+        } catch (_) {
+        }
+      }
+      if (idBackImage != null) {
+        try {
+          await File(idBackImage!.path).delete();
+        } catch (_) {
+        }
+      }
     }
+  } else {
+    setErrorMessage("No se pudo crear la cuenta. Inténtalo de nuevo.");
+    setLoading(false);
+    return null;
   }
+}
 
   Future<bool> checkEmailExists() async {
     setLoading(true);

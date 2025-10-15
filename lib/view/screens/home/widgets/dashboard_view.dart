@@ -25,7 +25,7 @@ class _DashboardViewState extends State<DashboardView> {
   Timer? _timer;
   String? _monitoredAppointmentId;
   bool _showTransitionShimmer = false;
-  bool _firstLoadDone = false; // ✅ evita el doble parpadeo inicial
+  bool _firstLoadDone = false;
 
   @override
   void initState() {
@@ -40,7 +40,6 @@ class _DashboardViewState extends State<DashboardView> {
 
     final monitoredAppointment = appointment!;
 
-    // ✅ Si está en fila, no se inicia el timer ni se marca como no_asistio
     if (monitoredAppointment.status == 'en_fila') {
       return;
     }
@@ -96,7 +95,14 @@ class _DashboardViewState extends State<DashboardView> {
           const DashboardHeader(),
           const SizedBox(height: 12),
           if (activeProfile == null)
-            const _DashboardLoadingShimmer()
+            // Muestra el shimmer solo para la tarjeta si el perfil está cargando
+            const Column(
+              children: [
+                _DashboardLoadingShimmer(),
+                // Puedes agregar placeholders para los botones si lo deseas, pero
+                // al dejarlos fuera, no parpadearán.
+              ],
+            )
           else
             _buildDashboardContent(context, activeProfile),
         ],
@@ -104,6 +110,21 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
+  /// **Widget corregido para evitar el parpadeo del dashboard.**
+  ///
+  /// El problema original era que durante la carga inicial (`ConnectionState.waiting`),
+  /// el `StreamBuilder` devolvía *únicamente* el widget `_DashboardLoadingShimmer`,
+  /// omitiendo el resto del contenido (botones, tarjeta de IA, etc.).
+  /// Al completarse la carga, reconstruía el widget tree con *todos* los elementos,
+  /// causando un salto en la UI (el "parpadeo").
+  ///
+  /// **Solución:**
+  /// La nueva lógica asegura que la estructura base del `Column` (que contiene
+  /// el `AnimatedSwitcher`, los botones y demás widgets) se renderice *siempre*.
+  /// La condición de carga inicial ahora decide qué widget se mostrará *dentro*
+  /// del `AnimatedSwitcher` (el shimmer o la tarjeta real), pero nunca altera
+  /// la estructura principal que está por debajo. Esto mantiene el layout estable
+  /// y la animación de carga contenida únicamente en el área de la tarjeta.
   Widget _buildDashboardContent(BuildContext context, UserModel activeProfile) {
     final appointmentViewModel = context.watch<AppointmentViewModel>();
 
@@ -115,24 +136,22 @@ class _DashboardViewState extends State<DashboardView> {
       builder: (context, snapshot) {
         final CitaModel? currentAppointment = snapshot.data;
 
-        // ✅ solo mostrar shimmer la primera vez, no en cada conexión
-        if (!_firstLoadDone &&
+        // Condición para mostrar el shimmer de carga solo la primera vez.
+        final bool showInitialShimmer = !_firstLoadDone &&
             snapshot.connectionState == ConnectionState.waiting &&
-            currentAppointment == null) {
-          return const _DashboardLoadingShimmer();
-        }
+            currentAppointment == null;
 
+        // Lógica para el shimmer de transición al cambiar de cita.
         if (_monitoredAppointmentId != currentAppointment?.id) {
           _startTimer(currentAppointment);
 
           if (_firstLoadDone) {
-            // solo mostrar shimmer en cambios posteriores, no en el arranque
+            // Activa el shimmer para la transición.
             _showTransitionShimmer = true;
             Future.delayed(const Duration(milliseconds: 300), () {
               if (mounted) setState(() => _showTransitionShimmer = false);
             });
           }
-
           _firstLoadDone = true;
         }
 
@@ -142,7 +161,8 @@ class _DashboardViewState extends State<DashboardView> {
 
         Widget appointmentSection;
 
-        if (_showTransitionShimmer) {
+        // Se unifica la lógica para decidir si se muestra el shimmer.
+        if (showInitialShimmer || _showTransitionShimmer) {
           appointmentSection =
               const _DashboardLoadingShimmer(key: ValueKey('loading'));
         } else if (currentAppointment?.status == 'en_fila') {
@@ -155,14 +175,14 @@ class _DashboardViewState extends State<DashboardView> {
             key: ValueKey('next-${currentAppointment.id}'),
             appointment: currentAppointment,
           );
-        } else if (currentAppointment == null) {
-          appointmentSection =
-              const NoAppointmentCard(key: ValueKey('no-appointment'));
         } else {
+          // Caso por defecto: no hay cita o la cita ya no es válida.
           appointmentSection =
               const NoAppointmentCard(key: ValueKey('no-appointment'));
         }
 
+        // Devolvemos SIEMPRE la misma estructura de widgets, cambiando solo
+        // el `child` del `AnimatedSwitcher`. Esto evita el parpadeo del layout.
         return Column(
           children: [
             AnimatedSwitcher(

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -57,40 +58,51 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => SplashViewModel()),
-        ChangeNotifierProvider(create: (_) => AuthViewModel()),
-        ChangeNotifierProvider(create: (_) => AppointmentViewModel()),
-        ChangeNotifierProvider(create: (_) => UserViewModel()),
-        ChangeNotifierProvider(create: (_) => FamilyViewModel()),
-        ChangeNotifierProvider(create: (_) => NotificationViewModel()),
-        ChangeNotifierProvider(create: (_) => HistoryViewModel()),
-        ChangeNotifierProvider(create: (_) => ChatViewModel()),
-      ],
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) {
-          return MaterialApp(
-            localizationsDelegates: context.localizationDelegates,
-            supportedLocales: context.supportedLocales,
-            locale: context.locale.languageCode == 'miq'
-                ? const Locale('es')
-                : context.locale,
-
-            title: 'MedicalHand',
-            debugShowCheckedModeBanner: false,
-            theme: themeProvider.currentTheme.copyWith(
-              textTheme: GoogleFonts.sourceSans3TextTheme(
-                ThemeData(
-                  brightness: themeProvider.currentTheme.brightness,
-                ).textTheme,
-              ),
-            ),
-            home: const SplashScreen(),
-          );
-        },
-      ),
+    return ScreenUtilInit(
+      designSize: const Size(390, 844), // 📱 Tamaño base (iPhone 12)
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => ThemeProvider()),
+            ChangeNotifierProvider(create: (_) => SplashViewModel()),
+            ChangeNotifierProvider(create: (_) => AuthViewModel()),
+            ChangeNotifierProvider(create: (_) => AppointmentViewModel()),
+            ChangeNotifierProvider(create: (_) => UserViewModel()),
+            ChangeNotifierProvider(create: (_) => FamilyViewModel()),
+            ChangeNotifierProvider(create: (_) => NotificationViewModel()),
+            ChangeNotifierProvider(create: (_) => HistoryViewModel()),
+            ChangeNotifierProvider(create: (_) => ChatViewModel()),
+          ],
+          child: Consumer<ThemeProvider>(
+            builder: (context, themeProvider, _) {
+              return MaterialApp(
+                builder: (context, widget) {
+                  ScreenUtil.init(context);
+                  return widget!;
+                },
+                localizationsDelegates: context.localizationDelegates,
+                supportedLocales: context.supportedLocales,
+                locale: context.locale.languageCode == 'miq'
+                    ? const Locale('es')
+                    : context.locale,
+                title: 'MedicalHand',
+                debugShowCheckedModeBanner: false,
+                theme: themeProvider.currentTheme.copyWith(
+                  textTheme: GoogleFonts.sourceSans3TextTheme(
+                    ThemeData(
+                      brightness: themeProvider.currentTheme.brightness,
+                    ).textTheme,
+                  ),
+                ),
+                home: const SplashScreen(),
+              );
+            },
+          ),
+        );
+      },
+      child: const SplashScreen(),
     );
   }
 }

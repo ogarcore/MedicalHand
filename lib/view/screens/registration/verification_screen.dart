@@ -30,7 +30,7 @@ class VerificationScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Ilustración minimalista y elegante
+                      // Ilustración minimalista
                       Container(
                         width: size.width * 0.35,
                         height: size.width * 0.35,
@@ -46,7 +46,7 @@ class VerificationScreen extends StatelessWidget {
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          Icons.mark_email_read_outlined,
+                          Icons.verified_outlined,
                           size: size.width * 0.18,
                           color: AppColors.primaryColor(context),
                         ),
@@ -56,7 +56,7 @@ class VerificationScreen extends StatelessWidget {
 
                       // Título principal
                       Text(
-                        'revisa_tu_correo'.tr(),
+                        'codigo_enviado'.tr(),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 32,
@@ -68,13 +68,13 @@ class VerificationScreen extends StatelessWidget {
 
                       SizedBox(height: size.height * 0.02),
 
-                      // Descripción elegante
+                      // Mensaje simplificado
                       Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: size.width * 0.05,
                         ),
                         child: Text(
-                          'hemos_enviado_un_enlace_de_verificacin_a_tu_direccin_de_corr'.tr(),
+                          'se_envio_codigo_verificacion_correo'.tr(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,
@@ -87,42 +87,33 @@ class VerificationScreen extends StatelessWidget {
 
                       SizedBox(height: size.height * 0.04),
 
-                      // Email destacado en tarjeta sutil
+                      // Email destacado
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(24),
+                        padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           color: AppColors.primaryColor(context).withAlpha(5),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppColors.primaryColor(
-                              context,
-                            ).withAlpha(25),
+                            color: AppColors.primaryColor(context).withAlpha(25),
                             width: 1,
                           ),
                         ),
                         child: Column(
                           children: [
+                            Icon(
+                              Icons.email_outlined,
+                              size: 24,
+                              color: AppColors.primaryColor(context),
+                            ),
+                            SizedBox(height: 12),
                             Text(
                               email,
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontSize: 17,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.primaryColor(context),
-                                letterSpacing: 0.3,
-                              ),
-                            ),
-                            SizedBox(height: 12),
-                            Text(
-                              'el_enlace_expirar_en_24_horas'.tr(),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.textColor(
-                                  context,
-                                ).withAlpha(128),
-                                fontWeight: FontWeight.w400,
                               ),
                             ),
                           ],
@@ -131,22 +122,34 @@ class VerificationScreen extends StatelessWidget {
 
                       SizedBox(height: size.height * 0.05),
 
-                      // Indicadores visuales minimalistas
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildStepIndicator(
-                            context: context,
-                            icon: Icons.inbox_outlined,
-                            text: 'bandeja_de_entrada'.tr(),
-                          ),
-                          SizedBox(width: 24),
-                          _buildStepIndicator(
-                            context: context,
-                            icon: Icons.folder_outlined,
-                            text: 'carpeta_spam'.tr(),
-                          ),
-                        ],
+                      // Indicador de tiempo
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[200]!),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.access_time_outlined,
+                              size: 16,
+                              color: Colors.grey[600],
+                            ),
+                            SizedBox(width: 6),
+                            Text(
+                              'válido por 24 horas',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
 
                       SizedBox(height: size.height * 0.08),
@@ -155,7 +158,7 @@ class VerificationScreen extends StatelessWidget {
                 ),
               ),
 
-              // Botón principal elegante
+              // Botón principal
               Container(
                 width: double.infinity,
                 height: 56,
@@ -182,7 +185,6 @@ class VerificationScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryColor(context),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -193,7 +195,6 @@ class VerificationScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
                     ),
                   ),
                 ),
@@ -202,35 +203,6 @@ class VerificationScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildStepIndicator({
-    required BuildContext context,
-    required IconData icon,
-    required String text,
-  }) {
-    return Column(
-      children: [
-        Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: AppColors.primaryColor(context).withAlpha(25),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: AppColors.primaryColor(context), size: 22),
-        ),
-        SizedBox(height: 8),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 12,
-            color: AppColors.textColor(context).withAlpha(153),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
     );
   }
 }

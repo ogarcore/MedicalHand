@@ -1,11 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
-// lib/view/screens/home/widgets/home_app_bar_logic.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/data/models/user_model.dart';
 import 'package:p_hn25/view/screens/family/family_members_screen.dart';
 import 'package:p_hn25/view/screens/home/widgets/home_app_bar.dart';
+import 'package:p_hn25/view/screens/notifications/notifications_screen.dart';
 import 'package:p_hn25/view/screens/profile/profile_screen.dart';
 import 'package:p_hn25/view/screens/splash/splash_screen.dart';
 import 'package:p_hn25/view/screens/support/support_screen.dart';
@@ -15,7 +15,6 @@ import 'package:p_hn25/view_model/family_view_model.dart';
 import 'package:p_hn25/view_model/notification_view_model.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:provider/provider.dart';
-import '../../notifications/notifications_screen.dart';
 
 mixin HomeAppBarLogic on State<HomeAppBar> {
   bool isMenuOpen = false;
@@ -106,13 +105,13 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
     }
 
     menuItems.add(
-  buildProfileMenuItem(
-    currentUser,
-    'nombre_con_parentesis_yo'.tr(
-      namedArgs: {'nombre': _getShortName(currentUser)}
-    ),
-  ),
-); 
+      buildProfileMenuItem(
+        currentUser,
+        'nombre_con_parentesis_yo'.tr(
+          namedArgs: {'nombre': _getShortName(currentUser)},
+        ),
+      ),
+    );
 
     if (familyMembers.isNotEmpty) {
       for (var member in familyMembers) {
@@ -222,7 +221,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
           const SizedBox(width: 12),
           Text(
             text,
-            style: TextStyle( fontWeight: FontWeight.w500),
+            style: const TextStyle(fontWeight: FontWeight.w500),
           ),
         ],
       ),
@@ -238,7 +237,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
         return CustomModal(
           icon: HugeIcons.strokeRoundedLogout03,
           title: 'cerrar_sesin'.tr(),
-          content: Text(
+          content: const Text(
             '¿Estás seguro de que deseas cerrar sesión?',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, height: 1.5),
@@ -252,124 +251,39 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
               text: 'aceptar'.tr(),
               isWarning: true,
               onPressed: () async {
-                final navigator = Navigator.of(context);
+                final navigator = Navigator.of(context, rootNavigator: true);
+
                 Navigator.of(dialogContext).pop();
 
-                // --- NUEVA TRANSICIÓN MÁS SUAVE AL CERRAR SESIÓN ---
-                showGeneralDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  barrierColor: Colors.black.withOpacity(0.15),
-                  transitionDuration: const Duration(milliseconds: 250),
-                  pageBuilder: (_, __, ___) => Scaffold(
-                    backgroundColor: AppColors.backgroundColor(context),
-                    body: Center(
-                      child: AnimatedScale(
-                        scale: 1,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeOutBack,
-                        child: Container(
-                          width: 280,
-                          padding: const EdgeInsets.all(32),
-                          decoration: BoxDecoration(
-                            color: AppColors.backgroundColor(context),
-                            borderRadius: BorderRadius.circular(28),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withAlpha(40),
-                                blurRadius: 30,
-                                spreadRadius: 2,
-                                offset: const Offset(0, 15),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 80,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: AppColors.primaryColor(context)
-                                        .withAlpha(60),
-                                    width: 2,
-                                  ),
-                                  gradient: RadialGradient(
-                                    colors: [
-                                      AppColors.primaryColor(context)
-                                          .withAlpha(30),
-                                      AppColors.primaryColor(context)
-                                          .withAlpha(10),
-                                    ],
-                                    center: Alignment.center,
-                                    radius: 0.7,
-                                  ),
-                                ),
-                                child: Center(
-                                  child: SizedBox(
-                                    width: 50,
-                                    height: 50,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 3,
-                                      valueColor:
-                                          AlwaysStoppedAnimation<Color>(
-                                        AppColors.primaryColor(context),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 24),
-                              Text(
-                                'cerrando_sesin'.tr(),
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.textColor(context),
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'su_sesin_se_est_cerrando_de_forma_segura'.tr(),
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.textColor(context)
-                                      .withAlpha(180),
-                                  height: 1.4,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
+                // 2. Transición a una PANTALLA COMPLETA de carga con un fundido suave.
+                navigator.push(PageRouteBuilder(
+                  pageBuilder: (_, __, ___) => const _LogoutLoadingScreen(),
+                  transitionDuration: const Duration(milliseconds: 500),
+                  transitionsBuilder: (_, animation, __, child) =>
+                      FadeTransition(opacity: animation, child: child),
+                ));
 
+                // Se da un respiro a la animación antes de empezar el trabajo pesado.
+                await Future.delayed(const Duration(milliseconds: 300));
+                
+                // 3. Realizar el cierre de sesión en segundo plano.
                 await authViewModel.signOut(context);
 
-                // Espera breve para dejar respirar la animación
-                await Future.delayed(const Duration(milliseconds: 300));
-
+                // 4. Pequeña pausa para que el proceso se sienta deliberado.
+                await Future.delayed(const Duration(milliseconds: 500));
+                
                 if (!navigator.mounted) return;
-                navigator.pop(); // Cierra el diálogo suave
-                await Future.delayed(const Duration(milliseconds: 100));
-
+                
+                // 5. Navegar a la pantalla de Splash, eliminando todas las rutas
+                // anteriores con otro fundido suave.
                 navigator.pushAndRemoveUntil(
                   PageRouteBuilder(
                     pageBuilder: (_, __, ___) => const SplashScreen(),
-                    transitionDuration: const Duration(milliseconds: 300),
-                    transitionsBuilder:
-                        (_, animation, __, child) => FadeTransition(
+                    transitionDuration: const Duration(milliseconds: 500),
+                    transitionsBuilder: (_, animation, __, child) =>
+                        FadeTransition(
                       opacity: CurvedAnimation(
-                        parent: animation,
-                        curve: Curves.easeOut,
-                      ),
+                          parent: animation, curve: Curves.easeOut),
                       child: child,
                     ),
                   ),
@@ -380,6 +294,55 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
           ],
         );
       },
+    );
+  }
+}
+
+/// Widget interno para la pantalla de carga al cerrar sesión.
+class _LogoutLoadingScreen extends StatelessWidget {
+  const _LogoutLoadingScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    // Scaffold con fondo sólido para una experiencia de pantalla completa.
+    return Scaffold(
+      backgroundColor: AppColors.backgroundColor(context),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 60,
+              height: 60,
+              child: CircularProgressIndicator(
+                strokeWidth: 3.5,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  AppColors.primaryColor(context),
+                ),
+              ),
+            ),
+            const SizedBox(height: 28),
+            Text(
+              'cerrando_sesin'.tr(),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textColor(context),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'su_sesin_se_est_cerrando_de_forma_segura'.tr(),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.textColor(context).withOpacity(0.7),
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
