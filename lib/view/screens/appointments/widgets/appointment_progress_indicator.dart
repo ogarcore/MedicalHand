@@ -36,7 +36,7 @@ class AppointmentProgressIndicator extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(13),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -109,7 +109,7 @@ class AppointmentProgressIndicator extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: effectiveActiveColor.withOpacity(0.08),
+                color: effectiveActiveColor.withAlpha(20),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(

@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:p_hn25/view_model/appointment_view_model.dart'; 
+import 'package:p_hn25/view_model/appointment_view_model.dart';
 import 'package:p_hn25/view_model/notification_view_model.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
-import 'package:provider/provider.dart'; 
+import 'package:provider/provider.dart';
 import '../view/screens/home/home_screen.dart';
 import '../view/screens/splash/no_internet_screen.dart';
 import '../view/screens/welcome/welcome_screen.dart';
@@ -20,17 +20,15 @@ class SplashViewModel extends ChangeNotifier {
     required UserViewModel userViewModel,
     required NotificationViewModel notificationViewModel,
   }) async {
-    if (!context.mounted) return;
-    
-    // La lógica de comprobación de internet no cambia.
     final connectivityResult = await (Connectivity().checkConnectivity());
+
+    if (!context.mounted) return;
+
     if (connectivityResult.contains(ConnectivityResult.none)) {
-      if (context.mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const NoInternetScreen()),
-        );
-      }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const NoInternetScreen()),
+      );
       return;
     }
 
@@ -38,29 +36,28 @@ class SplashViewModel extends ChangeNotifier {
 
     if (currentUser != null) {
       try {
-        // Obtenemos la instancia del AppointmentViewModel desde el Provider.
-        final appointmentViewModel = Provider.of<AppointmentViewModel>(context, listen: false);
+        final appointmentViewModel =
+            Provider.of<AppointmentViewModel>(context, listen: false);
 
-        await Future.wait([
+        // Se inician las cargas de datos del usuario y la cita.
+        final dataFuture = Future.wait([
           userViewModel.fetchCurrentUser(),
           appointmentViewModel.fetchInitialDashboardAppointment(currentUser.uid),
         ]);
-        // --- FIN DE LA MODIFICACIÓN CLAVE ---
 
-        // El resto de la lógica de inicialización y navegación no cambia.
-        await _notificationService.initNotifications(
-          userViewModel: userViewModel,
-          notificationViewModel: notificationViewModel,
-        );
-
+        await dataFuture;
         if (context.mounted) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => const HomeScreen()),
           );
         }
+
+        _notificationService.initNotifications(
+          userViewModel: userViewModel,
+          notificationViewModel: notificationViewModel,
+        );
       } catch (e) {
-        print("Error durante la carga inicial de datos: $e");
         if (context.mounted) {
           Navigator.pushReplacement(
             context,
@@ -69,7 +66,7 @@ class SplashViewModel extends ChangeNotifier {
         }
       }
     } else {
-      await Future.delayed(const Duration(milliseconds: 1200));
+      await Future.delayed(const Duration(milliseconds: 300));
       if (context.mounted) {
         Navigator.pushReplacement(
           context,

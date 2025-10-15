@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:intl/intl.dart'; // Importado para el formato de fecha
 import 'package:p_hn25/view/screens/registration/registration_step3_screen.dart';
 import 'package:p_hn25/view/widgets/custom_modal.dart';
 import 'package:p_hn25/view/widgets/gradient_background.dart';

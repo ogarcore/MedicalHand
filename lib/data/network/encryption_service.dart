@@ -42,9 +42,6 @@ class EncryptionService {
 
       return _encrypter.decrypt(encrypted, iv: iv);
     } catch (e) {
-      // Si la desencriptación falla (por datos corruptos o cambios de clave),
-      // devolvemos un mensaje de error en lugar de crashear la app.
-      print("Error al desencriptar: $e");
       return "Error: no se pudo leer el mensaje.";
     }
   }

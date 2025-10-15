@@ -61,11 +61,9 @@ class HistoryViewModel extends ChangeNotifier {
       final allConsultations = await Future.wait(futures);
       return allConsultations;
 
-    } on FirebaseException catch (e) {
-      debugPrint("Error de Firebase al cargar el historial: $e");
+    } on FirebaseException {
       throw Exception("No se pudo cargar el historial. Inténtalo de nuevo.");
     } catch (e) {
-      debugPrint("Error inesperado: $e");
       throw Exception("Ocurrió un error inesperado.");
     }
   }

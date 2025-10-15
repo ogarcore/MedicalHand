@@ -14,22 +14,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  print("--- BACKGROUND HANDLER ACTIVADO ---");
-
-  // Imprime todo el contenido del mensaje
-  print("Mensaje completo: ${message.toMap()}");
-  print("Contenido de 'notification': ${message.notification?.toMap()}");
-  print("Contenido de 'data': ${message.data}");
 
   final prefs = await SharedPreferences.getInstance();
   final userId = prefs.getString('last_active_user_id');
 
-  print("UserID encontrado en SharedPreferences: $userId");
 
   if (userId == null) {
-    print(
-      "Error: No se encontró un usuario activo. No se guardará la notificación.",
-    );
+    //
     return;
   }
 
@@ -43,7 +34,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     );
     await NotificationStorageService.addNotification(userId, notification);
   }
-  print("--- BACKGROUND HANDLER FINALIZADO ---");
 }
 
 class NotificationService {
@@ -110,7 +100,6 @@ class NotificationService {
     }
     final String? profileId = message.data['patientProfileId'];
     if (profileId != null && _userViewModel != null) {
-      print('Cambiando al perfil: $profileId');
       _userViewModel!.changeActiveProfileById(profileId);
     }
   }
@@ -171,7 +160,6 @@ class NotificationService {
     _onMessageSubscription = FirebaseMessaging.onMessage.listen((
       RemoteMessage message,
     ) {
-      print('Notificación recibida en primer plano!');
 
       final userId = _userViewModel?.currentUser?.uid;
       if (userId == null) return;
@@ -184,7 +172,6 @@ class NotificationService {
 
     _onMessageOpenedAppSubscription = FirebaseMessaging.onMessageOpenedApp
         .listen((RemoteMessage message) {
-          print('Notificación abierta desde segundo plano!');
           _handleNotificationTap(message);
         });
 
@@ -207,15 +194,12 @@ class NotificationService {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('Permiso concedido por el usuario');
     } else {
-      print('Permiso denegado por el usuario');
     }
   }
 
   Future<String?> _getToken() async {
     final token = await _firebaseMessaging.getToken();
-    print('Token FCM: $token');
     return token;
   }
 }

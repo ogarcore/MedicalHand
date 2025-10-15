@@ -128,7 +128,7 @@ class CustomModal extends StatelessWidget {
                 if (isLoading)
                   Positioned.fill(
                     child: Container(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withAlpha(179),
                       child: const Center(
                         child: CircularProgressIndicator(),
                       ),

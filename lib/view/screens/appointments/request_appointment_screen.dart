@@ -204,127 +204,137 @@ Future<void> _loadDepartments() async {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: Scaffold(
-          backgroundColor: AppColors.backgroundColor(context),
-          appBar: AppBar(
-            title: Text(
-              'solicitar_cita_mdica'.tr(),
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
+@override
+Widget build(BuildContext context) {
+  return PopScope(
+    canPop: false,
+    onPopInvokedWithResult: (didPop, result) async {
+      if (!didPop) {
+        final shouldPop = await _onWillPop();
+        if (shouldPop) {
+          if (!context.mounted) return; // ✅ Evita el warning
+          Navigator.of(context).pop();
+        }
+      }
+    },
+    child: GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: AppColors.backgroundColor(context),
+        appBar: AppBar(
+          title: Text(
+            'solicitar_cita_mdica'.tr(),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(22),
+              ),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.primaryColor(context).withAlpha(243),
+                  AppColors.primaryColor(context).withAlpha(217),
+                ],
               ),
             ),
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(22),
-                ),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    AppColors.primaryColor(context).withAlpha(243),
-                    AppColors.primaryColor(context).withAlpha(217),
+          ),
+          elevation: 1,
+          shadowColor: const Color.fromARGB(100, 0, 0, 0),
+          surfaceTintColor: Colors.transparent,
+          centerTitle: false,
+          iconTheme: const IconThemeData(color: Colors.white),
+        ),
+        body: _isLoadingDepartments
+            ? const Center(child: CircularProgressIndicator())
+            : Form(
+                child: Column(
+                  children: [
+                    AppointmentProgressIndicator(
+                      currentStep: _currentStep,
+                      activeColor: AppColors.primaryColor(context),
+                    ),
+                    Expanded(
+                      child: PageView(
+                        controller: _pageController,
+                        physics: const NeverScrollableScrollPhysics(),
+                        onPageChanged: (page) {
+                          setState(() => _currentStep = page);
+                        },
+                        children: [
+                          AppointmentStepLayout(
+                            icon: HugeIcons.strokeRoundedLocation04,
+                            title: 'en_qué_departamento_te_encuentras'.tr(),
+                            subtitle:
+                                'selecciona_tu_ubicacin_para_mostrarte_los_hospital_de_tu_zon'.tr(),
+                            iconColor: AppColors.primaryColor(context),
+                            content: AppStyledDropdown(
+                              value: _selectedDepartament,
+                              items: _departmentsList,
+                              hintText: 'selecciona_t_departamento'.tr(),
+                              prefixIcon: HugeIcons.strokeRoundedLocation04,
+                              iconColor: AppColors.accentColor(context),
+                              iconBackgroundColor: AppColors.accentColor(
+                                context,
+                              ).withAlpha(30),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setState(() {
+                                    _selectedDepartament = value;
+                                  });
+                                  _fetchHospitalsForDepartment(value);
+                                }
+                              },
+                            ),
+                          ),
+                          AppointmentStepLayout(
+                            icon: HugeIcons.strokeRoundedHospital01,
+                            title: 'elige_tu_centro_mdico'.tr(),
+                            subtitle:
+                                'elige_el_centro_mdico_donde_deseas_agendar_tu_cita'.tr(),
+                            content: _buildHospitalsDropdown(),
+                          ),
+                          AppointmentStepLayout(
+                            icon: HugeIcons.strokeRoundedNote,
+                            title: 'cuntanos_sobre_tu_consulta'.tr(),
+                            subtitle:
+                                'describe_brevemente_el_motivo_de_tu_visita_mdica'.tr(),
+                            content: CustomTextField(
+                              controller: _reasonController,
+                              focusNode: _reasonFocusNode,
+                              labelText: 'motivo_de_la_consulta'.tr(),
+                              hintText:
+                                  'ej_dolor_de_cabeza_chequeo_general_molestias'.tr(),
+                              icon: HugeIcons.strokeRoundedNote,
+                              maxLines: 5,
+                              iconColor: AppColors.accentColor(context),
+                              focusedBorderColor: AppColors.accentColor(
+                                context,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ),
-            elevation: 1,
-            shadowColor: const Color.fromARGB(100, 0, 0, 0),
-            surfaceTintColor: Colors.transparent,
-            centerTitle: false,
-            iconTheme: const IconThemeData(color: Colors.white),
-          ),
-          body: _isLoadingDepartments
-              ? const Center(child: CircularProgressIndicator())
-              : Form(
-                  child: Column(
-                    children: [
-                      AppointmentProgressIndicator(
-                        currentStep: _currentStep,
-                        activeColor: AppColors.primaryColor(context),
-                      ),
-                      Expanded(
-                        child: PageView(
-                          controller: _pageController,
-                          physics: const NeverScrollableScrollPhysics(),
-                          onPageChanged: (page) {
-                            setState(() => _currentStep = page);
-                          },
-                          children: [
-                            AppointmentStepLayout(
-                              icon: HugeIcons.strokeRoundedLocation04,
-                              title: 'en_qué_departamento_te_encuentras'.tr(),
-                              subtitle:
-                                  'selecciona_tu_ubicacin_para_mostrarte_los_hospital_de_tu_zon'.tr(),
-                              iconColor: AppColors.primaryColor(context),
-                              content: AppStyledDropdown(
-                                value: _selectedDepartament,
-                                items: _departmentsList,
-                                hintText: 'selecciona_t_departamento'.tr(),
-                                prefixIcon: HugeIcons.strokeRoundedLocation04,
-                                iconColor: AppColors.accentColor(context),
-                                iconBackgroundColor: AppColors.accentColor(
-                                  context,
-                                ).withAlpha(30),
-                                onChanged: (value) {
-                                  if (value != null) {
-                                    setState(() {
-                                      _selectedDepartament = value;
-                                    });
-                                    _fetchHospitalsForDepartment(value);
-                                  }
-                                },
-                              ),
-                            ),
-                            AppointmentStepLayout(
-                              icon: HugeIcons.strokeRoundedHospital01,
-                              title: 'elige_tu_centro_mdico'.tr(),
-                              subtitle:
-                                  'elige_el_centro_mdico_donde_deseas_agendar_tu_cita'.tr(),
-                              content: _buildHospitalsDropdown(),
-                            ),
-                            AppointmentStepLayout(
-                              icon: HugeIcons.strokeRoundedNote,
-                              title: 'cuntanos_sobre_tu_consulta'.tr(),
-                              subtitle:
-                                  'describe_brevemente_el_motivo_de_tu_visita_mdica'.tr(),
-                              content: CustomTextField(
-                                controller: _reasonController,
-                                focusNode: _reasonFocusNode,
-                                labelText: 'motivo_de_la_consulta'.tr(),
-                                hintText:
-                                    'ej_dolor_de_cabeza_chequeo_general_molestias'.tr(),
-                                icon: HugeIcons.strokeRoundedNote,
-                                maxLines: 5,
-                                iconColor: AppColors.accentColor(context),
-                                focusedBorderColor: AppColors.accentColor(
-                                  context,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-          bottomNavigationBar: AppointmentNavigationBar(
-            currentStep: _currentStep,
-            onNextPressed: _nextStepOrSummary,
-            onPreviousPressed: _previousStep,
-          ),
+        bottomNavigationBar: AppointmentNavigationBar(
+          currentStep: _currentStep,
+          onNextPressed: _nextStepOrSummary,
+          onPreviousPressed: _previousStep,
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildHospitalsDropdown() {
     if (_selectedDepartament == null) {

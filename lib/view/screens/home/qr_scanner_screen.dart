@@ -127,7 +127,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
+          SizedBox(
             width: 280,
             height: 280,
             child: CustomPaint(

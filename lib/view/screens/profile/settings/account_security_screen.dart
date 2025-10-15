@@ -42,8 +42,9 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
     if (user == null) return;
 
     bool reauthenticated = false;
-    final isGoogleProvider =
-        user.providerData.any((info) => info.providerId == 'google.com');
+    final isGoogleProvider = user.providerData.any(
+      (info) => info.providerId == 'google.com',
+    );
 
     setState(() => _isDeleting = true);
 
@@ -51,10 +52,12 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
       reauthenticated = await _reauthenticateWithGoogle();
     } else {
       final password = await _promptForPassword(context);
+      if (!mounted) return;
       if (password != null && password.isNotEmpty) {
-        reauthenticated =
-            await Provider.of<UserViewModel>(context, listen: false)
-                .reauthenticate(user.email!, password);
+        reauthenticated = await Provider.of<UserViewModel>(
+          context,
+          listen: false,
+        ).reauthenticate(user.email!, password);
       }
     }
 
@@ -63,8 +66,7 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:
-                Text('autenticacin_fallida_no_se_elimin_la_cuenta'.tr()),
+            content: Text('autenticacin_fallida_no_se_elimin_la_cuenta'.tr()),
             backgroundColor: AppColors.warningColor(context),
             behavior: SnackBarBehavior.floating,
           ),
@@ -72,9 +74,11 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
       }
       return;
     }
-
-    final success =
-        await Provider.of<UserViewModel>(context, listen: false).deleteAccount();
+    if (!mounted) return;
+    final success = await Provider.of<UserViewModel>(
+      context,
+      listen: false,
+    ).deleteAccount();
 
     setState(() => _isDeleting = false);
 
@@ -107,11 +111,11 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      await FirebaseAuth.instance.currentUser
-          ?.reauthenticateWithCredential(credential);
+      await FirebaseAuth.instance.currentUser?.reauthenticateWithCredential(
+        credential,
+      );
       return true;
     } catch (e) {
-      print("Error en reautenticación con Google: $e");
       return false;
     }
   }
@@ -127,8 +131,9 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
       builder: (context) => GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Text('confirmar_identidad'.tr()),
           content: Form(
             key: formKey,
@@ -238,7 +243,8 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'esta_accin_es_permanente_todos_tus_datos_sern_eliminados_def'.tr(),
+                      'esta_accin_es_permanente_todos_tus_datos_sern_eliminados_def'
+                          .tr(),
                       style: TextStyle(
                         color: AppColors.textLightColor(context),
                         fontSize: 15,
@@ -347,9 +353,10 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
                             onTap: () => _showChangePasswordDialog(context),
                           ),
                           Divider(
-                              height: 1,
-                              color: Colors.grey.shade200,
-                              indent: 16),
+                            height: 1,
+                            color: Colors.grey.shade200,
+                            indent: 16,
+                          ),
                         ],
                         _SettingsOptionRow(
                           title: 'eliminar_cuenta'.tr(),
@@ -364,10 +371,8 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
             ),
             if (_isDeleting)
               Container(
-                color: Colors.black.withOpacity(0.5),
-                child: const Center(
-                  child: CircularProgressIndicator(),
-                ),
+                color: Colors.black.withAlpha(128),
+                child: const Center(child: CircularProgressIndicator()),
               ),
           ],
         ),
@@ -481,7 +486,8 @@ class __ChangePasswordDialogState extends State<_ChangePasswordDialog> {
           child: Column(
             children: [
               Text(
-                'para_proteger_tu_cuenta_ingresa_tu_contrasea_actual_antes_de'.tr(),
+                'para_proteger_tu_cuenta_ingresa_tu_contrasea_actual_antes_de'
+                    .tr(),
                 style: TextStyle(color: AppColors.textLightColor(context)),
               ),
               const SizedBox(height: 24),
@@ -492,15 +498,19 @@ class __ChangePasswordDialogState extends State<_ChangePasswordDialog> {
                 icon: HugeIcons.strokeRoundedCirclePassword,
                 obscureText: _isCurrentPasswordObscured,
                 validator: (value) => AppValidators.validateGenericEmpty(
-                    value, 'La contraseña actual'),
+                  value,
+                  'La contraseña actual',
+                ),
                 suffixIcon: IconButton(
                   icon: Icon(
                     _isCurrentPasswordObscured
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined,
                   ),
-                  onPressed: () => setState(() =>
-                      _isCurrentPasswordObscured = !_isCurrentPasswordObscured),
+                  onPressed: () => setState(
+                    () => _isCurrentPasswordObscured =
+                        !_isCurrentPasswordObscured,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -518,7 +528,8 @@ class __ChangePasswordDialogState extends State<_ChangePasswordDialog> {
                         : Icons.visibility_outlined,
                   ),
                   onPressed: () => setState(
-                      () => _isNewPasswordObscured = !_isNewPasswordObscured),
+                    () => _isNewPasswordObscured = !_isNewPasswordObscured,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -543,8 +554,10 @@ class __ChangePasswordDialogState extends State<_ChangePasswordDialog> {
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined,
                   ),
-                  onPressed: () => setState(() => _isConfirmPasswordObscured =
-                      !_isConfirmPasswordObscured),
+                  onPressed: () => setState(
+                    () => _isConfirmPasswordObscured =
+                        !_isConfirmPasswordObscured,
+                  ),
                 ),
               ),
             ],

@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:intl/intl.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/app/core/utils/input_formatters.dart';
 
@@ -24,7 +23,7 @@ class FilterHistoryModal extends StatefulWidget {
 
 class _FilterHistoryModalState extends State<FilterHistoryModal> {
   String? _selectedSpecialty;
-  bool _withResultsOnly = false;
+  final bool _withResultsOnly = false;
   DateTime? _selectedDate;
   final TextEditingController _dateController = TextEditingController();
 

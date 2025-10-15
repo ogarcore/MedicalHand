@@ -61,6 +61,7 @@ class WelcomeScreen extends StatelessWidget {
 
   void _handleLogin(BuildContext context) async {
     final connected = await _hasInternet();
+    if (!context.mounted) return;
     if (!connected) {
       _showNoConnectionMessage(context);
       return;
@@ -74,6 +75,7 @@ class WelcomeScreen extends StatelessWidget {
 
   void _handleRegister(BuildContext context) async {
     final connected = await _hasInternet();
+    if (!context.mounted) return;
     if (!connected) {
       _showNoConnectionMessage(context);
       return;
@@ -216,7 +218,8 @@ class WelcomeScreen extends StatelessWidget {
                       const SizedBox(height: 12),
 
                       Text(
-                        'el_poder_de_gestionar_tu_bienestar_nen_la_palma_de_tu_mano'.tr(),
+                        'el_poder_de_gestionar_tu_bienestar_nen_la_palma_de_tu_mano'
+                            .tr(),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 17,

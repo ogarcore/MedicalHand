@@ -21,10 +21,8 @@ class FirebaseStorageService {
       final downloadUrl = await snapshot.ref.getDownloadURL();
 
       return downloadUrl;
-    } on FirebaseException catch (e) {
-      print("Error al subir archivo a Firebase Storage: $e");
-      // Retornamos una cadena vacía o lanzamos una excepción
-      // dependiendo de cómo quieras manejar los errores.
+    } on FirebaseException {
+
       return '';
     }
   }

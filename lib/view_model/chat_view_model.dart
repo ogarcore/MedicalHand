@@ -38,7 +38,7 @@ class ChatViewModel extends ChangeNotifier {
 
       _messages = snapshot.docs.map((doc) => Message.fromFirestore(doc)).toList();
     } catch (e) {
-      debugPrint("Error cargando historial de chat: $e");
+//
     } finally {
       _isInitializing = false; // ✅ Finaliza el estado de inicialización
       notifyListeners();

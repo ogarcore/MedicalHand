@@ -60,17 +60,19 @@ class _DashboardViewState extends State<DashboardView> {
       }
 
       if (updatedAppointment.status == 'en_fila' ||
-          updatedAppointment.status == 'terminada') {
+          updatedAppointment.status == 'terminada' ||updatedAppointment.status == 'asistencia_confirmada' ) {
         timer.cancel();
         return;
       }
-
-      final hasPassed =
-          DateTime.now().isAfter(updatedAppointment.assignedDate!);
+      if (!mounted) return;
+      final hasPassed = DateTime.now().isAfter(
+        updatedAppointment.assignedDate!,
+      );
       if (hasPassed) {
-        context
-            .read<AppointmentViewModel>()
-            .updateAppointmentStatus(updatedAppointment.id!, 'no_asistio');
+        context.read<AppointmentViewModel>().updateAppointmentStatus(
+          updatedAppointment.id!,
+          'no_asistio',
+        );
         timer.cancel();
       }
     });
@@ -131,13 +133,15 @@ class _DashboardViewState extends State<DashboardView> {
     return StreamBuilder<CitaModel?>(
       key: ValueKey(activeProfile.uid),
       initialData: appointmentViewModel.initialDashboardAppointment,
-      stream:
-          appointmentViewModel.getDashboardAppointmentStream(activeProfile.uid),
+      stream: appointmentViewModel.getDashboardAppointmentStream(
+        activeProfile.uid,
+      ),
       builder: (context, snapshot) {
         final CitaModel? currentAppointment = snapshot.data;
 
         // Condición para mostrar el shimmer de carga solo la primera vez.
-        final bool showInitialShimmer = !_firstLoadDone &&
+        final bool showInitialShimmer =
+            !_firstLoadDone &&
             snapshot.connectionState == ConnectionState.waiting &&
             currentAppointment == null;
 
@@ -157,14 +161,15 @@ class _DashboardViewState extends State<DashboardView> {
 
         final bool isAppointmentStillValid =
             currentAppointment?.assignedDate != null &&
-                currentAppointment!.assignedDate!.isAfter(DateTime.now());
+            currentAppointment!.assignedDate!.isAfter(DateTime.now());
 
         Widget appointmentSection;
 
         // Se unifica la lógica para decidir si se muestra el shimmer.
         if (showInitialShimmer || _showTransitionShimmer) {
-          appointmentSection =
-              const _DashboardLoadingShimmer(key: ValueKey('loading'));
+          appointmentSection = const _DashboardLoadingShimmer(
+            key: ValueKey('loading'),
+          );
         } else if (currentAppointment?.status == 'en_fila') {
           appointmentSection = VirtualTicketCard(
             key: ValueKey('virtual-ticket-${currentAppointment!.id}'),
@@ -177,8 +182,9 @@ class _DashboardViewState extends State<DashboardView> {
           );
         } else {
           // Caso por defecto: no hay cita o la cita ya no es válida.
-          appointmentSection =
-              const NoAppointmentCard(key: ValueKey('no-appointment'));
+          appointmentSection = const NoAppointmentCard(
+            key: ValueKey('no-appointment'),
+          );
         }
 
         // Devolvemos SIEMPRE la misma estructura de widgets, cambiando solo
@@ -297,7 +303,10 @@ class _AppointmentCardPlaceholder extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildPlaceholderLine(
-                          width: 160, height: 18, borderRadius: 6),
+                        width: 160,
+                        height: 18,
+                        borderRadius: 6,
+                      ),
                       const SizedBox(height: 6),
                       Row(
                         children: [
@@ -311,7 +320,10 @@ class _AppointmentCardPlaceholder extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           _buildPlaceholderLine(
-                              width: 80, height: 16, borderRadius: 6),
+                            width: 80,
+                            height: 16,
+                            borderRadius: 6,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 6),
@@ -327,7 +339,10 @@ class _AppointmentCardPlaceholder extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           _buildPlaceholderLine(
-                              width: 60, height: 15, borderRadius: 6),
+                            width: 60,
+                            height: 15,
+                            borderRadius: 6,
+                          ),
                         ],
                       ),
                     ],
@@ -348,10 +363,16 @@ class _AppointmentCardPlaceholder extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _buildPlaceholderLine(
-                          width: 30, height: 27, borderRadius: 6),
+                        width: 30,
+                        height: 27,
+                        borderRadius: 6,
+                      ),
                       const SizedBox(height: 2),
                       _buildPlaceholderLine(
-                          width: 40, height: 14, borderRadius: 4),
+                        width: 40,
+                        height: 14,
+                        borderRadius: 4,
+                      ),
                     ],
                   ),
                 ),

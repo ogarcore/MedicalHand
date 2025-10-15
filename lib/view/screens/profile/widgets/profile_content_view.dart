@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/app/core/utils/input_formatters.dart';
@@ -117,7 +116,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
                 top: 0,
                 right: 0,
                 child: Material(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withAlpha(128),
                   borderRadius: BorderRadius.circular(30),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(30),
@@ -142,8 +141,9 @@ class _ProfileContentViewState extends State<ProfileContentView> {
 
   Future<void> _pickAndUploadImage(String imageType) async {
     final isFront = imageType == 'id_front';
-    if ((isFront && _isUploadingFront) || (!isFront && _isUploadingBack))
+    if ((isFront && _isUploadingFront) || (!isFront && _isUploadingBack)) {
       return;
+    }
 
     var status = await Permission.photos.request();
     if (status.isDenied || status.isPermanentlyDenied) {
@@ -197,6 +197,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
       String firestoreField = isFront
           ? 'verification.idFrontUrl'
           : 'verification.idBackUrl';
+      if (!mounted) return;
       final success = await Provider.of<UserViewModel>(
         context,
         listen: false,
@@ -217,7 +218,6 @@ class _ProfileContentViewState extends State<ProfileContentView> {
         );
       }
     } catch (e) {
-      print("Error al subir imagen: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -286,7 +286,10 @@ class _ProfileContentViewState extends State<ProfileContentView> {
               const ProfileDivider(),
               Column(
                 children: [
-                  InfoRow(label: 'cdula_de_identidad'.tr(), value: widget.user.idNumber),
+                  InfoRow(
+                    label: 'cdula_de_identidad'.tr(),
+                    value: widget.user.idNumber,
+                  ),
                   if (idFrontUrl != null || idBackUrl != null)
                     _buildIdImageViewer(context, idFrontUrl, idBackUrl),
                 ],
@@ -418,7 +421,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.accentColor(context).withOpacity(0.1),
+              color: AppColors.accentColor(context).withAlpha(26),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -474,7 +477,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.warningColor(context).withOpacity(0.1),
+                color: AppColors.warningColor(context).withAlpha(26),
               ),
               child: Icon(
                 HugeIcons.strokeRoundedAddCircle,
@@ -497,7 +500,8 @@ class _ProfileContentViewState extends State<ProfileContentView> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'agrega_a_alguien_para_notificar_en_caso_de_emergencia'.tr(),
+                    'agrega_a_alguien_para_notificar_en_caso_de_emergencia'
+                        .tr(),
                     style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                   ),
                 ],
@@ -610,7 +614,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
               top: 4,
               right: 4,
               child: Material(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withAlpha(128),
                 borderRadius: BorderRadius.circular(20),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(20),
@@ -628,7 +632,7 @@ class _ProfileContentViewState extends State<ProfileContentView> {
               Container(
                 height: 100,
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
+                  color: Colors.black.withAlpha(153),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Center(
@@ -744,7 +748,7 @@ class _EmergencyContactDialogState extends State<EmergencyContactDialog> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: AppColors.accentColor(context).withOpacity(0.1),
+                        color: AppColors.accentColor(context).withAlpha(26),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(

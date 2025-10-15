@@ -125,7 +125,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
     }
 
     menuItems.add(const PopupMenuDivider());
-
+    if (!mounted) return;
     if (activeProfile.uid == currentUser.uid) {
       menuItems.add(
         _buildNavigationMenuItem(
@@ -219,10 +219,7 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
         children: [
           Icon(icon, color: color, size: 20),
           const SizedBox(width: 12),
-          Text(
-            text,
-            style: const TextStyle(fontWeight: FontWeight.w500),
-          ),
+          Text(text, style: const TextStyle(fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -256,24 +253,26 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                 Navigator.of(dialogContext).pop();
 
                 // 2. Transición a una PANTALLA COMPLETA de carga con un fundido suave.
-                navigator.push(PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => const _LogoutLoadingScreen(),
-                  transitionDuration: const Duration(milliseconds: 500),
-                  transitionsBuilder: (_, animation, __, child) =>
-                      FadeTransition(opacity: animation, child: child),
-                ));
+                navigator.push(
+                  PageRouteBuilder(
+                    pageBuilder: (_, __, ___) => const _LogoutLoadingScreen(),
+                    transitionDuration: const Duration(milliseconds: 500),
+                    transitionsBuilder: (_, animation, __, child) =>
+                        FadeTransition(opacity: animation, child: child),
+                  ),
+                );
 
                 // Se da un respiro a la animación antes de empezar el trabajo pesado.
                 await Future.delayed(const Duration(milliseconds: 300));
-                
+                if (!mounted) return;
                 // 3. Realizar el cierre de sesión en segundo plano.
                 await authViewModel.signOut(context);
 
                 // 4. Pequeña pausa para que el proceso se sienta deliberado.
                 await Future.delayed(const Duration(milliseconds: 500));
-                
+
                 if (!navigator.mounted) return;
-                
+
                 // 5. Navegar a la pantalla de Splash, eliminando todas las rutas
                 // anteriores con otro fundido suave.
                 navigator.pushAndRemoveUntil(
@@ -282,10 +281,12 @@ mixin HomeAppBarLogic on State<HomeAppBar> {
                     transitionDuration: const Duration(milliseconds: 500),
                     transitionsBuilder: (_, animation, __, child) =>
                         FadeTransition(
-                      opacity: CurvedAnimation(
-                          parent: animation, curve: Curves.easeOut),
-                      child: child,
-                    ),
+                          opacity: CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeOut,
+                          ),
+                          child: child,
+                        ),
                   ),
                   (Route<dynamic> route) => false,
                 );
@@ -336,7 +337,7 @@ class _LogoutLoadingScreen extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textColor(context).withOpacity(0.7),
+                color: AppColors.textColor(context).withAlpha(179),
                 height: 1.4,
               ),
             ),

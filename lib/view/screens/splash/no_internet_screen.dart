@@ -18,8 +18,8 @@ class NoInternetScreen extends StatelessWidget {
             end: Alignment.bottomCenter,
             colors: [
               AppColors.primaryColor(context),
-              AppColors.primaryColor(context).withOpacity(0.9),
-              AppColors.primaryColor(context).withOpacity(0.8),
+              AppColors.primaryColor(context).withAlpha(230),
+              AppColors.primaryColor(context).withAlpha(204),
             ],
           ),
         ),

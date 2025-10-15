@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:intl/intl.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/data/models/user_model.dart';
 import 'package:p_hn25/view/widgets/custom_modal.dart';
@@ -182,7 +181,7 @@ class _FamilyMemberProfileScreenState extends State<FamilyMemberProfileScreen> {
                 top: 0,
                 right: 0,
                 child: Material(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withAlpha(128),
                   borderRadius: BorderRadius.circular(30),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(30),
@@ -205,113 +204,118 @@ class _FamilyMemberProfileScreenState extends State<FamilyMemberProfileScreen> {
     );
   }
 
-  Future<void> _pickAndUploadImage(String imageType) async {
-    final isFront = imageType == 'id_front';
-    if ((isFront && _isUploadingFront) || (!isFront && _isUploadingBack)) {
+ Future<void> _pickAndUploadImage(String imageType) async {
+  final isFront = imageType == 'id_front';
+  if ((isFront && _isUploadingFront) || (!isFront && _isUploadingBack)) {
+    return;
+  }
+
+  var status = await Permission.photos.request();
+
+  // --- PRIMERA CORRECCIÓN ---
+  // Se añade la verificación después del primer 'await'.
+  if (!mounted) return;
+
+  if (status.isDenied || status.isPermanentlyDenied) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('se_necesita_permiso_para_acceder_a_la_galera'.tr()),
+        backgroundColor: Colors.orange,
+      ),
+    );
+    if (status.isPermanentlyDenied) {
+      openAppSettings();
+    }
+    return;
+  }
+
+  setState(() {
+    if (isFront) {
+      _isUploadingFront = true;
+    } else {
+      _isUploadingBack = true;
+    }
+  });
+
+  try {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile == null) {
+      setState(() {
+        if (isFront) {
+          _isUploadingFront = false;
+        } else {
+          _isUploadingBack = false;
+        }
+      });
       return;
     }
 
-    var status = await Permission.photos.request();
-    if (status.isDenied || status.isPermanentlyDenied) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('se_necesita_permiso_para_acceder_a_la_galera'.tr()),
-            backgroundColor: Colors.orange,
+    File imageFile = File(pickedFile.path);
+
+    final storageRef = FirebaseStorage.instance.ref(
+      'user_identity_documents/${_currentMember.uid}/$imageType.jpg',
+    );
+
+    UploadTask uploadTask = storageRef.putFile(imageFile);
+    TaskSnapshot snapshot = await uploadTask;
+    String newDownloadUrl = await snapshot.ref.getDownloadURL();
+
+    if (!mounted) return;
+
+    String firestoreField =
+        isFront ? 'verification.idFrontUrl' : 'verification.idBackUrl';
+
+    final success = await Provider.of<UserViewModel>(
+      context,
+      listen: false,
+    ).updateFamilyMemberProfile(_currentMember.uid, {firestoreField: newDownloadUrl});
+
+    if (success && mounted) {
+      setState(() {
+        if (isFront) {
+          _currentMember.verification?['idFrontUrl'] = newDownloadUrl;
+        } else {
+          _currentMember.verification?['idBackUrl'] = newDownloadUrl;
+        }
+      });
+    }
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            success
+                ? 'Imagen actualizada con éxito.'
+                : 'Error al actualizar la imagen.',
           ),
-        );
-      }
-      if (status.isPermanentlyDenied) {
-        openAppSettings();
-      }
-      return;
-    }
-
-    setState(() {
-      if (isFront) {
-        _isUploadingFront = true;
-      } else {
-        _isUploadingBack = true;
-      }
-    });
-
-    try {
-      final picker = ImagePicker();
-      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-      if (pickedFile == null) {
-        setState(() {
-          if (isFront) {
-            _isUploadingFront = false;
-          } else {
-            _isUploadingBack = false;
-          }
-        });
-        return;
-      }
-
-      File imageFile = File(pickedFile.path);
-
-      final storageRef = FirebaseStorage.instance.ref(
-        'user_identity_documents/${_currentMember.uid}/$imageType.jpg',
+          backgroundColor:
+              success ? Colors.green.shade700 : Colors.red.shade700,
+        ),
       );
-
-      UploadTask uploadTask = storageRef.putFile(imageFile);
-      TaskSnapshot snapshot = await uploadTask;
-      String newDownloadUrl = await snapshot.ref.getDownloadURL();
-
-      String firestoreField =
-          isFront ? 'verification.idFrontUrl' : 'verification.idBackUrl';
-
-      final success = await Provider.of<UserViewModel>(
-        context,
-        listen: false,
-      ).updateFamilyMemberProfile(_currentMember.uid, {firestoreField: newDownloadUrl});
-
-      if (success && mounted) {
-        setState(() {
-          if (isFront) {
-            _currentMember.verification?['idFrontUrl'] = newDownloadUrl;
-          } else {
-            _currentMember.verification?['idBackUrl'] = newDownloadUrl;
-          }
-        });
-      }
-      
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              success
-                  ? 'Imagen actualizada con éxito.'
-                  : 'Error al actualizar la imagen.',
-            ),
-            backgroundColor:
-                success ? Colors.green.shade700 : Colors.red.shade700,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Ocurrió un error. Inténtalo de nuevo.'),
-            backgroundColor: Colors.red.shade700,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          if (isFront) {
-            _isUploadingFront = false;
-          } else {
-            _isUploadingBack = false;
-          }
-        });
-      }
+    }
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Ocurrió un error. Inténtalo de nuevo.'),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+    }
+  } finally {
+    if (mounted) {
+      setState(() {
+        if (isFront) {
+          _isUploadingFront = false;
+        } else {
+          _isUploadingBack = false;
+        }
+      });
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -575,7 +579,7 @@ class _FamilyMemberProfileScreenState extends State<FamilyMemberProfileScreen> {
               top: 4,
               right: 4,
               child: Material(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withAlpha(128),
                 borderRadius: BorderRadius.circular(20),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(20),
@@ -591,7 +595,7 @@ class _FamilyMemberProfileScreenState extends State<FamilyMemberProfileScreen> {
               Container(
                 height: 100,
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
+                  color: Colors.black.withAlpha(153),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Center(

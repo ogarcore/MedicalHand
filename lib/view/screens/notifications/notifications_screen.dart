@@ -118,7 +118,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                                   colors: [
                                     AppColors.warningColor(context),
                                     AppColors.warningColor(context)
-                                        .withOpacity(0.8),
+                                        .withAlpha(204),
                                   ],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
@@ -126,7 +126,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                                 borderRadius: BorderRadius.circular(50),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.redAccent.withOpacity(0.3),
+                                    color: Colors.redAccent.withAlpha(77),
                                     blurRadius: 4,
                                     offset: const Offset(0, 1),
                                   ),
@@ -240,8 +240,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         child: InkWell(
           onTap: () {},
           borderRadius: BorderRadius.circular(16),
-          splashColor: AppColors.primaryColor(context).withOpacity(0.1),
-          highlightColor: AppColors.primaryColor(context).withOpacity(0.08),
+          splashColor: AppColors.primaryColor(context).withAlpha(26),
+          highlightColor: AppColors.primaryColor(context).withAlpha(20),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: Row(
@@ -249,7 +249,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryColor(context).withOpacity(0.1),
+                    color: AppColors.primaryColor(context).withAlpha
+                    (26),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(

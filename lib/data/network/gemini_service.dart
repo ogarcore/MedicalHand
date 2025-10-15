@@ -6,7 +6,7 @@ import 'package:p_hn25/data/models/message_model.dart';
 class GeminiService {
   final String _apiKey = geminiApiKey;
 
-  final String _model = 'models/gemini-2.5-flash-lite';
+  final String _model = 'models/gemini-2.0-flash';
 
   Future<String> generateContent(List<Message> history, String prompt) async {
     final url = Uri.parse(
@@ -120,23 +120,19 @@ Mantén siempre un tono amigable, profesional y claro. No uses asteriscos ni nin
         } else if (response.statusCode == 429 || response.statusCode == 503) {
           // errores transitorios → reintentar
           if (attempt == maxRetries - 1) {
-            print('Error final tras reintentos: ${response.body}');
             return 'El servicio está ocupado. Inténtalo nuevamente en unos momentos.';
           }
-          print('Error ${response.statusCode}, reintentando en ${delaySeconds}s...');
           await Future.delayed(Duration(seconds: delaySeconds));
           delaySeconds *= 2;
         } else {
           // error definitivo
-          print('Error en Gemini API: ${response.statusCode} - ${response.body}');
           return 'Ocurrió un error (${response.statusCode}). Por favor inténtalo de nuevo.';
         }
       } catch (e) {
         if (attempt == maxRetries - 1) {
-          print('Error de conexión a Gemini: $e');
           return 'No se pudo conectar con el servicio de asistencia. Revisa tu conexión.';
         }
-        print('Error de red: $e, reintentando en ${delaySeconds}s...');
+
         await Future.delayed(Duration(seconds: delaySeconds));
         delaySeconds *= 2;
       }

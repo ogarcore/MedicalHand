@@ -40,7 +40,8 @@ class _LoginScreenState extends State<LoginScreen> {
           icon: HugeIcons.strokeRoundedSquareLockPassword,
           title: 'recuperar_contrasea'.tr(),
           subtitle:
-              'introduce_el_correo_electrnico_asociado_a_tu_cuenta_para_env'.tr(),
+              'introduce_el_correo_electrnico_asociado_a_tu_cuenta_para_env'
+                  .tr(),
           content: CustomTextField(
             controller: resetEmailController,
             labelText: 'correo_electrnico'.tr(),
@@ -58,27 +59,34 @@ class _LoginScreenState extends State<LoginScreen> {
               isPrimary: true,
               onPressed: () async {
                 if (resetEmailController.text.isEmpty) return;
+
                 final navigator = Navigator.of(context);
                 final messenger = ScaffoldMessenger.of(context);
+                final successColor = AppColors.successColor(context);
+                final warningColor = AppColors.warningColor(context);
+
                 final error = await authViewModel.sendPasswordResetLink(
                   resetEmailController.text.trim(),
                 );
-                if (!mounted) return;
-                navigator.pop(); // Cierra el modal
+
+                if (!mounted) return; 
+
+                navigator.pop();
+
                 if (error == null) {
                   messenger.showSnackBar(
                     SnackBar(
                       content: Text(
                         'enlace_de_recuperacin_enviado_a_tu_correo'.tr(),
                       ),
-                      backgroundColor: AppColors.successColor(context),
+                      backgroundColor: successColor,
                     ),
                   );
                 } else {
                   messenger.showSnackBar(
                     SnackBar(
                       content: Text(error),
-                      backgroundColor: AppColors.warningColor(context),
+                      backgroundColor: warningColor,
                     ),
                   );
                 }

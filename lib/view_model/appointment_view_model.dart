@@ -71,7 +71,6 @@ Future<CitaModel?> getAppointmentById(String appointmentId) async {
     if (!doc.exists) return null;
     return CitaModel.fromFirestore(doc);
   } catch (e) {
-    debugPrint('Error al obtener la cita por ID: $e');
     return null;
   }
 }
@@ -171,7 +170,6 @@ Future<CitaModel?> getAppointmentById(String appointmentId) async {
         initialDashboardAppointment = null;
       }
     } catch (e) {
-      print("Error al pre-cargar la cita del dashboard: $e");
       initialDashboardAppointment = null;
     }
   }
@@ -232,7 +230,6 @@ Future<CitaModel?> getAppointmentById(String appointmentId) async {
       });
       return true;
     } catch (e) {
-      print('Error al solicitar reprogramación: $e');
       return false;
     }
   }
@@ -330,7 +327,6 @@ Future<CitaModel?> getAppointmentById(String appointmentId) async {
 
       return {'success': true, 'turnNumber': newTurnNumber};
     } catch (e) {
-      print('Error en la transacción de check-in: $e');
       return {
         'success': false,
         'message':
@@ -480,7 +476,6 @@ Stream<DocumentSnapshot> getPatientQueueStream(String queueDocId, String userId)
 
       return query.docs.isNotEmpty;
     } catch (e) {
-      print("Error verificando expediente: $e");
       return false;
     }
   }

@@ -6,7 +6,6 @@ import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/data/models/cita_model.dart';
 import 'package:p_hn25/view_model/appointment_view_model.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 
 class VirtualTicketCard extends StatelessWidget {
   final CitaModel appointment;

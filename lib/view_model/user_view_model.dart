@@ -56,7 +56,6 @@ class UserViewModel extends ChangeNotifier {
       await fetchCurrentUser();
       return true;
     } catch (e) {
-      print("Error al actualizar el perfil: $e");
       return false;
     }
   }
@@ -66,7 +65,6 @@ class UserViewModel extends ChangeNotifier {
   Future<bool> updateFamilyMemberProfile(String memberId, Map<String, dynamic> updatedData) async {
     // Se necesita un usuario autenticado para realizar la acción.
     if (_auth.currentUser == null) {
-      print("Error: No hay un usuario autenticado para realizar esta acción.");
       return false;
     }
 
@@ -81,7 +79,6 @@ class UserViewModel extends ChangeNotifier {
       await fetchCurrentUser(); 
       return true;
     } catch (e) {
-      print("Error al actualizar el perfil del familiar: $e");
       return false;
     }
   }
@@ -109,14 +106,13 @@ class UserViewModel extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print("Error al cambiar al perfil del familiar: $e");
+      //
     }
   }
 
 Future<bool> updateEmergencyContact(String name, String phone) async {
   final user = _auth.currentUser;
   if (user == null) {
-    print("Error: Usuario no autenticado.");
     return false;
   }
 
@@ -142,7 +138,6 @@ Future<bool> updateEmergencyContact(String name, String phone) async {
 
     return true;
   } catch (e) {
-    print("Error al actualizar contacto de emergencia: $e");
     return false;
   }
 }
@@ -156,7 +151,9 @@ Future<bool> updateEmergencyContact(String name, String phone) async {
       await _firestore.collection('usuarios_movil').doc(user.uid).set({
         'fcmToken': token,
       }, SetOptions(merge: true));
-    } catch (e) {}
+    } catch (e) {
+      //
+    }
   }
 
   void changeActiveProfile(UserModel newProfile) {
@@ -196,19 +193,15 @@ Future<bool> updateEmergencyContact(String name, String phone) async {
     await user.reauthenticateWithCredential(credential);
     await user.updatePassword(newPassword);
 
-    print("Contraseña actualizada correctamente.");
+
     return true;
   } on FirebaseAuthException catch (e) {
     if (e.code == 'wrong-password') {
-      print('La contraseña actual es incorrecta.');
     } else if (e.code == 'requires-recent-login') {
-      print('El usuario debe iniciar sesión nuevamente antes de cambiar la contraseña.');
     } else {
-      print('Error de FirebaseAuth al cambiar contraseña: ${e.code}');
     }
     return false;
   } catch (e) {
-    print("Error al cambiar la contraseña: $e");
     return false;
   } finally {
     _isLoading = false;
@@ -231,11 +224,9 @@ Future<bool> updateEmergencyContact(String name, String phone) async {
     clearUser();
 
     return true;
-  } on FirebaseAuthException catch (e) {
-    print('Error de autenticación al eliminar cuenta: $e');
+  } on FirebaseAuthException {
     return false;
   } catch (e) {
-    print('Error al eliminar cuenta: $e');
     return false;
   } finally {
     _isLoading = false;
@@ -252,10 +243,8 @@ Future<bool> reauthenticate(String email, String password) async {
     final credential = EmailAuthProvider.credential(email: email, password: password);
     await user.reauthenticateWithCredential(credential);
 
-    print('Usuario reautenticado correctamente');
     return true;
   } catch (e) {
-    print('Error al reautenticar: $e');
     return false;
   }
 }

@@ -40,16 +40,16 @@ class ProgressStepWidget extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(
                 color: isCompleted
-                    ? activeColor.withOpacity(0.4) // Opacidad ligeramente aumentada
+                    ? activeColor.withAlpha(102) // Opacidad ligeramente aumentada
                     : isActive
-                        ? activeColor.withOpacity(0.25) // Opacidad ligeramente aumentada
+                        ? activeColor.withAlpha(64) // Opacidad ligeramente aumentada
                         : Colors.transparent,
                 width: isActive ? 2.5 : 0, // Borde ligeramente más grueso
               ),
               boxShadow: isActive
                   ? [
                       BoxShadow(
-                        color: activeColor.withOpacity(0.25), // Opacidad aumentada
+                        color: activeColor.withAlpha(64), // Opacidad aumentada
                         blurRadius: 8, // Desenfoque aumentado
                         offset: const Offset(0, 3), // Offset ligeramente aumentado
                       ),

@@ -9,12 +9,13 @@ class ChatDisclaimerBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primaryColor = AppColors.primaryColor(context);
+     final accentColor = AppColors.accentColor(context);
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: primaryColor.withAlpha(10),
+        color: primaryColor.withAlpha(35),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: primaryColor.withAlpha(26),
@@ -27,12 +28,12 @@ class ChatDisclaimerBanner extends StatelessWidget {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: primaryColor.withAlpha(26),
+              color: accentColor.withAlpha(26),
               shape: BoxShape.circle,
             ),
             child: Icon(
               HugeIcons.strokeRoundedCovidInfo,
-              color: primaryColor,
+              color: accentColor,
               size: 16,
             ),
           ),
@@ -45,7 +46,7 @@ class ChatDisclaimerBanner extends StatelessWidget {
                   'para_tu_bienestar'.tr(),
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: primaryColor,
+                    color: accentColor,
                     fontSize: 13,
                   ),
                 ),
@@ -53,7 +54,7 @@ class ChatDisclaimerBanner extends StatelessWidget {
                 Text(
                   'asistente_para_consejos_de_bienestar_general_consulta_a_un_m'.tr(),
                   style: TextStyle(
-                    color: AppColors.textLightColor(context),
+                    color: AppColors.textColor(context).withAlpha(200),
                     fontSize: 12,
                     height: 1.3,
                   ),

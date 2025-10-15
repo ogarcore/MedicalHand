@@ -142,6 +142,9 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                                   context,
                                 );
                                 final navigator = Navigator.of(context);
+                                final warningColor = AppColors.warningColor(
+                                  context,
+                                );
 
                                 final emailExists = await viewModel
                                     .checkEmailExists();
@@ -159,9 +162,7 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                                         viewModel.errorMessage ??
                                             'Error desconocido.',
                                       ),
-                                      backgroundColor: AppColors.warningColor(
-                                        context,
-                                      ),
+                                      backgroundColor: warningColor,
                                     ),
                                   );
                                 } else {
@@ -177,6 +178,7 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                           );
                         },
                       ),
+
                       const SizedBox(height: 20),
                       Row(
                         children: [
@@ -261,6 +263,12 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                                         final scaffoldMessenger =
                                             ScaffoldMessenger.of(context);
                                         final navigator = Navigator.of(context);
+                                        final warningColor =
+                                            AppColors.warningColor(context);
+                                        final accentColor =
+                                            AppColors.accentColor(
+                                              context,
+                                            ).withAlpha(200);
 
                                         setState(() {
                                           _isGoogleLoading = true;
@@ -282,10 +290,7 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                                                 viewModel.errorMessage ??
                                                     'Ocurrió un error.',
                                               ),
-                                              backgroundColor:
-                                                  AppColors.warningColor(
-                                                    context,
-                                                  ),
+                                              backgroundColor: warningColor,
                                             ),
                                           );
                                           return;
@@ -293,12 +298,10 @@ class _RegistrationStep1ScreenState extends State<RegistrationStep1Screen> {
                                         if (result == 'EXIST') {
                                           scaffoldMessenger.showSnackBar(
                                             SnackBar(
-                                              backgroundColor:
-                                                  AppColors.accentColor(
-                                                    context,
-                                                  ).withAlpha(200),
+                                              backgroundColor: accentColor,
                                               content: Text(
-                                                'esta_cuenta_ya_est_registrada_por_favor_inicia_sesin'.tr(),
+                                                'esta_cuenta_ya_est_registrada_por_favor_inicia_sesin'
+                                                    .tr(),
                                               ),
                                             ),
                                           );

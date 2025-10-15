@@ -126,7 +126,7 @@ class _EditFamilyMemberMedicalInfoScreenState extends State<EditFamilyMemberMedi
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withAlpha(51),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
@@ -146,13 +146,13 @@ class _EditFamilyMemberMedicalInfoScreenState extends State<EditFamilyMemberMedi
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      AppColors.accentColor(context).withOpacity(0.1),
-                      AppColors.accentColor(context).withOpacity(0.05),
+                      AppColors.accentColor(context).withAlpha(26),
+                      AppColors.accentColor(context).withAlpha(13),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: AppColors.accentColor(context).withOpacity(0.2),
+                    color: AppColors.accentColor(context).withAlpha(51),
                     width: 1,
                   ),
                 ),
@@ -166,13 +166,13 @@ class _EditFamilyMemberMedicalInfoScreenState extends State<EditFamilyMemberMedi
                           end: Alignment.bottomRight,
                           colors: [
                             AppColors.accentColor(context),
-                            AppColors.accentColor(context).withOpacity(0.8),
+                            AppColors.accentColor(context).withAlpha(204),
                           ],
                         ),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.accentColor(context).withOpacity(0.3),
+                            color: AppColors.accentColor(context).withAlpha(77),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -227,7 +227,7 @@ class _EditFamilyMemberMedicalInfoScreenState extends State<EditFamilyMemberMedi
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.06),
+                                color: Colors.black.withAlpha(15),
                                 blurRadius: 20,
                                 offset: const Offset(0, 8),
                               ),
@@ -313,10 +313,10 @@ class _EditFamilyMemberMedicalInfoScreenState extends State<EditFamilyMemberMedi
                 });
               },
               deleteIcon: const Icon(Icons.close, size: 18),
-              backgroundColor: AppColors.accentColor(context).withOpacity(0.1),
+              backgroundColor: AppColors.accentColor(context).withAlpha(26),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
-                side: BorderSide(color: AppColors.accentColor(context).withOpacity(0.2)),
+                side: BorderSide(color: AppColors.accentColor(context).withAlpha(51)),
               ),
             );
           }).toList(),
@@ -345,7 +345,7 @@ class _EditFamilyMemberMedicalInfoScreenState extends State<EditFamilyMemberMedi
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withAlpha(11),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -384,7 +384,7 @@ class _EditFamilyMemberMedicalInfoScreenState extends State<EditFamilyMemberMedi
             margin: const EdgeInsets.all(12),
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.accentColor(context).withOpacity(0.1),
+              color: AppColors.accentColor(context).withAlpha(26),
               shape: BoxShape.circle,
             ),
             child: Icon(

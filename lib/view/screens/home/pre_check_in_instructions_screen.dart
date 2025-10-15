@@ -317,7 +317,7 @@ class _PreCheckInInstructionsScreenState
                   icon: HugeIcons.strokeRoundedPinLocation01,
                   title: 'dirgete_al_hospital'.tr(),
                   description:
-                      'Hospital ${widget.appointment.hospital} - ${widget.appointment.specialty ?? 'Consulta Externa'}',
+                      '${widget.appointment.hospital} - ${widget.appointment.specialty ?? 'Consulta Externa'}',
                 ),
                 const SizedBox(height: 12),
                 _EnhancedStepRow(
@@ -485,7 +485,7 @@ class _PreCheckInInstructionsScreenState
                 const SizedBox(height: 12),
                 _EnhancedQRStep(
                   number: 2,
-                  icon: HugeIcons.strokeRoundedTarget01,
+                  icon: HugeIcons.strokeRoundedQrCode01,
                   title: 'enfoca_el_cdigo'.tr(),
                   description:
                       'Apunta la cámara hacia el QR ubicado en la sala de espera',
@@ -567,7 +567,7 @@ class _PreCheckInInstructionsScreenState
                     )
                   else
                     Icon(
-                      HugeIcons.strokeRoundedCheckList,
+                      HugeIcons.strokeRoundedTickDouble03,
                       size: 18,
                       color: Colors.white.withAlpha(230),
                     ),
@@ -695,8 +695,7 @@ class _EnhancedQRStep extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-
-                'key'.tr(namedArgs: {"number": number.toString()}),
+                '$number',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 13,

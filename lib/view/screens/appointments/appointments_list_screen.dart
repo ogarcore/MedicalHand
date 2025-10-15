@@ -395,7 +395,7 @@ class _ShimmerCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16.0),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.5), // Usamos un color base semitransparente para el shimmer
+        color: Colors.white.withAlpha(128), // Usamos un color base semitransparente para el shimmer
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(

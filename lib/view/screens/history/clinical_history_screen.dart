@@ -347,7 +347,7 @@ class _ShimmerHistoryCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.5),
+        color: Colors.white.withAlpha(128),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(

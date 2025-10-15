@@ -123,7 +123,6 @@ class FamilyViewModel extends ChangeNotifier {
       setLoading(false);
       return true;
     } catch (e) {
-      print("Error al guardar familiar: $e");
       setLoading(false);
       return false;
     }

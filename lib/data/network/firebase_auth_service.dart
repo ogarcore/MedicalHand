@@ -18,7 +18,7 @@ class FirebaseAuthService {
       }
       await _auth.signOut();
     } catch (e) {
-     //pasa nada
+      //pasa nada
     }
   }
 
@@ -68,7 +68,6 @@ class FirebaseAuthService {
     }
   }
 
-
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     serverClientId:
         '818500504209-vn67582a72oa8l06t6f0qfb17ta3tkvq.apps.googleusercontent.com',
@@ -86,8 +85,7 @@ class FirebaseAuthService {
       );
       await credential.user?.sendEmailVerification();
       return credential.user;
-    } on FirebaseAuthException catch (e) {
-      print("Error en el registro: ${e.message}");
+    } on FirebaseAuthException {
       return null;
     }
   }
@@ -100,7 +98,7 @@ class FirebaseAuthService {
           .doc(userModel.uid)
           .set(userModel.toMap());
     } catch (e) {
-     //pasa nada
+      //pasa nada
     }
   }
 
@@ -137,7 +135,7 @@ class FirebaseAuthService {
       await _googleSignIn.disconnect();
       await _auth.signOut();
     } catch (e) {
-      print("Error al desconectar de Google: ${e.toString()}");
+      // Error manejado,
     }
   }
 
@@ -154,7 +152,6 @@ class FirebaseAuthService {
           .docs
           .isNotEmpty; // Si la lista de documentos no está vacía, el correo existe
     } catch (e) {
-      print("Error al verificar email en Firestore: ${e.toString()}");
       return false; // En caso de error, asumimos que no existe para evitar bloqueos
     }
   }
@@ -197,16 +194,14 @@ class FirebaseAuthService {
   }
 
   Future<void> updateUserAuthProvider(String uid, String provider) async {
-  try {
-    await _firestore
-        .collection('usuarios_movil')
-        .doc(uid)
-        .update({'authProvider': provider}); // Actualiza solo este campo
-  } catch (e) {
-    print("Error al actualizar el authProvider: ${e.toString()}");
+    try {
+      await _firestore.collection('usuarios_movil').doc(uid).update({
+        'authProvider': provider,
+      }); // Actualiza solo este campo
+    } catch (e) {
+      //
+    }
   }
-}
-
 
   // NUEVO: Enviar correo para restablecer contraseña
   Future<void> sendPasswordResetEmail(String email) async {
@@ -227,7 +222,6 @@ class FirebaseAuthService {
           .get();
       return doc.exists;
     } catch (e) {
-      print("Error al verificar usuario: ${e.toString()}");
       return false;
     }
   }

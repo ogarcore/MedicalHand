@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:intl/intl.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/app/core/utils/input_formatters.dart';
 import 'package:p_hn25/app/core/utils/validators.dart';
@@ -391,7 +390,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
               height: 44,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [primaryColor.withOpacity(0.8), primaryColor],
+                  colors: [primaryColor.withAlpha(204), primaryColor],
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),

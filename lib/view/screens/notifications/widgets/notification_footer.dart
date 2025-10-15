@@ -26,13 +26,13 @@ class NotificationFooter extends StatelessWidget {
         color: isDark ? Colors.grey.shade900 : Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withAlpha(20),
             blurRadius: 20,
             spreadRadius: 2,
             offset: const Offset(0, -4),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withAlpha(6),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -69,7 +69,7 @@ class NotificationFooter extends StatelessWidget {
                 boxShadow: canMarkAsRead
                     ? [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withAlpha(13),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -82,8 +82,8 @@ class NotificationFooter extends StatelessWidget {
                 child: InkWell(
                   onTap: canMarkAsRead ? onMarkAllAsRead : null,
                   borderRadius: BorderRadius.circular(14),
-                  splashColor: primaryColor.withOpacity(0.1),
-                  highlightColor: primaryColor.withOpacity(0.05),
+                  splashColor: primaryColor.withAlpha(26),
+                  highlightColor: primaryColor.withAlpha(13),
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                     child: Row(
@@ -133,12 +133,12 @@ class NotificationFooter extends StatelessWidget {
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color: primaryColor.withOpacity(0.3),
+                    color: primaryColor.withAlpha(77),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
                   BoxShadow(
-                    color: primaryColor.withOpacity(0.2),
+                    color: primaryColor.withAlpha(51),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
@@ -150,8 +150,8 @@ class NotificationFooter extends StatelessWidget {
                 child: InkWell(
                   onTap: onClearAll,
                   borderRadius: BorderRadius.circular(14),
-                  splashColor: Colors.white.withOpacity(0.2),
-                  highlightColor: Colors.white.withOpacity(0.1),
+                  splashColor: Colors.white.withAlpha(51),
+                  highlightColor: Colors.white.withAlpha(26),
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                     child: Row(

@@ -6,6 +6,7 @@ class PermissionService {
   Future<bool> handleCameraPermission(BuildContext context, {String? reason}) async {
     var status = await Permission.camera.status;
 
+    if (!context.mounted) return false;
     if (status.isGranted) {
       return true;
     }

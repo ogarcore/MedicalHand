@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:intl/intl.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 // Asumo que estos archivos existen en tu proyecto
 import 'package:p_hn25/app/core/utils/input_formatters.dart';
@@ -112,7 +111,7 @@ Future<void> _handleSave() async {
         );
       }
     } catch (e) {
-      print('Error al parsear la fecha: $e');
+//
     }
 
     final viewModel = Provider.of<UserViewModel>(context, listen: false);
@@ -160,7 +159,7 @@ Future<void> _handleSave() async {
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withAlpha(51),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
@@ -181,13 +180,13 @@ Future<void> _handleSave() async {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      AppColors.accentColor(context).withOpacity(0.1),
-                      AppColors.accentColor(context).withOpacity(0.05),
+                      AppColors.accentColor(context).withAlpha(26),
+                      AppColors.accentColor(context).withAlpha(13),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: AppColors.accentColor(context).withOpacity(0.2),
+                    color: AppColors.accentColor(context).withAlpha(51),
                     width: 1,
                   ),
                 ),
@@ -201,7 +200,7 @@ Future<void> _handleSave() async {
                           end: Alignment.bottomRight,
                           colors: [
                             AppColors.accentColor(context),
-                            AppColors.accentColor(context).withOpacity(0.8),
+                            AppColors.accentColor(context).withAlpha(204),
                           ],
                         ),
                         shape: BoxShape.circle,
@@ -209,7 +208,7 @@ Future<void> _handleSave() async {
                           BoxShadow(
                             color: AppColors.accentColor(
                               context,
-                            ).withOpacity(0.3),
+                            ).withAlpha(77),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -269,7 +268,7 @@ Future<void> _handleSave() async {
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.06),
+                                color: Colors.black.withAlpha(16),
                                 blurRadius: 20,
                                 offset: const Offset(0, 8),
                               ),
@@ -493,7 +492,7 @@ Future<void> _handleSave() async {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withAlpha(11),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -530,7 +529,7 @@ Future<void> _handleSave() async {
             margin: const EdgeInsets.all(12),
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.accentColor(context).withOpacity(0.1),
+              color: AppColors.accentColor(context).withAlpha(26),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, size: 20, color: AppColors.accentColor(context)),

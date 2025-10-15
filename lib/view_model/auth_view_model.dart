@@ -152,8 +152,7 @@ class AuthViewModel extends ChangeNotifier {
       // Esperamos a que todas las tareas terminen
       await Future.wait(postLoginTasks);
     } catch (e) {
-      print("Error ejecutando tareas post-login: $e");
-      // Opcional: Mostrar un SnackBar o mensaje de error no intrusivo
+//
     }
   }
 
@@ -217,7 +216,7 @@ class AuthViewModel extends ChangeNotifier {
           'fcmToken': FieldValue.delete(),
         });
       } catch (e) {
-        print('Error al borrar el token FCM: $e');
+//
       }
     }
 
@@ -354,6 +353,7 @@ class AuthViewModel extends ChangeNotifier {
       finalizationTasks.add(_authService.updateUserAuthProvider(user.uid, providerId));
 
       await Future.wait(finalizationTasks);
+      if (!context.mounted) return null;
 
       final userViewModel = Provider.of<UserViewModel>(context, listen: false);
       await userViewModel.fetchCurrentUser();

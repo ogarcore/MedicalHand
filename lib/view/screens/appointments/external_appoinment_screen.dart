@@ -50,7 +50,7 @@ class _ExternalAppoinmentScreenState extends State<ExternalAppoinmentScreen> {
     'Jinotega',
     'Managua',
   ];
-  List<HospitalModel> _hospitalsList = [];
+  final List<HospitalModel> _hospitalsList = [];
 
   Future<void> _pickImage() async {
     // 1. Si ya está activo, no hagas nada.

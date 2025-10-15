@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:intl/intl.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/data/models/cita_model.dart';
 import 'package:p_hn25/view/screens/home/widgets/appointment_details_modal.dart';
@@ -16,6 +15,7 @@ class NextAppointmentCard extends StatelessWidget {
   // Nueva función para lanzar los mapas, ahora usando GeoPoint
   Future<void> _launchMaps(BuildContext context, GeoPoint? hospitalLocation) async {
     // 1. Validar que la ubicación no sea nula
+    
     if (hospitalLocation == null) {
       _showErrorSnackBar(context, 'La ubicación del hospital no está disponible.');
       return;
@@ -32,6 +32,8 @@ class NextAppointmentCard extends StatelessWidget {
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     } else {
+    
+      // ignore: use_build_context_synchronously
       _showErrorSnackBar(context, 'No se pudo abrir la aplicación de mapas.');
     }
   }
