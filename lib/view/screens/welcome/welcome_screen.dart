@@ -160,7 +160,7 @@ class WelcomeScreen extends StatelessWidget {
                     children: [
                       // Logo
                       Container(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(0),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: LinearGradient(
@@ -175,7 +175,7 @@ class WelcomeScreen extends StatelessWidget {
                             BoxShadow(
                               color: AppColors.primaryColor(
                                 context,
-                              ).withAlpha(60),
+                              ).withAlpha(5),
                               blurRadius: 20,
                               spreadRadius: 2,
                             ),
@@ -184,7 +184,7 @@ class WelcomeScreen extends StatelessWidget {
                         child: Image.asset(
                           'assets/images/icono.png',
                           width: 150,
-                          height: 130,
+                          height: 160,
                           fit: BoxFit.contain,
                         ),
                       ),
