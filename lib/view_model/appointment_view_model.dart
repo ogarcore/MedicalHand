@@ -82,17 +82,27 @@ Future<CitaModel?> getAppointmentById(String appointmentId) async {
           .collection('hospitales_MedicalHand')
           .where('city', isEqualTo: department)
           .get();
+
       final hospitals = snapshot.docs.map((doc) {
+        // Guardamos la data en una variable para extraerla de forma más segura
+        final data = doc.data(); 
+
         return HospitalModel(
-          id: doc.data()[''] as String,
-          name: doc.data()['name'] as String,
-          location: doc.data()['location'] as GeoPoint,
+          // IMPORTANTE: Normalmente el ID se saca del documento mismo (doc.id)
+          // Si lo tienes guardado como un campo dentro del documento, cámbialo a data['id'] o data['id_hospital']
+          id: doc.id, 
+          name: data['name'] as String,
+          location: data['location'] as GeoPoint,
         );
       }).toList();
+
       hospitals.sort((a, b) => a.name.compareTo(b.name));
       return hospitals;
+      
     } catch (e) {
-      //;
+      // NUNCA dejes un catch vacío en etapa de desarrollo. 
+      // Esto te salvará horas de dolores de cabeza.
+      print('🔥 ERROR en getHospitals: $e'); 
       return [];
     }
   }

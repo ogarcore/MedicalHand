@@ -1,9 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
-// lib/view/screens/appointments/appointment_options.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
-import 'package:p_hn25/view/screens/appointments/external_appoinment_screen.dart';
+// Se eliminó la importación de external_appoinment_screen.dart ya no es necesaria
 import 'package:p_hn25/view/screens/appointments/request_appointment_screen.dart';
 import 'package:p_hn25/view/widgets/primary_button.dart';
 import 'package:p_hn25/view/widgets/secondary_button.dart';
@@ -45,7 +44,7 @@ class AppointmentOptionsScreen extends StatelessWidget {
             child: AppBar(
               title: Text(
                 'tipo_de_cita'.tr(),
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
                   fontSize: 20,
@@ -106,7 +105,7 @@ class AppointmentOptionsScreen extends StatelessWidget {
                         ),
                         SizedBox(height: isSmallScreen ? 4 : 6),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: Text(
                             'selecciona_la_opcin_segn_tu_necesidad_mdica'.tr(),
                             textAlign: TextAlign.center,
@@ -123,15 +122,13 @@ class AppointmentOptionsScreen extends StatelessWidget {
 
                   SizedBox(height: isSmallScreen ? 16 : 20),
 
-                  // Opciones de cita
-                  // Botón 1: Consulta General (SecondaryButton)
+                  // Opciones de cita - SOLO CONSULTA GENERAL
                   _buildOptionCard(
                     context: context,
                     icon: HugeIcons.strokeRoundedDoctor03,
                     iconColor: AppColors.primaryColor(context),
                     title: 'consulta_general'.tr(),
-                    description:
-                        'solicita_una_cita_para_consulta_externa'.tr(),
+                    description: 'solicita_una_cita_para_consulta_externa'.tr(),
                     buttonText: 'seleccionar'.tr(),
                     onPressed: () => Navigator.push(
                       context,
@@ -140,67 +137,6 @@ class AppointmentOptionsScreen extends StatelessWidget {
                       ),
                     ),
                     isHighlighted: false,
-                    isSmallScreen: isSmallScreen,
-                  ),
-
-                  SizedBox(height: isSmallScreen ? 12 : 16),
-
-                  // Separador elegante
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Divider(
-                          color: Colors.grey.withAlpha(38),
-                          thickness: 1,
-                          height: 1,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          'o'.tr(),
-                          style: TextStyle(
-                            color: AppColors.textLightColor(
-                              context,
-                            ).withAlpha(178),
-                            fontWeight: FontWeight.w500,
-                            fontSize: 11,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Divider(
-                          color: Colors.grey.withAlpha(38),
-                          thickness: 1,
-                          height: 1,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: isSmallScreen ? 12 : 16),
-
-                  // Botón 2: Carril Rápido (PrimaryButton)
-                  _buildOptionCard(
-                    context: context,
-                    icon: HugeIcons.strokeRoundedHospital02,
-                    iconColor: AppColors.accentColor(context),
-                    title: 'referencia_externa'.tr(),
-                    description: 'para_usuarios_con_referencia_médica'.tr(),
-                    details: [
-                      'referencia_en_apel_de_centros_de_salud'.tr(),
-                      'Hoja de Referencia Digital en app',
-                    ],
-                    buttonText: 'seleccionar'.tr(),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const ExternalAppoinmentScreen(),
-                        ),
-                      );
-                    },
-                    isHighlighted: true,
                     isSmallScreen: isSmallScreen,
                   ),
 
@@ -277,7 +213,10 @@ class AppointmentOptionsScreen extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [iconColor.withAlpha(38), iconColor.withAlpha(64)],
+                    colors: [
+                      iconColor.withAlpha(38),
+                      iconColor.withAlpha(64)
+                    ],
                   ),
                   shape: BoxShape.circle,
                 ),
@@ -318,7 +257,7 @@ class AppointmentOptionsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(top: 5, right: 6),
+                      padding: const EdgeInsets.only(top: 5, right: 6),
                       child: Icon(
                         Icons.circle,
                         size: 5,
