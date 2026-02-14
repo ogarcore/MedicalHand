@@ -212,7 +212,7 @@ Widget build(BuildContext context) {
       if (!didPop) {
         final shouldPop = await _onWillPop();
         if (shouldPop) {
-          if (!context.mounted) return; // ✅ Evita el warning
+          if (!context.mounted) return; 
           Navigator.of(context).pop();
         }
       }

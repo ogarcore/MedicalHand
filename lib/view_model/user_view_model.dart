@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:p_hn25/data/models/user_model.dart';
+import 'package:p_hn25/data/network/database_service.dart';
 
 class UserViewModel extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+ final _firestore = DatabaseService.instance;
 
   UserModel? _currentUser;
   UserModel? get currentUser => _currentUser;

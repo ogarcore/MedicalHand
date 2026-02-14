@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:p_hn25/data/network/database_service.dart';
 import '../data/models/consultation_model.dart'; // Asegúrate que la ruta sea correcta
 
 
 class HistoryViewModel extends ChangeNotifier {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+ final _firestore = DatabaseService.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<List<ConsultationModel>>? _historyFuture;

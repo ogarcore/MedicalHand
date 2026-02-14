@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:p_hn25/app/core/utils/validators.dart';
+import 'package:p_hn25/data/network/database_service.dart' show DatabaseService;
 import 'package:p_hn25/data/network/notification_service.dart';
 import 'package:p_hn25/view_model/appointment_view_model.dart';
 import 'package:p_hn25/view_model/chat_view_model.dart';
@@ -20,7 +21,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthViewModel extends ChangeNotifier {
   final FirebaseAuthService _authService = FirebaseAuthService();
   final FirebaseStorageService _storageService = FirebaseStorageService();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+ final _firestore = DatabaseService.instance;
   final NotificationService _notificationService = NotificationService.instance;
 
   final TextEditingController emailController = TextEditingController();
@@ -232,9 +233,9 @@ class AuthViewModel extends ChangeNotifier {
 
     await _authService.signOut();
 
-    await FirebaseFirestore.instance.terminate();
-    await FirebaseFirestore.instance.clearPersistence();
-    await FirebaseFirestore.instance.enableNetwork();
+    await DatabaseService.instance.terminate();
+    await DatabaseService.instance.clearPersistence();
+    await DatabaseService.instance.enableNetwork();
   }
 
   Future<void> cancelGoogleRegistration() async {
@@ -353,8 +354,9 @@ class AuthViewModel extends ChangeNotifier {
       finalizationTasks.add(_authService.updateUserAuthProvider(user.uid, providerId));
 
       await Future.wait(finalizationTasks);
-      if (!context.mounted) return null;
+      
 
+      // ignore: use_build_context_synchronously
       final userViewModel = Provider.of<UserViewModel>(context, listen: false);
       await userViewModel.fetchCurrentUser();
 

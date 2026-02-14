@@ -162,21 +162,16 @@ async function procesarExamenes(event, datosAntes, datosDespues) {
   }
 
   const db = getFirestore();
+  const consultaRef = db.collection("consultas").doc(event.params.consultaId);
+
   const examsAntes = datosAntes?.examsRequested || [];
   const examsDespues = datosDespues.examsRequested;
+
+  const examsParaActualizar = JSON.parse(JSON.stringify(examsDespues));
+
+  let seEnvioAlgunaNotificacion = false; 
+
   const patientId = datosDespues.patient_uid;
-
-  // Leemos el documento actual desde Firestore (versión más reciente)
-  const consultaRef = db.collection("consultas").doc(event.params.consultaId);
-  const consultaSnap = await consultaRef.get();
-  const consultaData = consultaSnap.data();
-
-  if (!consultaData) {
-    logger.error(` No se encontró la consulta ${event.params.consultaId}`);
-    return null;
-  }
-
-  const examsActualizados = [...consultaData.examsRequested]; // Copia actual del array
 
   for (let i = 0; i < examsDespues.length; i++) {
     const examenAntes = examsAntes[i];
@@ -189,29 +184,23 @@ async function procesarExamenes(event, datosAntes, datosDespues) {
 
     const tieneResultados =
       examenDespues.resultados && examenDespues.resultados.length > 0;
-
-    const yaNotificado = examenDespues.estado === "notificado";
-
-    if (cambioACompletado && tieneResultados && !yaNotificado) {
-      logger.info(` Resultado detectado para '${examenDespues.nombre}' en consulta ${event.params.consultaId}`);
+    
+    if (cambioACompletado && tieneResultados) {
+      logger.info(`Resultado detectado para '${examenDespues.nombre}' en consulta ${event.params.consultaId}`);
 
       const patientDoc = await db.collection("usuarios_movil").doc(patientId).get();
       if (!patientDoc.exists) {
-        logger.error(` Paciente ${patientId} no encontrado para notificar.`);
+        logger.error(`Paciente ${patientId} no encontrado para notificar.`);
         continue;
       }
 
       const patientData = patientDoc.data();
       const patientName = patientData.personalInfo?.firstName || "el paciente";
-      const tutorId = patientData.managedBy || patientId;
 
-      let notificationBody = `Ya puedes ver los resultados de tu examen de ${examenDespues.nombre}.`;
-      if (patientId !== tutorId) {
-        notificationBody = `Resultados de ${examenDespues.nombre} listos para ${patientName}.`;
-      }
-
+      const notificationBody = `Ya puedes ver los resultados de tu examen de ${examenDespues.nombre}.`;
+      
       const notification = {
-        title: "Resultados de Examen Disponibles ",
+        title: "Resultados de Examen Disponibles",
         body: notificationBody,
       };
 
@@ -224,23 +213,22 @@ async function procesarExamenes(event, datosAntes, datosDespues) {
       try {
         await sendNotificationToTutor(patientId, notification, data, "results");
 
-        // Modificar localmente el estado del examen a "notificado"
-        examsActualizados[i] = {
-          ...examsActualizados[i],
-          estado: "notificado",
-        };
+        examsParaActualizar[i].estado = "notificado";
+        seEnvioAlgunaNotificacion = true; 
 
-        logger.info(` Examen '${examenDespues.nombre}' marcado como notificado en memoria.`);
+        logger.info(`Examen '${examenDespues.nombre}' marcado como notificado en memoria.`);
       } catch (error) {
-        logger.error(` Error notificando examen '${examenDespues.nombre}':`, error);
+        logger.error(`Error notificando examen '${examenDespues.nombre}':`, error);
       }
     }
   }
 
-  //  Actualizamos el documento completo, solo si hubo cambios
-  await consultaRef.update({ examsRequested: examsActualizados });
 
-  logger.info(` Consulta ${event.params.consultaId} actualizada sin pérdida de datos.`);
+  if (seEnvioAlgunaNotificacion) {
+    await consultaRef.update({ examsRequested: examsParaActualizar });
+    logger.info(`Consulta ${event.params.consultaId} actualizada con estados de notificación.`);
+  }
+
   return null;
 }
 

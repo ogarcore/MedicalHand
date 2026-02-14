@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(390, 844), // 📱 Tamaño base (iPhone 12)
+      designSize: const Size(390, 844), 
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {

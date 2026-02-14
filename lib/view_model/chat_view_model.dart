@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:p_hn25/data/models/message_model.dart';
+import 'package:p_hn25/data/network/database_service.dart';
 import 'package:p_hn25/data/network/gemini_service.dart';
 
 class ChatViewModel extends ChangeNotifier {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+ final _firestore = DatabaseService.instance;
   final GeminiService _geminiService = GeminiService();
 
   List<Message> _messages = [];

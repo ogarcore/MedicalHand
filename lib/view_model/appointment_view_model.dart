@@ -1,15 +1,15 @@
-// lib/view_model/appointment_view_model.dart
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:p_hn25/data/network/database_service.dart';
 import 'package:p_hn25/data/network/notification_service.dart';
 import '../data/models/cita_model.dart';
 import '../data/models/hospital_model.dart';
 
 class AppointmentViewModel extends ChangeNotifier {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+ final _firestore = DatabaseService.instance;
   final NotificationService _notificationService = NotificationService.instance;
 
   CitaModel? initialDashboardAppointment;
@@ -84,7 +84,7 @@ Future<CitaModel?> getAppointmentById(String appointmentId) async {
           .get();
       final hospitals = snapshot.docs.map((doc) {
         return HospitalModel(
-          id: doc.data()['hospitalId'] as String,
+          id: doc.data()[''] as String,
           name: doc.data()['name'] as String,
           location: doc.data()['location'] as GeoPoint,
         );
@@ -153,7 +153,7 @@ Future<CitaModel?> getAppointmentById(String appointmentId) async {
     try {
       final querySnapshot = await _firestore
           .collection('citas')
-          .where('uid', isEqualTo: userId) // Corregido de 'userId' a 'uid'
+          .where('uid', isEqualTo: userId) 
           .where(
             'status',
             whereIn: ['confirmada', 'pendiente', 'pendiente_reprogramacion'],
@@ -364,7 +364,8 @@ Future<CitaModel?> getAppointmentById(String appointmentId) async {
   }
 
 Stream<DocumentSnapshot> getVirtualQueueStream(String queueDocId) {
-  return FirebaseFirestore.instance
+  // CAMBIO HECHO AQUÍ:
+  return DatabaseService.instance
       .collection('filas_virtuales')
       .doc(queueDocId)
       .snapshots();
@@ -418,7 +419,7 @@ Stream<DocumentSnapshot> getManagedQueueStream(String queueDocId, String userId)
   }
 
 Stream<DocumentSnapshot> getPatientQueueStream(String queueDocId, String userId) {
-  return FirebaseFirestore.instance
+  return DatabaseService.instance
       .collection('filas_virtuales')
       .doc(queueDocId)
       .collection('pacientes')

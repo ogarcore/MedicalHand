@@ -5,10 +5,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:p_hn25/data/models/user_model.dart';
+import 'package:p_hn25/data/network/database_service.dart';
 import 'package:p_hn25/data/network/firebase_storage_service.dart';
 
 class FamilyViewModel extends ChangeNotifier {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+ final _firestore = DatabaseService.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorageService _storageService = FirebaseStorageService();
 
@@ -99,7 +100,6 @@ class FamilyViewModel extends ChangeNotifier {
         sex: 'No especificado',
         phoneNumber: phoneController.text.trim(),
         address: addressController.text.trim(),
-        // CAMBIO: Se añade la información médica al mapa
         medicalInfo: {
           'kinship': selectedKinship,
           'bloodType': bloodTypeController.text.trim(),
@@ -135,13 +135,11 @@ class FamilyViewModel extends ChangeNotifier {
     birthDateController.clear();
     phoneController.clear();
     addressController.clear();
-    // CAMBIO: Se limpian los nuevos controladores
     bloodTypeController.clear();
     allergiesController.clear();
     selectedKinship = null;
     idFrontImage = null;
     idBackImage = null;
-    // Notificamos para que el dropdown se resetee en la UI si es necesario
     notifyListeners();
   }
 

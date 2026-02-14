@@ -60,7 +60,7 @@ class _DashboardViewState extends State<DashboardView> {
       }
 
       if (updatedAppointment.status == 'en_fila' ||
-          updatedAppointment.status == 'terminada' ||updatedAppointment.status == 'asistencia_confirmada' ) {
+          updatedAppointment.status == 'terminada') {
         timer.cancel();
         return;
       }

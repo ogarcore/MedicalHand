@@ -7,13 +7,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/data/models/user_model.dart';
+import 'package:p_hn25/data/network/database_service.dart';
 import 'package:p_hn25/view/widgets/custom_modal.dart';
 import 'package:p_hn25/view_model/family_view_model.dart';
 import 'package:p_hn25/view_model/user_view_model.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 // --- IMPORTS AÑADIDOS PARA LA NAVEGACIÓN ---
 import 'edit_family_member_info_screen.dart';
@@ -55,15 +55,17 @@ class _FamilyMemberProfileScreenState extends State<FamilyMemberProfileScreen> {
     );
 
     // Cuando regresa, si la pantalla sigue existiendo, busca los datos actualizados.
-    if (mounted) {
-      final doc = await FirebaseFirestore.instance.collection('usuarios_movil').doc(_currentMember.uid).get();
-      if (doc.exists) {
-        // Actualiza el estado con los nuevos datos para refrescar la UI.
-        setState(() {
-          _currentMember = UserModel.fromFirestore(doc);
-        });
-      }
-    }
+   if (mounted) {
+  // CAMBIO HECHO AQUÍ: Apuntando al servicio de la BD 'medicalhand'
+  final doc = await DatabaseService.instance.collection('usuarios_movil').doc(_currentMember.uid).get();
+  
+  if (doc.exists) {
+    // Actualiza el estado con los nuevos datos para refrescar la UI.
+    setState(() {
+      _currentMember = UserModel.fromFirestore(doc);
+    });
+  }
+}
   }
 
   String _formatDateOfBirth(UserModel user) {
