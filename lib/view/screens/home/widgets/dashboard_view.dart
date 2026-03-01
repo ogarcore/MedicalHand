@@ -112,21 +112,6 @@ class _DashboardViewState extends State<DashboardView> {
     );
   }
 
-  /// **Widget corregido para evitar el parpadeo del dashboard.**
-  ///
-  /// El problema original era que durante la carga inicial (`ConnectionState.waiting`),
-  /// el `StreamBuilder` devolvía *únicamente* el widget `_DashboardLoadingShimmer`,
-  /// omitiendo el resto del contenido (botones, tarjeta de IA, etc.).
-  /// Al completarse la carga, reconstruía el widget tree con *todos* los elementos,
-  /// causando un salto en la UI (el "parpadeo").
-  ///
-  /// **Solución:**
-  /// La nueva lógica asegura que la estructura base del `Column` (que contiene
-  /// el `AnimatedSwitcher`, los botones y demás widgets) se renderice *siempre*.
-  /// La condición de carga inicial ahora decide qué widget se mostrará *dentro*
-  /// del `AnimatedSwitcher` (el shimmer o la tarjeta real), pero nunca altera
-  /// la estructura principal que está por debajo. Esto mantiene el layout estable
-  /// y la animación de carga contenida únicamente en el área de la tarjeta.
   Widget _buildDashboardContent(BuildContext context, UserModel activeProfile) {
     final appointmentViewModel = context.watch<AppointmentViewModel>();
 

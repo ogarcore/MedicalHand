@@ -6,7 +6,7 @@ import 'package:p_hn25/data/models/message_model.dart';
 class GeminiService {
   final String _apiKey = geminiApiKey;
 
-  final String _model = 'models/gemini-2.0-flash';
+  final String _model = 'models/gemini-2.5-flash';
 
   Future<String> generateContent(List<Message> history, String prompt) async {
     final url = Uri.parse(
@@ -26,7 +26,11 @@ Tus capacidades principales son las siguientes.
 
 Primero, dar consejos de bienestar. Ofrece consejos generales sobre hidratación, ejercicio, dieta balanceada y hábitos saludables.
 
-Segundo, guiar sobre el uso de la app. Ayuda a los usuarios a entender cómo usar MedicalHand. Para agendar una nueva cita, explícales que deben ir a la sección 'Agendar Cita'. Detalla que el proceso les pedirá seleccionar primero su ubicación o departamento, luego el hospital de su preferencia que esté disponible en esa zona, y finalmente escribir el motivo de su consulta. También puedes explicarles cómo revisar su historial de citas en la sección 'Mis Citas' y su historial básico en el apartado de mi historial.
+Segundo, guía a los usuarios sobre el uso de la app. Ayúdales a entender cómo utilizar MedicalHand de manera sencilla. Para agendar una nueva cita, explícales que deben ingresar a la sección “Agendar Cita”. Allí encontrarán disponible la opción de Cita de Consulta General, ya que la atención está configurada automáticamente en la Clínica Sierra Maestra.
+
+Indícales que deben seleccionar la cita de Consulta General, escribir el motivo de su consulta y continuar. Finalmente, la aplicación les mostrará un resumen con los detalles ingresados antes de confirmar la solicitud.
+
+También puedes orientarles sobre cómo revisar sus citas en la sección “Mis Citas” y consultar su historial básico en el apartado “Mi Historial”.
 
 Tercero, orientar sobre síntomas con mucha precaución. Puedes interpretar síntomas de manera general y educativa. Por ejemplo, si alguien menciona 'dolor de cabeza y congestión', puedes explicar que 'comúnmente esos síntomas se asocian a resfriados o alergias'.
 
@@ -117,10 +121,17 @@ Mantén siempre un tono amigable, profesional y claro. No uses asteriscos ni nin
             }
           }
           return 'No se recibió una respuesta válida del modelo.';
-        } else if (response.statusCode == 429 || response.statusCode == 503) {
-          // errores transitorios → reintentar
+        } else if (response.statusCode == 429) {
+          // error de cuota o límite de peticiones
           if (attempt == maxRetries - 1) {
-            return 'El servicio está ocupado. Inténtalo nuevamente en unos momentos.';
+            return 'Límite de cuota excedido (Error 429). Por favor revisa los límites de tu API Key o si está siendo usada por muchas personas.';
+          }
+          await Future.delayed(Duration(seconds: delaySeconds));
+          delaySeconds *= 2;
+        } else if (response.statusCode == 503) {
+          // error de servicio ocupado
+          if (attempt == maxRetries - 1) {
+            return 'El servicio está ocupado de parte de Google. Inténtalo nuevamente en unos momentos.';
           }
           await Future.delayed(Duration(seconds: delaySeconds));
           delaySeconds *= 2;

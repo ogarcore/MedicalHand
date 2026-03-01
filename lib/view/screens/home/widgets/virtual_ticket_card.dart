@@ -13,6 +13,9 @@ class VirtualTicketCard extends StatelessWidget {
   const VirtualTicketCard({super.key, required this.appointment});
 
   String _getQueueDocId() {
+    if (appointment.queueDocId != null) {
+      return appointment.queueDocId!;
+    }
     final specialty = (appointment.specialty ?? '').replaceAll(' ', '');
     final hospitalId = appointment.idHospital;
     final formattedDate = DateFormat('dd-MM-yyyy').format(DateTime.now());

@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-// lib/view/screens/home/widgets/ai_chat_card.dart
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';

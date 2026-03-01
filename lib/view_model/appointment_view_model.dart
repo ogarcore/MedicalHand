@@ -330,7 +330,10 @@ Future<CitaModel?> getAppointmentById(String appointmentId) async {
         });
 
         // Actualizamos el estado de la cita original.
-        transaction.update(appointmentRef, {'status': 'en_fila'});
+        transaction.update(appointmentRef, {
+          'status': 'en_fila',
+          'queueDocId': queueDocId,
+        });
 
         return nextTurn;
       });
@@ -373,14 +376,20 @@ Future<CitaModel?> getAppointmentById(String appointmentId) async {
     });
   }
 
-Stream<DocumentSnapshot> getVirtualQueueStream(String queueDocId) {
-  // CAMBIO HECHO AQUÍ:
-  return DatabaseService.instance
-      .collection('filas_virtuales')
-      .doc(queueDocId)
-      .snapshots();
-}
-Stream<DocumentSnapshot> getManagedQueueStream(String queueDocId, String userId) {
+  Stream<DocumentSnapshot> getVirtualQueueStream(String? queueDocId) {
+    if (queueDocId == null) {
+      return Stream.empty();
+    }
+    return DatabaseService.instance
+        .collection('filas_virtuales')
+        .doc(queueDocId)
+        .snapshots();
+  }
+  Stream<DocumentSnapshot> getManagedQueueStream(
+      String? queueDocId, String userId) {
+    if (queueDocId == null) {
+      return Stream.empty();
+    }
     late StreamSubscription patientSubscription;
     late StreamSubscription queueSubscription;
     final controller = StreamController<DocumentSnapshot>();
@@ -428,14 +437,18 @@ Stream<DocumentSnapshot> getManagedQueueStream(String queueDocId, String userId)
     return controller.stream;
   }
 
-Stream<DocumentSnapshot> getPatientQueueStream(String queueDocId, String userId) {
-  return DatabaseService.instance
-      .collection('filas_virtuales')
-      .doc(queueDocId)
-      .collection('pacientes')
-      .doc(userId)
-      .snapshots();
-}
+  Stream<DocumentSnapshot> getPatientQueueStream(
+      String? queueDocId, String userId) {
+    if (queueDocId == null) {
+      return Stream.empty();
+    }
+    return DatabaseService.instance
+        .collection('filas_virtuales')
+        .doc(queueDocId)
+        .collection('pacientes')
+        .doc(userId)
+        .snapshots();
+  }
 
   void listenToNextAppointment(String userId) {
     if (_listeningForUserId == userId) return;

@@ -5,7 +5,6 @@ import 'package:p_hn25/app/core/constants/app_colors.dart';
 import 'package:p_hn25/view_model/chat_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'widgets/chat_bubble.dart';
 import 'widgets/chat_disclaimer_banner.dart';
 import 'widgets/chat_info_dialog.dart';

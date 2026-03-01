@@ -16,9 +16,9 @@ class SupportScreen extends StatelessWidget {
             'La Fila Virtual se activa automáticamente el día de tu cita. La aplicación te notificará cuando se acerque tu turno para que puedas dirigirte a la sala de espera. Ya no necesitas hacer un registro manual al llegar; el sistema te gestiona para minimizar tu tiempo en el hospital.',
       },
       {
-        'question': '¿Cómo puedo reprogramar o cancelar una cita?',
+        'question': '¿Cómo puedo cancelar una cita?',
         'answer':
-            'Ve a la sección "Mis Citas" y busca la cita en la pestaña "Próximas". Toca el ícono de opciones (los tres puntos) en la tarjeta de la cita. Se desplegará un menú donde podrás seleccionar "Reprogramar" para solicitar un cambio de fecha, o "Cancelar" para anularla.',
+            'Ve a la sección "Mis Citas" y busca la cita en la pestaña "Próximas". Toca el ícono de opciones en la tarjeta de la cita. Se desplegará un menú donde podrás seleccionar "Cancelar" para anularla.',
       },
       {
         'question': '¿Cómo cambio para gestionar el perfil de un familiar?',

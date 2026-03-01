@@ -2,10 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:p_hn25/app/core/constants/app_colors.dart';
-import 'package:p_hn25/app/core/utils/validators.dart';
 import 'package:p_hn25/view/widgets/custom_modal.dart';
 import 'package:p_hn25/data/models/cita_model.dart';
-import 'package:p_hn25/view/widgets/custom_text_field.dart';
 import 'package:p_hn25/view_model/appointment_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -185,57 +183,6 @@ class _AppointmentCardState extends State<AppointmentCard> {
     );
   }
 
-  void _rescheduleAppointment() {
-    final viewModel = Provider.of<AppointmentViewModel>(context, listen: false);
-    final reasonController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
-
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return CustomModal(
-          title: 'reprogramacin'.tr(),
-          subtitle:
-              'Tu cita volverá al estado "Pendiente" para que el hospital te asigne una nueva fecha.',
-          icon: HugeIcons.strokeRoundedRepeat,
-          content: Form(
-            key: formKey,
-            child: CustomTextField(
-              labelText: 'motivo_de_la_reprogramacin'.tr(),
-              icon: HugeIcons.strokeRoundedAlertDiamond,
-              controller: reasonController,
-              hintText: 'explica_brevemente_por_qu_necesitas_el_cambio'.tr(),
-              maxLines: 3,
-              validator: AppValidators.validateRescheduleReason,
-            ),
-          ),
-          actions: [
-            ModalButton(
-              text: 'cancelar'.tr(),
-              onPressed: () => Navigator.of(ctx).pop(),
-            ),
-            ModalButton(
-              text: 'aceptar'.tr(),
-              onPressed: () {
-                if (formKey.currentState!.validate()) {
-                  Navigator.of(ctx).pop();
-                  viewModel.requestReschedule(
-                    appointmentId: widget.appointment.id!,
-                    reason: reasonController.text.trim(),
-                    previousDate: widget.appointment.assignedDate!,
-                  );
-                  _showConfirmationSnackBar(
-                    'Solicitud de reprogramación enviada.',
-                  );
-                }
-              },
-              isPrimary: true,
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   String _formatDate() {
     if (widget.appointment.status == 'pendiente' ||
@@ -639,32 +586,6 @@ class _AppointmentCardState extends State<AppointmentCard> {
                     ),
                     child: Row(
                       children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: _rescheduleAppointment,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.accentColor(
-                                context,
-                              ).withAlpha(200),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 1,
-                              shadowColor: AppColors.accentColor(
-                                context,
-                              ).withAlpha(100),
-                            ),
-                            child: Text(
-                              'reprogramar'.tr(),
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ),
-                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: ElevatedButton(

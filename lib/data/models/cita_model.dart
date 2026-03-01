@@ -24,6 +24,7 @@ class CitaModel {
   final bool? reminder24hSent;
   final bool? reminder48hSent;
   final GeoPoint? hospitalLocation;
+  final String? queueDocId;
 
   CitaModel({
     this.id,
@@ -49,6 +50,7 @@ class CitaModel {
     this.reminder24hSent,
     this.reminder48hSent,
     this.hospitalLocation,
+    this.queueDocId,
   });
 
   Map<String, dynamic> toMap() {
@@ -77,6 +79,7 @@ class CitaModel {
       'reminder24hSent': reminder24hSent,
       'reminder48hSent': reminder48hSent,
       'hospitalLocation': hospitalLocation,
+      'queueDocId': queueDocId,
     };
   }
 
@@ -114,6 +117,7 @@ class CitaModel {
       hospitalLocation: data['hospitalLocation'] is GeoPoint
           ? data['hospitalLocation'] as GeoPoint
           : null,
+      queueDocId: data['queueDocId'],
     );
   }
 
